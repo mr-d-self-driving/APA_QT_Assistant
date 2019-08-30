@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "QCustomPlot\qcustomplot.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QCustomPlot *mPlot;
+    QTimer mDataTimer50ms;
 };
 
 #endif // MAINWINDOW_H
