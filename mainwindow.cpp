@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // 设置第0列与第1列的比例为1：9
     main_layout->setColumnStretch(0,1);
     main_layout->setColumnStretch(1,9);
+    main_layout->setColumnMinimumWidth(0,100);
 
     QWidget *mian_widget = new QWidget();
 
