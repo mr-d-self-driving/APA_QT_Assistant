@@ -20,6 +20,10 @@ private:
     Ui::MainWindow *ui;
     QCustomPlot *mPlot;
     QTimer mDataTimer50ms;
+
+private slots:
+    void ProcessItemActiveState(QListWidgetItem *current, QListWidgetItem *previous);
+    void ProcessItemActiveState(QListWidgetItem *current);
 };
 
 #endif // MAINWINDOW_H
