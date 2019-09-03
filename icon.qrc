@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>Icon/active_car.png</file>
         <file>Icon/unactive_car.png</file>
+        <file>Icon/active_detect.png</file>
+        <file>Icon/unactive_detect.png</file>
+        <file>Icon/active_path.png</file>
+        <file>Icon/unactive_path.png</file>
     </qresource>
 </RCC>
