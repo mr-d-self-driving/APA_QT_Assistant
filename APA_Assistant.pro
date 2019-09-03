@@ -24,16 +24,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        WinZlgCan/can_rev_work_thread.cpp \
+        WinZlgCan/win_zlg_can.cpp \
         main.cpp \
         mainwindow.cpp \
         QCustomPlot/qcustomplot.cpp
 
 HEADERS += \
+        WinZlgCan/ControlCAN.h \
+        WinZlgCan/can_rev_work_thread.h \
+        WinZlgCan/win_zlg_can.h \
         mainwindow.h \
         QCustomPlot/qcustomplot.h
+
+LIBS += -L$$PWD/WinZlgCan/ -lControlCAN
 
 FORMS += \
         mainwindow.ui
 
 RESOURCES += \
     icon.qrc
+
+DISTFILES += \
+    WinZlgCan/ControlCAN.lib
