@@ -415,12 +415,32 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    mCanRevWorkThread.quit();
+    mWinZlgCan.CanClose();
     delete ui;
 }
 
 void MainWindow::sTimer20msTask(void)
 {
+    // calculate and add a new data point to each graph:
+    mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
+    mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);
 
+    // make key axis range scroll with the data:
+    mControlPlot->xAxis->rescale();
+    mControlGraph1->rescaleValueAxis(false, true);
+    mControlGraph2->rescaleValueAxis(false, true);
+    mControlPlot->xAxis->setRange(mControlPlot->xAxis->range().upper, 100, Qt::AlignRight);
+
+    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
+    double graph1Value = mControlGraph1->dataMainValue(mControlGraph1->dataCount()-1);
+    double graph2Value = mControlGraph2->dataMainValue(mControlGraph2->dataCount()-1);
+    mControlTag1->updatePosition(graph1Value);
+    mControlTag2->updatePosition(graph2Value);
+    mControlTag1->setText(QString::number(graph1Value, 'f', 2));
+    mControlTag2->setText(QString::number(graph2Value, 'f', 2));
+
+    mControlPlot->replot();
 }
 
 void MainWindow::sTimer20ms_Control(void)
