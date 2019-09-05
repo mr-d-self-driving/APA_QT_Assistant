@@ -1,15 +1,12 @@
 #ifndef CAN_REV_WORK_THREAD_H
 #define CAN_REV_WORK_THREAD_H
 
-#include <QObject>
+#include <QMainWindow>
 #include <QThread>
-#include <QWidget>
 #include <QMutex>
-#include <QDebug>
-//#include "vehicle.h"
-//#include "crc_compute.h"
 #include "./WinZlgCan/win_zlg_can.h"
-//#include "./base.h"
+#include "Percaption/Interface/percaption.h"
+#include "Interaction/HMI/Terminal.h"
 
 class CanRevWorkThread : public QThread
 {
@@ -33,24 +30,15 @@ protected:
     virtual void run();
 
 private:
-
     WinZlgCan _m_zlg_can;
     VCI_CAN_OBJ *_rev_can_data;
     QMutex lockMute;
-//    VehInfCA mVehInfCA;
 
-//    bool tFlagCA;
-
-//    // NXP
-//    bool tFlagLin;
-//    LIN_STP318_ReadData LinData318;
-//    LIN_STP313_ReadData LinData313;
-//    NXPCTRL NxpStatus;
-//    // added by zhn 20190801
-//    LaneInfo tLaneInfo;
-//    Obs tObs;
+    Terminal t_Terminal;
+    Percaption t_Percaption;
 
 signals:
+    void SendPercaptionMessage(Percaption *p);
 //    void TestSignal(VehInf,int);
 //    void NoData(int);
 //    void SendPInfo(int, int, int, MvParkSlot, int);
@@ -69,8 +57,6 @@ signals:
 //    void SendACK(int,int);
 //    void SendNxpPosition(int, int, int, int );
 //    void SendNxpUPosition(int, float, float, int );
-
-//// added by zhn 20190801
 //    void SendLaneInfo(LaneInfo);
 //    void SendWarningFlag(bool ,unsigned int);
 //    void SendObst(unsigned int, Obs);

@@ -1,10 +1,7 @@
 #ifndef WIN_ZLG_CAN_H
 #define WIN_ZLG_CAN_H
 
-#include <QObject>
-#include <QThread>
-#include <QWidget>
-#include <QMutex>
+#include <QMainWindow>
 #include <QLibrary>
 #include <QMessageBox>
 #include <stdlib.h>
