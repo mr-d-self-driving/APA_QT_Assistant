@@ -1,7 +1,5 @@
 #include "can_rev_work_thread.h"
 
-#define V_M_S (0.015625)
-
 CanRevWorkThread::CanRevWorkThread()
 {
 //    tFlagCA = false;
@@ -14,20 +12,10 @@ void CanRevWorkThread::run()
     while(1)
     {
         lockMute.lock();
-
         // CAN0 接收解码
         _rev_can_data = _m_zlg_can.CAN_Receive(0,&len);
-//        len = _m_zlg_can.CAN_Receive(0,&_rev_can_data);
         this->CAN0Parse(len,_rev_can_data);
         free(_rev_can_data);
-
-
-
-//        if(tFlagCA)
-//        {
-//            emit SendCAInfo(mVehInfCA);
-//            tFlagCA = false;
-//        }
 
         // CAN1 接收解码
         _rev_can_data = _m_zlg_can.CAN_Receive(1,&len);
@@ -40,7 +28,7 @@ void CanRevWorkThread::run()
         free(_rev_can_data);
 
         lockMute.unlock();
-        usleep(20);
+        msleep(10);
     }
 
 }
@@ -581,195 +569,6 @@ void CanRevWorkThread::CAN2Parse(uint32_t num,VCI_CAN_OBJ* packet)
 
 void CanRevWorkThread::NXP_PlatformParse(VCI_CAN_OBJ packet)
 {
-    switch (packet.ID)
-    {
-//        //Lin
-//        case 0x400://1
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//            emit SendSignal318(0, 1, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x401://2
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(0, 2, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x402://3
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(0, 3, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x403://4
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(0, 4, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x404://5
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(1, 1, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x405://6
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(1, 2, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x406://7
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(1, 3, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x407://8
-//            LinData318.status = (uint8_t)( packet.Data[6]);
-//            LinData318.TOF = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//    //                LinData318.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal318(1, 4, LinData318);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x408://9
-//            LinData313.status = (uint8_t)( packet.Data[6]);
-//            LinData313.TOF1 = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//            LinData313.TOF2 = (uint16_t)((uint16_t)((packet.Data[3] << 8) | packet.Data[2])*USS_K);
-//            LinData313.Level = (uint8_t)( packet.Data[4]*USS_K2);
-//            LinData313.Width = (uint8_t)( packet.Data[5]);
-//            LinData313.count  = LinData313.count+1;
-//    //                LinData313.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal313(0, 1, LinData313);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x409://10
-//            LinData313.status = (uint8_t)( packet.Data[6]);
-//            LinData313.TOF1 = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//            LinData313.TOF2 = (uint16_t)((uint16_t)((packet.Data[3] << 8) | packet.Data[2])*USS_K);
-//            LinData313.Level = (uint8_t)( packet.Data[4]*USS_K2);
-//            LinData313.Width = (uint8_t)( packet.Data[5]);
-//            LinData313.count  = LinData313.count+1;//(uint8_t)( packet.Data[7]);
-//            emit SendSignal313(0, 2, LinData313);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x40A://11
-//            LinData313.status = (uint8_t)( packet.Data[6]);
-//            LinData313.TOF1 = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//            LinData313.TOF2 = (uint16_t)((uint16_t)((packet.Data[3] << 8) | packet.Data[2])*USS_K);
-//            LinData313.Level = (uint8_t)( packet.Data[4]*USS_K2);
-//            LinData313.Width = (uint8_t)( packet.Data[5]);
-//            LinData313.count  = LinData313.count+1;
-//    //                LinData313.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal313(1, 1, LinData313);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x40B://12
-//            LinData313.status = (uint8_t)( packet.Data[6]);
-//            LinData313.TOF1 = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0])*USS_K);
-//            LinData313.TOF2 = (uint16_t)((uint16_t)((packet.Data[3] << 8) | packet.Data[2])*USS_K);
-//            LinData313.Level = (uint8_t)( packet.Data[4]*USS_K2);
-//            LinData313.Width = (uint8_t)( packet.Data[5]);
-//            LinData313.count  = LinData313.count+1;
-//    //                LinData313.count  = (uint8_t)( packet.Data[7]);
-//            emit SendSignal313(1, 2, LinData313);
-//            tFlagLin = true;
-//            break;
-
-//        case 0x416://ack
-//            emit SendACK((uint8_t)( packet.Data[0]), (uint8_t)( packet.Data[1]));
-//            tFlagLin = true;
-//            break;
-
-//        case 0x414:
-//        {
-//            signed short tmp;
-//            tmp = (int16_t)((int16_t)((packet.Data[3] << 8) | packet.Data[2]));
-//            NxpStatus.ACC = tmp*0.01;
-//            tmp = (int16_t)((int16_t)((packet.Data[5] << 8) | packet.Data[4]));
-//            NxpStatus.torque = tmp*0.01;
-//            uint16_t utmp = (uint16_t)((uint16_t)((packet.Data[7] << 8) | packet.Data[6]));
-//            NxpStatus.speed = utmp*0.01;
-//        }
-//        break;
-
-//        case 0x415:
-//        {
-//            uint16_t utmp;
-//            utmp = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0]));
-//            NxpStatus.distance = utmp*0.001;
-//            emit SendNxpCtlStauts(NxpStatus);
-//        }
-//        break;
-
-
-//        case 0x442://x,y,yaw
-//        {
-//            int x = (int16_t)((int16_t)((packet.Data[1] << 8) | packet.Data[0]));
-//            int y = (int16_t)((int16_t)((packet.Data[3] << 8) | packet.Data[2]));
-//            int yaw = (int16_t)((int16_t)((packet.Data[5] << 8) | packet.Data[4]));
-//            int count = (int16_t)((int16_t)((packet.Data[7] << 8) | packet.Data[6]));//(uint8_t)(packet.Data[6]);
-//            emit SendNxpPosition(x, y, yaw, count);
-//            tFlagLin = true;
-//        }break;
-
-//        case 0x448://ack
-//            emit SendNxpACK((uint8_t)( packet.Data[0]));
-//            tFlagLin = true;
-//            break;
-
-
-//        case 0x44D://三角定位最近距离
-//        {
-//            int nDistance = (uint16_t)((uint16_t)((packet.Data[1] << 8) | packet.Data[0]));
-//            int nStatus = (int16_t)(packet.Data[7]);
-//            float fDistance = nDistance * 0.0001;
-//            emit SendSignalD(fDistance,nStatus);
-//            tFlagLin = true;
-//        }
-//          break;
-
-//        case 0x480://position 0
-//        case 0x481://position 1
-//        case 0x482://position 2
-//        case 0x483://position 3
-//        case 0x484://position 4
-//        case 0x485://position 5
-//        case 0x486://position 6
-//        case 0x487://position 7
-//        case 0x488://position 8
-//        case 0x489://position 9
-//        case 0x48A://position 10
-//        case 0x48B://position 11
-//        {
-//            int nIndex =  packet.ID - 0x480;
-//            float x = 0.001 * ((int16_t)((packet.Data[1] << 8) | packet.Data[0]));
-//            float y = 0.001 * ((int16_t)((packet.Data[3] << 8) | packet.Data[2]));
-//            int status = (int16_t)(packet.Data[7]);
-
-//            emit SendNxpUPosition(nIndex,x,y,status);
-//            tFlagLin = true;
-//        }
-//        break;
-    default:
-        break;
-    }
+    t_Terminal.Parse(packet,&t_Percaption);
+    emit SendPercaptionMessage(&t_Percaption);
 }

@@ -232,6 +232,9 @@ MainWindow::MainWindow(QWidget *parent) :
     gVehicleControlInputGroup->setFixedHeight(160);
     gVehicleControlInputGroup->setLayout(gVehicleControlInputLayout);
 
+    button_timer_control = new QPushButton();
+    button_timer_control->setText("开始");
+
     /*** Control IO Layout ***/
     QGridLayout *gControl_IO_Layout = new QGridLayout();
     gControl_IO_Layout->addWidget(gCanGroup,0,0);
@@ -240,7 +243,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gControl_IO_Layout->addWidget(gVehicleVelocityGroup,3,0);
     gControl_IO_Layout->addWidget(gVehicleMotionGroup,4,0);
     gControl_IO_Layout->addWidget(gVehicleControlInputGroup,5,0);
-
+    gControl_IO_Layout->addWidget(button_timer_control,6,0);
     gControl_IO_Layout->setRowStretch(0,1);
     gControl_IO_Layout->setRowStretch(1,1);
     gControl_IO_Layout->setRowStretch(2,1);
@@ -248,8 +251,31 @@ MainWindow::MainWindow(QWidget *parent) :
     gControl_IO_Layout->setRowStretch(4,1);
     gControl_IO_Layout->setRowStretch(5,1);
     gControl_IO_Layout->setRowStretch(6,1);
+    gControl_IO_Layout->setRowStretch(7,1);
     // Plot 元素
     mControlPlot = new QCustomPlot();
+
+    // configure plot to have two right axes:
+    mControlPlot->yAxis->setTickLabels(false);
+    connect(mControlPlot->yAxis2, SIGNAL(rangeChanged(QCPRange)), mControlPlot->yAxis, SLOT(setRange(QCPRange))); // left axis only mirrors inner right axis
+    mControlPlot->yAxis2->setVisible(true);
+    mControlPlot->axisRect()->addAxis(QCPAxis::atRight);
+    mControlPlot->axisRect()->axis(QCPAxis::atRight, 0)->setPadding(30); // add some padding to have space for tags
+    mControlPlot->axisRect()->axis(QCPAxis::atRight, 1)->setPadding(30); // add some padding to have space for tags
+
+    mControlPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+    // create graphs:
+    mControlGraph1 = mControlPlot->addGraph(mControlPlot->xAxis, mControlPlot->axisRect()->axis(QCPAxis::atRight, 0));
+    mControlGraph2 = mControlPlot->addGraph(mControlPlot->xAxis, mControlPlot->axisRect()->axis(QCPAxis::atRight, 1));
+    mControlGraph1->setPen(QPen(QColor(250, 120, 0)));
+    mControlGraph2->setPen(QPen(QColor(0, 180, 60)));
+
+    // create tags with newly introduced AxisTag class (see axistag.h/.cpp):
+    mControlTag1 = new AxisTag(mControlGraph1->valueAxis());
+    mControlTag1->setPen(mControlGraph1->pen());
+    mControlTag2 = new AxisTag(mControlGraph2->valueAxis());
+    mControlTag2->setPen(mControlGraph2->pen());
+
     QGridLayout *gControlLayout = new QGridLayout();
     gControlLayout->addLayout(gControl_IO_Layout, 0, 0);
     gControlLayout->addWidget(mControlPlot, 0, 1);
@@ -258,15 +284,116 @@ MainWindow::MainWindow(QWidget *parent) :
     gControlLayout->setColumnMinimumWidth(0,100);
 
     /*** Detect UI ***/
+    label_FrontObstacle_Text = new QLabel();
+    label_FrontObstacle_Text->setText("前:");
+    label_FrontObstacleDistance_Value = new QLabel();
+    label_FrontObstacleDistance_Value->setText("0");
+    label_FrontObstacleRegion_Value = new QLabel();
+    label_FrontObstacleRegion_Value->setText("中间");
+    label_FrontObstacleStatus_Value = new QLabel();
+    label_FrontObstacleStatus_Value->setText("正常");
+
+    label_RearObstacle_Text = new QLabel();
+    label_RearObstacle_Text->setText("后:");
+    label_RearObstacleDistance_Value = new QLabel();
+    label_RearObstacleDistance_Value->setText("0");
+    label_RearObstacleRegion_Value = new QLabel();
+    label_RearObstacleRegion_Value->setText("中间");
+    label_RearObstacleStatus_Value = new QLabel();
+    label_RearObstacleStatus_Value->setText("正常");
+
+    QGridLayout *gObstacleDistanceLayout = new QGridLayout();
+    gObstacleDistanceLayout->addWidget(label_FrontObstacle_Text,0,0);
+    gObstacleDistanceLayout->addWidget(label_FrontObstacleDistance_Value,0,1);
+    gObstacleDistanceLayout->addWidget(label_FrontObstacleRegion_Value,0,2);
+    gObstacleDistanceLayout->addWidget(label_FrontObstacleStatus_Value,0,3);
+    gObstacleDistanceLayout->addWidget(label_RearObstacle_Text,1,0);
+    gObstacleDistanceLayout->addWidget(label_RearObstacleDistance_Value,1,1);
+    gObstacleDistanceLayout->addWidget(label_RearObstacleRegion_Value,1,2);
+    gObstacleDistanceLayout->addWidget(label_RearObstacleStatus_Value,1,3);
+
+    gObstacleDistanceLayout->setColumnStretch(0,1);
+    gObstacleDistanceLayout->setColumnStretch(1,3);
+    gObstacleDistanceLayout->setColumnStretch(2,2);
+    gObstacleDistanceLayout->setColumnStretch(3,2);
+
+    QGroupBox *gObstacleDistance = new QGroupBox();
+    gObstacleDistance->setTitle("避障距离");
+    gObstacleDistance->setFixedHeight(90);
+    gObstacleDistance->setLayout(gObstacleDistanceLayout);
+
+    QGridLayout *gDetect_Show_Layout = new QGridLayout();
+    gDetect_Show_Layout->addWidget(gObstacleDistance,0,0);
+    gDetect_Show_Layout->setRowStretch(0,1);
+    gDetect_Show_Layout->setRowStretch(1,1);
+
     mDetectPlot = new QCustomPlot();
+    // configure plot to have two right axes:
+    mDetectPlot->yAxis->setTickLabels(false);
+    connect(mDetectPlot->yAxis2, SIGNAL(rangeChanged(QCPRange)), mDetectPlot->yAxis, SLOT(setRange(QCPRange))); // left axis only mirrors inner right axis
+    mDetectPlot->yAxis2->setVisible(true);
+    mDetectPlot->axisRect()->addAxis(QCPAxis::atRight);
+    mDetectPlot->axisRect()->axis(QCPAxis::atRight, 0)->setPadding(30); // add some padding to have space for tags
+    mDetectPlot->axisRect()->axis(QCPAxis::atRight, 1)->setPadding(30); // add some padding to have space for tags
+
+    mDetectPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+    // create graphs:
+    mDetectGraph1 = mDetectPlot->addGraph(mDetectPlot->xAxis, mDetectPlot->axisRect()->axis(QCPAxis::atRight, 0));
+    mDetectGraph2 = mDetectPlot->addGraph(mDetectPlot->xAxis, mDetectPlot->axisRect()->axis(QCPAxis::atRight, 1));
+    mDetectGraph1->setPen(QPen(QColor(250, 120, 0)));
+    mDetectGraph2->setPen(QPen(QColor(0, 180, 60)));
+
+    // create tags with newly introduced AxisTag class (see axistag.h/.cpp):
+    mDetectTag1 = new AxisTag(mDetectGraph1->valueAxis());
+    mDetectTag1->setPen(mDetectGraph1->pen());
+    mDetectTag2 = new AxisTag(mDetectGraph2->valueAxis());
+    mDetectTag2->setPen(mDetectGraph2->pen());
+
+
     QGridLayout *gDetectLayout = new QGridLayout();
+    gDetectLayout->addLayout(gDetect_Show_Layout, 0,0);
     gDetectLayout->addWidget(mDetectPlot, 0, 1);
     gDetectLayout->setColumnStretch(0,1);
     gDetectLayout->setColumnStretch(1,9);
 
     /*** Path UI ***/
+    QLabel *label_VehicleInitPointX_Text = new QLabel();
+    label_VehicleInitPointX_Text->setText("X:");
+    QLabel *label_VehicleInitPointY_Text = new QLabel();
+    label_VehicleInitPointY_Text->setText("Y:");
+    QLabel *label_VehicleInitPointYaw_Text = new QLabel();
+    label_VehicleInitPointYaw_Text->setText("Yaw:");
+
+    QLineEdit *text_VehicleInitPointX = new QLineEdit();
+    text_VehicleInitPointX->setText("0");
+    QLineEdit *text_VehicleInitPointY = new QLineEdit();
+    text_VehicleInitPointY->setText("0");
+    QLineEdit *text_VehicleInitPointYaw = new QLineEdit();
+    text_VehicleInitPointYaw->setText("0");
+
+    QGridLayout *gVehicleInitPosition_Layout = new QGridLayout();
+    gVehicleInitPosition_Layout->addWidget(label_VehicleInitPointX_Text,0,0);
+    gVehicleInitPosition_Layout->addWidget(label_VehicleInitPointY_Text,1,0);
+    gVehicleInitPosition_Layout->addWidget(label_VehicleInitPointYaw_Text,2,0);
+
+    gVehicleInitPosition_Layout->addWidget(text_VehicleInitPointX,0,1);
+    gVehicleInitPosition_Layout->addWidget(text_VehicleInitPointY,1,1);
+    gVehicleInitPosition_Layout->addWidget(text_VehicleInitPointYaw,2,1);
+
+    QGroupBox *gVehicleInitPosition_Group = new QGroupBox();
+    gVehicleInitPosition_Group->setTitle("车辆初始位置");
+    gVehicleInitPosition_Group->setFixedHeight(90);
+    gVehicleInitPosition_Group->setLayout(gObstacleDistanceLayout);
+
+    QGridLayout *gPath_IO_Layout = new QGridLayout();
+    gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
+    gPath_IO_Layout->setRowStretch(0,1);
+    gPath_IO_Layout->setRowStretch(1,1);
+
+
     mPathPlot = new QCustomPlot();
     QGridLayout *gPathLayout = new QGridLayout();
+    gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
     gPathLayout->addWidget(mPathPlot, 0, 1);
     gPathLayout->setColumnStretch(0,1);
     gPathLayout->setColumnStretch(1,9);
@@ -297,37 +424,82 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(PMainWidget);
 
+
     /****************** single connect slot *********************/
     /*** List Widget ***/
     // list 选择变动与 stack widget 界面更新的连接
     connect(list_function,SIGNAL(currentRowChanged(int)),stack_Widget,SLOT(setCurrentIndex(int)));
     // list 的元素变化时相应图片激活状态切换
-    connect(list_function,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(ProcessItemActiveState(QListWidgetItem*,QListWidgetItem*)));
+    connect(list_function,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(sProcessItemActiveState(QListWidgetItem*,QListWidgetItem*)));
+
+    connect(&mDataTimer20ms,SIGNAL(timeout()),this,SLOT(sTimer20msTask()));
+    connect(button_timer_control,SIGNAL(clicked()),this,SLOT(sTimer20ms_Control()));
 
     /*** CAN Configure single connect ***/
     // CAN Connect single and the Slot
-    connect(button_CanConnect,SIGNAL(clicked()),this,SLOT(CAN_Connect()));
+    connect(button_CanConnect,SIGNAL(clicked()),this,SLOT(sCAN_Connect()));
     // CAN Open single and the Slot
-    connect(button_CanOpen,SIGNAL(clicked()),this,SLOT(CAN_Open()));
+    connect(button_CanOpen,SIGNAL(clicked()),this,SLOT(sCAN_Open()));
     // CAN Close single and the Slot
-    connect(button_CanClose,SIGNAL(clicked()),this,SLOT(CAN_Close()));
+    connect(button_CanClose,SIGNAL(clicked()),this,SLOT(sCAN_Close()));
 
+    connect(&mCanRevWorkThread,SIGNAL(SendPercaptionMessage(Percaption*)),this,SLOT(DisplayPercaption(Percaption*)));
+    // 定时器20ms
+    mDataTimer20ms.start(20);
 }
 
 MainWindow::~MainWindow()
 {
+    mCanRevWorkThread.quit();
+    mWinZlgCan.CanClose();
     delete ui;
 }
 
-void MainWindow::ProcessItemActiveState(QListWidgetItem *current, QListWidgetItem *previous)
+void MainWindow::sTimer20msTask(void)
 {
-    if(NULL == previous)
+    // calculate and add a new data point to each graph:
+    mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
+    mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);
+
+    // make key axis range scroll with the data:
+    mControlPlot->xAxis->rescale();
+    mControlGraph1->rescaleValueAxis(false, true);
+    mControlGraph2->rescaleValueAxis(false, true);
+    mControlPlot->xAxis->setRange(mControlPlot->xAxis->range().upper, 100, Qt::AlignRight);
+
+    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
+    double graph1Value = mControlGraph1->dataMainValue(mControlGraph1->dataCount()-1);
+    double graph2Value = mControlGraph2->dataMainValue(mControlGraph2->dataCount()-1);
+    mControlTag1->updatePosition(graph1Value);
+    mControlTag2->updatePosition(graph2Value);
+    mControlTag1->setText(QString::number(graph1Value, 'f', 2));
+    mControlTag2->setText(QString::number(graph2Value, 'f', 2));
+
+    mControlPlot->replot();
+}
+
+void MainWindow::sTimer20ms_Control(void)
+{
+    if(mDataTimer20ms.isActive())
+    {
+        mDataTimer20ms.stop();
+        button_timer_control->setText("开始");
+    }
+    else
+    {
+        mDataTimer20ms.start(20);
+        button_timer_control->setText("结束");
+    }
+}
+
+void MainWindow::sProcessItemActiveState(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    if(!previous)
     {
         current->setIcon(QIcon(":/Icon/active_car.png"));
     }
     else
     {
-//        qDebug("current Select id:%d;previous select id:%d",this->list_function->row(current),this->list_function->row(previous));
         switch (this->list_function->row(current)) {
             case 0:
                 current->setIcon(QIcon(":/Icon/active_car.png"));
@@ -363,11 +535,12 @@ void MainWindow::ProcessItemActiveState(QListWidgetItem *current, QListWidgetIte
     }
 }
 
-void MainWindow::CAN_Connect(void)
+void MainWindow::sCAN_Connect(void)
 {
     if(1 == mWinZlgCan.getConnectStatus())
     {
         mWinZlgCan.CanClose();
+        mCanRevWorkThread.quit();
         this->button_CanOpen->setEnabled(false);
         this->button_CanClose->setEnabled(false);
         this->button_CanConnect->setText("连接");
@@ -375,35 +548,74 @@ void MainWindow::CAN_Connect(void)
     else
     {
         mWinZlgCan.CanConnect();
-        this->button_CanOpen->setEnabled(true);
-        this->button_CanClose->setEnabled(true);
-        this->button_CanConnect->setText("断开");
+        if(1 == mWinZlgCan.getConnectStatus())
+        {
+            this->button_CanOpen->setEnabled(true);
+            this->button_CanClose->setEnabled(false);
+            this->button_CanConnect->setText("断开");
+        }
     }
 }
 
-void MainWindow::CAN_Open(void)
+void MainWindow::sCAN_Open(void)
 {
     if((0 == mWinZlgCan.CanOpen(0)) && (0 == mWinZlgCan.CanOpen(1)) && (0 == mWinZlgCan.CanOpen(2)))
     {
+        mCanRevWorkThread.start();
         mWinZlgCan.setOpenStatus(1);
-        this->button_CanConnect->setEnabled(false);
+        this->button_CanOpen->setEnabled(false);
         this->button_CanClose->setEnabled(true);
     }
     else
     {
-        QMessageBox::information(NULL, "错误", "CAN设备启动失败");
+        QMessageBox::information(this, "错误", "CAN设备启动失败");
         mWinZlgCan.setOpenStatus(0);
         this->button_CanClose->setEnabled(false);
-        this->button_CanConnect->setEnabled(false);
+        this->button_CanOpen->setEnabled(false);
     }
 }
 
-void MainWindow::CAN_Close(void)
+void MainWindow::sCAN_Close(void)
 {
     mWinZlgCan.CanReset(0);
     mWinZlgCan.CanReset(1);
     mWinZlgCan.CanReset(2);
     mWinZlgCan.setOpenStatus(0);
-    this->button_CanConnect->setEnabled(true);
+    mCanRevWorkThread.quit();
+    this->button_CanOpen->setEnabled(true);
     this->button_CanClose->setEnabled(false);
+}
+
+void MainWindow::DisplayPercaption(Percaption *p)
+{
+
+    label_FrontObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getFrontObstacleDistance().distance)));
+    label_FrontObstacleRegion_Value->setText(obstacle_region[p->getFrontObstacleDistance().region]);
+    label_FrontObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
+
+    label_RearObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getRearObstacleDistance().distance)));
+    label_RearObstacleRegion_Value->setText(obstacle_region[p->getRearObstacleDistance().region]);
+    label_RearObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
+
+    // calculate and add a new data point to each graph:
+//    mDetectGraph1->addData(mDetectGraph1->dataCount(), qSin(mDetectGraph1->dataCount()/50.0)+qSin(mDetectGraph1->dataCount()/50.0/0.3843)*0.25);
+//    mDetectGraph2->addData(mDetectGraph2->dataCount(), qCos(mDetectGraph2->dataCount()/50.0)+qSin(mDetectGraph2->dataCount()/50.0/0.4364)*0.15);
+    mDetectGraph1->addData(mDetectGraph1->dataCount(), static_cast<double>(p->getFrontObstacleDistance().distance));
+    mDetectGraph2->addData(mDetectGraph2->dataCount(), static_cast<double>(p->getRearObstacleDistance().distance));
+
+    // make key axis range scroll with the data:
+    mDetectPlot->xAxis->rescale();
+    mDetectGraph1->rescaleValueAxis(false, true);
+    mDetectGraph2->rescaleValueAxis(false, true);
+    mDetectPlot->xAxis->setRange(mDetectPlot->xAxis->range().upper, 100, Qt::AlignRight);
+
+    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
+    double graph1Value = mDetectGraph1->dataMainValue(mDetectGraph1->dataCount()-1);
+    double graph2Value = mDetectGraph2->dataMainValue(mDetectGraph2->dataCount()-1);
+    mDetectTag1->updatePosition(graph1Value);
+    mDetectTag2->updatePosition(graph2Value);
+    mDetectTag1->setText(QString::number(graph1Value, 'f', 2));
+    mDetectTag2->setText(QString::number(graph2Value, 'f', 2));
+
+    mDetectPlot->replot();
 }
