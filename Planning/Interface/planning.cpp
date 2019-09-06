@@ -7,7 +7,7 @@
 /* ---   -----------    ----------------    ---------------------            */
 /* 1.0	 Guohua Zhu     January 9 2019      Initial Version                  */
 /*****************************************************************************/
-#include <planning.h>
+#include "./Planning/Interface/planning.h"
 
 Planning::Planning() {
 	MinParkingLength.setContainer(this);

@@ -7,7 +7,7 @@
 /* ---   -----------    ----------------    ---------------------            */
 /* 1.0	 Guohua Zhu     January 16 2019      Initial Version                 */
 /*****************************************************************************/
-#include "algebraic_geometry.h"
+#include "./Common/Math/algebraic_geometry.h"
 
 AlgebraicGeometry::AlgebraicGeometry() {
 

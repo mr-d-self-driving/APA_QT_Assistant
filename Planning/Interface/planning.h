@@ -11,24 +11,23 @@
 #ifndef INTERFACE_PATH_PLANNING_H_
 #define INTERFACE_PATH_PLANNING_H_
 // Common
-#include "derivative.h"
-#include "property.h"
-#include "percaption.h"
+#include <QMainWindow>
+#include "./Common/Utils/Inc/property.h"
+#include "./Percaption/Interface/percaption.h"
 // math
 #include "math.h"
-#include "vector_2d.h"
-#include "vehicle_body.h"
-#include "algebraic_geometry.h"
+#include "./Common/Math/vector_2d.h"
+#include "./Common/Math/vehicle_body.h"
+#include "./Common/Math/algebraic_geometry.h"
 //configure
-#include "vehilce_config.h"
+#include "./Common/Configure/Configs/vehilce_config.h"
 // Controller
-#include "Interface/vehicle_controller.h"
+#include "./Interaction/CANBUS/Interface/vehicle_controller.h"
 //#include "ChangAn/chang_an_controller.h"
 // Track
-#include "../../VehicleState/GeometricTrack/geometric_track.h"
+#include "./Common/VehicleState/GeometricTrack/geometric_track.h"
 // perception
-#include "Ultrasonic.h"
-//#include "Terminal.h"
+#include "./Interaction/Ultrasonic/Ultrasonic.h"
 
 //state
 #define PARKING_FINISH        ( 1   ) // 泊车完成的状态标志

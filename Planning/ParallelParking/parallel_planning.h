@@ -12,8 +12,8 @@
 #ifndef PARALLELPARKING_PARALLEL_PLANNING_H_
 #define PARALLELPARKING_PARALLEL_PLANNING_H_
 
-#include "Terminal.h"
-#include "planning.h"
+#include "./Interaction/HMI/Terminal.h"
+#include "./Planning/Interface/planning.h"
 
 // 轨迹规划状态
 typedef enum _ParallelPlanningState

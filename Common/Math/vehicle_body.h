@@ -17,12 +17,13 @@
 #ifndef MATH_VEHICLE_BODY_H_
 #define MATH_VEHICLE_BODY_H_
 
-#include "derivative.h"
-#include "property.h"
-#include <vector_2d.h>
+#include <QMainWindow>
 #include "math.h"
-#include "vehilce_config.h"
-#include "algebraic_geometry.h"
+#include "./Common/Utils/Inc/property.h"
+#include "./Common/Math/vector_2d.h"
+#include "./Common/Math/algebraic_geometry.h"
+#include "./Common/Configure/Configs/vehilce_config.h"
+
 
 class VehicleBody {
 public:

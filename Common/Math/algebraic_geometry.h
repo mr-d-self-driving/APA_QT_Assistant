@@ -11,12 +11,12 @@
 #ifndef MATH_ALGEBRAIC_GEOMETRY_H_
 #define MATH_ALGEBRAIC_GEOMETRY_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "vector_2d.h"
-#include "solve_equation.h"
+#include <QMainWindow>
 #include "math.h"
-#include "vehilce_config.h"
+#include "./Common/Utils/Inc/property.h"
+#include "./Common/Math/vector_2d.h"
+#include "./Common/Math/solve_equation.h"
+#include "./Common/Configure/Configs/vehilce_config.h"
 
 typedef struct _Line
 {

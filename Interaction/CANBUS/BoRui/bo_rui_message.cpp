@@ -25,8 +25,8 @@ void BoRuiMessage::Init()
 
 void BoRuiMessage::Parse(const uint32_t id,const uint8_t *dat,const uint32_t lenght)
 {
-	uint8_t crc_temp,i;
-	uint8_t dat_temp[7];
+//	uint8_t crc_temp,i;
+//	uint8_t dat_temp[7];
 	switch(id)
 	{
 		case 0x2A0://eps status

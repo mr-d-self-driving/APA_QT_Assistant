@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include <solve_equation.h>
+#include "./Common/Math/solve_equation.h"
 
 SolveEquation::SolveEquation() {
 	// TODO Auto-generated constructor stub

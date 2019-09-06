@@ -11,9 +11,9 @@
 /* 1.0	 Guohua Zhu     January 21 2019      Add  Control State Machine      */
 /* 1.0	 Guohua Zhu     January 23 2019      Add  Control Other Machine      */
 /*****************************************************************************/
-#include "parallel_planning.h"
+#include "./Planning/ParallelParking/parallel_planning.h"
 
-Terminal m_ParallelPlanningTerminal;
+//Terminal m_ParallelPlanningTerminal;
 
 ParallelPlanning::ParallelPlanning() {
 	LineInit.setContainer(this);
@@ -63,12 +63,12 @@ void ParallelPlanning::Work(Percaption *p)
 			if( (0 == _trial_status) && (_reverse_cnt >= 9))//fail
 			{
 				Command = 0;
-				m_ParallelPlanningTerminal.EnterParkingPositionSend(_enter_parking, _reverse_cnt,0);
+//				m_ParallelPlanningTerminal.EnterParkingPositionSend(_enter_parking, _reverse_cnt,0);
 				_parallel_planning_state = WaitStart;
 			}
 			else
 			{
-				m_ParallelPlanningTerminal.EnterParkingPositionSend(_enter_parking, _reverse_cnt,0x5A);
+//				m_ParallelPlanningTerminal.EnterParkingPositionSend(_enter_parking, _reverse_cnt,0x5A);
 				_parallel_planning_state = FirstArcPlanning;
 			}
 			break;
@@ -458,7 +458,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 	{
 		case ParkingCenterAdjust:
 			ParkingCenterAdjustment(s,u);
-			m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
+//			m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 			_parking_complete_state = GearShiftJudge;
 			break;
 
@@ -568,7 +568,7 @@ int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageM
 void ParallelPlanning::ReversedTrial(Percaption *inf)
 {
 	// 车位信息发送
-	m_ParallelPlanningTerminal.ParkingMsgSend(inf,FrontMarginBoundary,RearMarginBoundary);
+//	m_ParallelPlanningTerminal.ParkingMsgSend(inf,FrontMarginBoundary,RearMarginBoundary);
 	/// 车辆初始位置信息
 	_init_parking.Center      = Vector2d(inf->PositionX,inf->PositionY);
 	_init_parking.AttitudeYaw = inf->AttitudeYaw;
@@ -596,7 +596,7 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	}
 	_parking_center_point = Vector2d( RearVirtualBoundary + (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.Y);
 
-	m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
+//	m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	// 根据车位长度，确定车辆最终的纵向位置
 	MinParkingLength = REAR_EDGE_TO_CENTER + sqrtf(powf(_plan_vehilce_config.RadiusFrontRight,2) - powf(MIN_LEFT_TURN_RADIUS + enter_point.Y,2));
 	if( inf->ParkingLength > (MinParkingLength + FrontMarginBoundary + RearMarginBoundary))//满足一次入库条件
@@ -609,7 +609,7 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 		_trial_status = 1;
 		rear_trial_body.Center = enter_point;
 		rear_trial_body.AttitudeYaw = 0.0f;
-		m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
+//		m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 	}
 	else//不满足一次入库，需多次尝试
 	{
@@ -623,8 +623,8 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 		rear_trial_body.AttitudeYaw = 0.0f;
 		rear_trial_arrary[_reverse_cnt]  = enter_point;
 
-		m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
-		m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
+//		m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
+//		m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 		while( (0 == _trial_status) && (_reverse_cnt < 9))
 		{
 			/*+--------------+----+----+----+*/
@@ -639,8 +639,8 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 			{
 				front_trial_body.OneTrial(-MIN_RIGHT_TURN_RADIUS, _parking_inside_rear_point);
 				rear_trial_body.OneTrial(MIN_LEFT_TURN_RADIUS, _parking_inside_front_point);
-				m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
-				m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
+//				m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
+//				m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 
 				front_trial_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
 				_plan_vehilce_config.EdgeRadius(MIN_LEFT_TURN_RADIUS);
@@ -655,8 +655,8 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 			{
 				front_trial_body.OneTrial(MIN_LEFT_TURN_RADIUS, _parking_inside_front_point);
 				rear_trial_body.OneTrial(-MIN_RIGHT_TURN_RADIUS, _parking_inside_rear_point);
-				m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
-				m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
+//				m_ParallelPlanningTerminal.FrontTrialPositionSend(front_trial_body,_reverse_cnt);
+//				m_ParallelPlanningTerminal.RearTrialPositionSend(rear_trial_body,_reverse_cnt);
 
 				rear_trial_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
 				_plan_vehilce_config.EdgeRadius(MIN_LEFT_TURN_RADIUS);
@@ -717,20 +717,20 @@ void ParallelPlanning::TurnningPoint()
 	_ahead_distance = - K * _line_init_circle_right_turn.SteeringAngle * 0.5;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_init_circle_right_turn.Point = _line_init_circle_right_tangent + Ahead.rotate(_line_init.Angle);
-	m_ParallelPlanningTerminal.TurnPointSend(_line_init_circle_right_turn,0);
+//	m_ParallelPlanningTerminal.TurnPointSend(_line_init_circle_right_turn,0);
 	// turning arc:sencond point
 	ahead_angle = _ahead_distance / _circle_right.Radius;
 	_line_middle_circle_right_turn.Point = _circle_right.Center +
    (_line_middle_circle_right_tangent    - _circle_right.Center).rotate(-ahead_angle);
 	_line_middle_circle_right_turn.SteeringAngle = 0;
 	_line_middle_circle_right_turn.Yaw = _line_middle.Angle;
-	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_right_turn,1);
+//	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_right_turn,1);
 	// line:third point
 	_line_middle_circle_left_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(_circle_left.Radius);
 	_ahead_distance = K* _line_middle_circle_left_turn.SteeringAngle * 0.5;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_middle_circle_left_turn.Point = _line_middle_circle_left_tangent + Ahead.rotate(_line_middle.Angle);
-	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_left_turn,2);
+//	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_left_turn,2);
 }
 
 /**************************************************************************************************/

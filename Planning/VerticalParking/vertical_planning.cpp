@@ -9,7 +9,7 @@
 /*****************************************************************************/
 #include "vertical_planning.h"
 
-Terminal m_VerticalPlanningTerminal;
+//Terminal m_VerticalPlanningTerminal;
 
 VerticalPlanning::VerticalPlanning() {
 	LineInit.setContainer(this);
@@ -1058,7 +1058,7 @@ int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 	_line_init.Angle   = inf->AttitudeYaw;
 
 	// 车位信息发送
-	m_VerticalPlanningTerminal.ParkingMsgSend(inf,FrontMarginBoundary,RearMarginBoundary);
+//	m_VerticalPlanningTerminal.ParkingMsgSend(inf,FrontMarginBoundary,RearMarginBoundary);
 	FrontVirtualBoundary =  inf->ParkingLength - FrontMarginBoundary;
 	RearVirtualBoundary  = RearMarginBoundary;
 
@@ -1068,7 +1068,7 @@ int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 	// TODO _parking_center_point 可以放到 Planning 类中
 	_parking_center_point.X = (FrontVirtualBoundary + RearVirtualBoundary) * 0.5;
 	_parking_center_point.Y = -FRONT_EDGE_TO_CENTER;
-	m_VerticalPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
+//	m_VerticalPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	_line_center.Point = _parking_center_point;
 	_line_center.Angle = PI_2;
 
@@ -1117,14 +1117,14 @@ void VerticalPlanning::EnterTrial(Line l_init)
 		_ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_init_circle_parking_enter_turn.Point = _line_init_circle_parking_enter_tangent + Ahead.rotate(_line_init.Angle);
-		m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
+//		m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
 
 		// 第二个转向点计算
 		ahead_angle = _ahead_distance / _circle_parking_enter.Radius;
 		_line_center_circle_parking_enter_turn.Point = _circle_parking_enter.Center +
 				(_line_center_circle_parking_enter_tangent - _circle_parking_enter.Center).rotate(-ahead_angle);
 		_line_center_circle_parking_enter_turn.SteeringAngle = 0;
-		m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
+//		m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
 	}
 	else// 不能一次入库，需要尝试
 	{
@@ -1151,26 +1151,26 @@ void VerticalPlanning::EnterTrial(Line l_init)
 		_ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_to_circle_enter_turn.Point = _init_circle_tangent + Ahead.rotate(_line_init.Angle);
-		m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,0);
+//		m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,0);
 
 		// 停车点,以切点的形式进行发送
 		_circle_enter_stop_point_turn.Point = _enter_circle_stop_Line.Point;
 		_circle_enter_stop_point_turn.Yaw   = _enter_circle_stop_Line.Angle;
 		_circle_enter_stop_point_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(_circle_outer.Radius);
-		m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,1);
+//		m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,1);
 
 		// 第二个转向点计算
 		ahead_angle = _ahead_distance / _circle_outer.Radius;
 		_circle_outer_to_line_turn.Point = _circle_outer.Center +
 		(_outer_enter_circle_line_tangent.Point - _circle_outer.Center).rotate(-ahead_angle);
 		_circle_outer_to_line_turn.SteeringAngle = 0;
-		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,2);
+//		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,2);
 
 		_next_stage_line_init_circle_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
 		_ahead_distance = - K * _next_stage_line_init_circle_enter_turn.SteeringAngle * 0.5;
 		Ahead = Vector2d(_ahead_distance,0);
 		_next_stage_line_init_circle_enter_turn.Point = _outer_enter_circle_line_tangent.Point + Ahead.rotate( _outer_enter_circle_line_tangent.Angle );
-		m_VerticalPlanningTerminal.TurnPointSend(_next_stage_line_init_circle_enter_turn,3);
+//		m_VerticalPlanningTerminal.TurnPointSend(_next_stage_line_init_circle_enter_turn,3);
 	}
 }
 
@@ -1193,13 +1193,13 @@ void VerticalPlanning::EnterTrialWithMargin(Line l_init)
 	_ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_to_circle_enter_turn.Point = _init_circle_tangent + Ahead.rotate(_line_init.Angle);
-	m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,0);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,0);
 
 	// 停车点,以切点的形式进行发送
 	_circle_enter_stop_point_turn.Point         = _enter_circle_stop_Line.Point;
 	_circle_enter_stop_point_turn.Yaw           = _enter_circle_stop_Line.Angle;
 	_circle_enter_stop_point_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(_circle_outer.Radius);
-	m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,1);
+//	m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,1);
 }
 
 void VerticalPlanning::OuterAndEnterTrial(Line l_init)
@@ -1231,14 +1231,14 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 		_ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_init_circle_parking_enter_turn.Point = _line_init_circle_parking_enter_tangent + Ahead.rotate( (_circle_enter.Center - _circle_outer.Center).Angle() + PI_2);
-		m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
+//		m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
 
 		// 第二个转向点计算
 		ahead_angle = _ahead_distance / _circle_enter.Radius;
 		_line_center_circle_parking_enter_turn.Point = _circle_enter.Center +
 				(_line_center_circle_parking_enter_tangent - _circle_enter.Center).rotate(-ahead_angle);
 		_line_center_circle_parking_enter_turn.SteeringAngle = 0;
-		m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
+//		m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
 
 		// 使出转向点计算
 		_stop_point_steering_angle = _plan_vehilce_config.SteeringAngleCalculate(_circle_outer.Radius);
@@ -1247,7 +1247,7 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 		_circle_outer_to_line_turn.Point = _circle_outer.Center +
        (_line_init_circle_parking_enter_tangent - _circle_outer.Center).rotate(-ahead_angle);
 		_circle_outer_to_line_turn.SteeringAngle = 0;
-		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,2);
+//		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,2);
 
 //		temp_turn.Point = _line_init_circle_parking_enter_tangent;
 //		temp_turn.SteeringAngle = 0;
@@ -1273,20 +1273,20 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
        (_outer_enter_circle_line_tangent.Point - _circle_outer.Center).rotate(-ahead_angle);
 		_circle_outer_to_line_turn.SteeringAngle = 0;
 		_circle_outer_to_line_turn.Yaw = _outer_enter_circle_line_tangent.Angle;
-		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,0);
+//		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,0);
 
 		// 驶入转向点计算
 		_line_to_circle_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
 		_ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_to_circle_enter_turn.Point = _outer_enter_circle_line_tangent.Point + Ahead.rotate(_outer_enter_circle_line_tangent.Angle);
-		m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,1);
+//		m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,1);
 
 		// 停车点,以切点的形式进行发送
 		_circle_enter_stop_point_turn.Point = _enter_circle_stop_Line.Point;
 		_circle_enter_stop_point_turn.Yaw   = _enter_circle_stop_Line.Angle;
 		_circle_enter_stop_point_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(_circle_outer.Radius);
-		m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,2);
+//		m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,2);
 	}
 }
 
@@ -1304,14 +1304,14 @@ void VerticalPlanning::PlanningArc(Line l_init)
 	_ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_init_circle_parking_enter_turn.Point = _line_init_circle_parking_enter_tangent + Ahead.rotate(_line_init.Angle);
-	m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
 
 	// 第二个转向点计算
 	ahead_angle = _ahead_distance / _circle_parking_enter.Radius;
 	_line_center_circle_parking_enter_turn.Point = _circle_parking_enter.Center +
 			(_line_center_circle_parking_enter_tangent - _circle_parking_enter.Center).rotate(-ahead_angle);
 	_line_center_circle_parking_enter_turn.SteeringAngle = 0;
-	m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
 }
 
 void VerticalPlanning::TransitionCurve(Percaption *inf)
@@ -1359,28 +1359,28 @@ void VerticalPlanning::TransitionCurve(Percaption *inf)
 	_ahead_distance = K * _line_init_circle_transition_turn.SteeringAngle * 0.5;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_init_circle_transition_turn.Point = _line_init_circle_transition_tangent + Ahead.rotate(_line_init.Angle);
-	m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_transition_turn,0);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_transition_turn,0);
 
 	// 第二个转向点计算
 	ahead_angle = _ahead_distance / _circle_transition.Radius;
 	_line_middle_circle_transition_turn.Point = _circle_transition.Center +
 			                                  ( _line_middle_circle_transition_tangent - _circle_transition.Center).rotate(ahead_angle);
 	_line_middle_circle_transition_turn.SteeringAngle = 0;
-	m_VerticalPlanningTerminal.TurnPointSend(_line_middle_circle_transition_turn,1);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_middle_circle_transition_turn,1);
 
 	// 第三个转向点计算
 	_line_middle_circle_parking_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_parking_enter.Radius);
 	_ahead_distance = - K * _line_middle_circle_parking_enter_turn.SteeringAngle * 0.5;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_middle_circle_parking_enter_turn.Point = _line_middle_circle_parking_enter_tangent + Ahead.rotate(_line_middle.Angle);
-	m_VerticalPlanningTerminal.TurnPointSend(_line_middle_circle_parking_enter_turn,2);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_middle_circle_parking_enter_turn,2);
 
 	// 第四个转向点
 	ahead_angle = _ahead_distance / _circle_parking_enter.Radius;
 	_line_center_circle_parking_enter_turn.Point = _circle_parking_enter.Center +
 			                                     ( _line_center_circle_parking_enter_tangent - _circle_parking_enter.Center).rotate(-ahead_angle);
 	_line_center_circle_parking_enter_turn.SteeringAngle = 0;
-	m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,3);
+//	m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,3);
 }
 
 /**************************************************************************************************/

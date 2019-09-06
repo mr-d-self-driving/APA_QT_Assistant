@@ -18,8 +18,8 @@
 #define MATH_VECTOR_2D_H_
 
 #include <QMainWindow>
-#include "./Common/Utils/Inc/property.h"
 #include "math.h"
+#include "./Common/Utils/Inc/property.h"
 
 class Vector2d {
 public:

@@ -11,8 +11,8 @@
 #ifndef VERTICALPARKING_VERTICAL_PLANNING_H_
 #define VERTICALPARKING_VERTICAL_PLANNING_H_
 
-#include "planning.h"
-#include "Terminal.h"
+#include "./Interaction/HMI/Terminal.h"
+#include "./Planning/Interface/planning.h"
 // 垂直轨迹规划状态
 typedef enum _VerticalPlanningState
 {
