@@ -382,8 +382,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QGroupBox *gVehicleInitPosition_Group = new QGroupBox();
     gVehicleInitPosition_Group->setTitle("车辆初始位置");
-    gVehicleInitPosition_Group->setFixedHeight(90);
-    gVehicleInitPosition_Group->setLayout(gObstacleDistanceLayout);
+    gVehicleInitPosition_Group->setFixedHeight(120);
+    gVehicleInitPosition_Group->setLayout(gVehicleInitPosition_Layout);
 
     QGridLayout *gPath_IO_Layout = new QGridLayout();
     gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
