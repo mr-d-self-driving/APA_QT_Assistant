@@ -60,7 +60,7 @@ public:
 	   * @param command the control command
 	   * @return error_code
 	   */
-	void Update(ControlCommand cmd) override;
+//	void Update(ControlCommand cmd) override;
 	void Update(APAControlCommand cmd) override;
 
 	// push the command to the vehiclevoid
@@ -76,7 +76,7 @@ public:
 	void VehicleContorl();
 
 	// Steeing angle control base on the angle speed
-	void SteeringAngleControl(float dt,float steer_angle);
+    void SteeringAngleControl(float dt);
 
 	// Steering Angle control state machine
 	void SteeringAngleControlStateMachine(uint8_t fd);

@@ -727,7 +727,7 @@ void ParallelPlanning::TurnningPoint()
 //	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_right_turn,1);
 	// line:third point
 	_line_middle_circle_left_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(_circle_left.Radius);
-	_ahead_distance = K* _line_middle_circle_left_turn.SteeringAngle * 0.5;
+    _ahead_distance = K* _line_middle_circle_left_turn.SteeringAngle * 0.5f;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_middle_circle_left_turn.Point = _line_middle_circle_left_tangent + Ahead.rotate(_line_middle.Angle);
 //	m_ParallelPlanningTerminal.TurnPointSend(_line_middle_circle_left_turn,2);

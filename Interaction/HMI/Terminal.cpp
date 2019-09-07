@@ -55,30 +55,12 @@ void    Terminal::setCommand(uint8_t value){_command = value;}
 uint8_t Terminal::getPushActive()             {return _push_active ;}
 void    Terminal::setPushActive(uint8_t value){_push_active = value;}
 /**************************************************************************************/
-void Terminal::CAN0Parse(uint32_t num,VCI_CAN_OBJ* packet)
-{
 
-}
-
-void Terminal::CAN1Parse(uint32_t num,VCI_CAN_OBJ* packet)
-{
-
-}
-
-void Terminal::CAN2Parse(uint32_t num,VCI_CAN_OBJ* packet)
-{
-    uint32_t i;
-    for(i=0;i<num;i++)
-    {
-//        Parse(packet);
-    }
-}
-
-void Terminal::Parse(VCI_CAN_OBJ *obj,VehicleController *ctl)
-{
-	uint8_t i,check_sum;
-    switch(obj->ID)
-	{
+//void Terminal::Parse(VCI_CAN_OBJ *obj,VehicleController *ctl)
+//{
+//	uint8_t i,check_sum;
+//    switch(obj->ID)
+//	{
 //		case 0x516://eps status
 //			check_sum =0 ;
 //			for(i=0;i<7;i++){
@@ -174,18 +156,18 @@ void Terminal::Parse(VCI_CAN_OBJ *obj,VehicleController *ctl)
 //                ctl->Gear 			= (uint8_t)obj->Data[6];
 //			}
 //			break;
-		default:
+//		default:
 
-			break;
-	}
-}
+//			break;
+//	}
+//}
 
-void Terminal::Parse(VCI_CAN_OBJ *obj,Ultrasonic *u)
-{
+//void Terminal::Parse(VCI_CAN_OBJ *obj,Ultrasonic *u)
+//{
 //	Ultrasonic_Packet ultrasonic_packet;
 //	ObstacleLocationPacket obstacle_location_packet;
-    switch(obj->ID)
-	{
+//    switch(obj->ID)
+//	{
 //        case 0x508://传感器9
 //        case 0x509://传感器10
 //        case 0x50A://传感器11
@@ -227,17 +209,17 @@ void Terminal::Parse(VCI_CAN_OBJ *obj,Ultrasonic *u)
 //        	AckValid = 0xa5;
 //        	break;
 
-		default:
+//		default:
 
-			break;
-	}
-}
+//			break;
+//	}
+//}
 
-void Terminal::Parse(VCI_CAN_OBJ *obj,MessageManager *msg)
-{
+//void Terminal::Parse(VCI_CAN_OBJ *obj,MessageManager *msg)
+//{
 //	Byte2Int temp_int;
-    switch(obj->ID)
-	{
+//    switch(obj->ID)
+//	{
 //        case 0x510:
 //            temp_int.b[1] = obj->Data[2];
 //            temp_int.b[0] = obj->Data[3];
@@ -252,11 +234,11 @@ void Terminal::Parse(VCI_CAN_OBJ *obj,MessageManager *msg)
 //            temp_int.b[0] = obj->Data[7];
 //        	msg->WheelSpeedRearRight = temp_int.u16 * 0.001;
 //        	break;
-		default:
+//		default:
 
-			break;
-	}
-}
+//			break;
+//	}
+//}
 
 void Terminal::Parse(VCI_CAN_OBJ obj,Percaption *pct)
 {
@@ -285,22 +267,22 @@ void Terminal::Parse(VCI_CAN_OBJ obj,Percaption *pct)
 	}
 }
 
-void Terminal::Parse(VCI_CAN_OBJ *obj)
-{
-    switch(obj->ID)
-	{
-        case 0x530:
-            Command = static_cast<uint8_t>(obj->Data[0]);
-        	break;
+//void Terminal::Parse(VCI_CAN_OBJ *obj)
+//{
+//    switch(obj->ID)
+//	{
+//        case 0x530:
+//            Command = static_cast<uint8_t>(obj->Data[0]);
+//        	break;
 
-        case 0x512:
-            AckEcho = static_cast<uint8_t>(obj->Data[0]);
-        	break;
+//        case 0x512:
+//            AckEcho = static_cast<uint8_t>(obj->Data[0]);
+//        	break;
 
-        default:
-        	break;
-	}
-}
+//        default:
+//        	break;
+//	}
+//}
 /**************************************************************************************/
 //void Terminal::Push(MessageManager *msg)
 //{

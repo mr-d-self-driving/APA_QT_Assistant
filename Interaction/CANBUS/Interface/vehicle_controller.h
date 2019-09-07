@@ -88,7 +88,7 @@ public:
 	   * @param command the control command
 	   * @return error_code
 	   */
-	virtual void Update(ControlCommand cmd) = 0;
+//	virtual void Update(ControlCommand cmd) = 0;
 
 	virtual void Update(APAControlCommand cmd) = 0;
 

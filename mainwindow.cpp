@@ -357,8 +357,43 @@ MainWindow::MainWindow(QWidget *parent) :
     gDetectLayout->setColumnStretch(1,9);
 
     /*** Path UI ***/
+    QLabel *label_VehicleInitPointX_Text = new QLabel();
+    label_VehicleInitPointX_Text->setText("X:");
+    QLabel *label_VehicleInitPointY_Text = new QLabel();
+    label_VehicleInitPointY_Text->setText("Y:");
+    QLabel *label_VehicleInitPointYaw_Text = new QLabel();
+    label_VehicleInitPointYaw_Text->setText("Yaw:");
+
+    QLineEdit *text_VehicleInitPointX = new QLineEdit();
+    text_VehicleInitPointX->setText("0");
+    QLineEdit *text_VehicleInitPointY = new QLineEdit();
+    text_VehicleInitPointY->setText("0");
+    QLineEdit *text_VehicleInitPointYaw = new QLineEdit();
+    text_VehicleInitPointYaw->setText("0");
+
+    QGridLayout *gVehicleInitPosition_Layout = new QGridLayout();
+    gVehicleInitPosition_Layout->addWidget(label_VehicleInitPointX_Text,0,0);
+    gVehicleInitPosition_Layout->addWidget(label_VehicleInitPointY_Text,1,0);
+    gVehicleInitPosition_Layout->addWidget(label_VehicleInitPointYaw_Text,2,0);
+
+    gVehicleInitPosition_Layout->addWidget(text_VehicleInitPointX,0,1);
+    gVehicleInitPosition_Layout->addWidget(text_VehicleInitPointY,1,1);
+    gVehicleInitPosition_Layout->addWidget(text_VehicleInitPointYaw,2,1);
+
+    QGroupBox *gVehicleInitPosition_Group = new QGroupBox();
+    gVehicleInitPosition_Group->setTitle("车辆初始位置");
+    gVehicleInitPosition_Group->setFixedHeight(90);
+    gVehicleInitPosition_Group->setLayout(gObstacleDistanceLayout);
+
+    QGridLayout *gPath_IO_Layout = new QGridLayout();
+    gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
+    gPath_IO_Layout->setRowStretch(0,1);
+    gPath_IO_Layout->setRowStretch(1,1);
+
+
     mPathPlot = new QCustomPlot();
     QGridLayout *gPathLayout = new QGridLayout();
+    gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
     gPathLayout->addWidget(mPathPlot, 0, 1);
     gPathLayout->setColumnStretch(0,1);
     gPathLayout->setColumnStretch(1,9);

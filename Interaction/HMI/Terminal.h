@@ -58,20 +58,15 @@ class Terminal
 public:
 	Terminal();
 	virtual ~Terminal();
-
-    void CAN0Parse(uint32_t num,VCI_CAN_OBJ* packet);
-    void CAN1Parse(uint32_t num,VCI_CAN_OBJ* packet);
-    void CAN2Parse(uint32_t num,VCI_CAN_OBJ* packet);
-
 	// CAN Module:Vehicle information receive
-    void Parse(VCI_CAN_OBJ *obj,VehicleController *ctl);
-    void Parse(VCI_CAN_OBJ *obj,MessageManager *msg);
+//    void Parse(VCI_CAN_OBJ *obj,VehicleController *ctl);
+//    void Parse(VCI_CAN_OBJ *obj,MessageManager *msg);
 
-    void Parse(VCI_CAN_OBJ *obj,Ultrasonic *u);
+//    void Parse(VCI_CAN_OBJ *obj,Ultrasonic *u);
 
     void Parse(VCI_CAN_OBJ obj,Percaption *pct);
 
-    void Parse(VCI_CAN_OBJ *obj);
+//    void Parse(VCI_CAN_OBJ *obj);
 	// Terminal Control
 ///////////////////////////////////////////////////////////////////////////
 	/*

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
 <<<<<<< HEAD
-<!-- Written by QtCreator 4.9.1, 2019-09-06T18:08:43. -->
+<!-- Written by QtCreator 4.9.1, 2019-09-04T22:02:25. -->
 =======
-<!-- Written by QtCreator 4.9.1, 2019-09-06T23:22:02. -->
->>>>>>> 1cf2849a7ea199bd78a68589b7515daff2243482
+<!-- Written by QtCreator 4.9.1, 2019-09-06T12:29:40. -->
+>>>>>>> origin/master
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -62,7 +62,23 @@
    <valuelist type="QVariantList" key="ClangCodeModel.CustomCommandLineKey">
     <value type="QString">-fno-delayed-template-parsing</value>
    </valuelist>
+<<<<<<< HEAD
    <value type="bool" key="ClangCodeModel.UseGlobalConfig">true</value>
+   <value type="bool" key="ClangTools.BuildBeforeAnalysis">false</value>
+   <value type="QString" key="ClangTools.DiagnosticConfig">Builtin.TidyAndClazy</value>
+   <valuelist type="QVariantList" key="ClangTools.SelectedDirs">
+    <value type="QString">C:/WorkSpace/GitHub/APA_QT_Assistant/APA_Assistant.pro</value>
+   </valuelist>
+=======
+   <value type="bool" key="ClangCodeModel.UseGlobalConfig">false</value>
+   <value type="QString" key="ClangCodeModel.WarningConfigId">{a91f2a91-b447-4722-b0b5-1e076b0406e6}</value>
+   <valuelist type="QVariantList" key="ClangStaticAnalyzer.SuppressedDiagnostics"/>
+   <value type="bool" key="ClangTools.BuildBeforeAnalysis">false</value>
+   <valuelist type="QVariantList" key="ClangTools.SelectedDirs"/>
+>>>>>>> origin/master
+   <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
+   <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
+   <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
   </valuemap>
  </data>
  <data>

@@ -1,7 +1,5 @@
 #include "can_rev_work_thread.h"
 
-#define V_M_S (0.015625)
-
 CanRevWorkThread::CanRevWorkThread()
 {
 //    tFlagCA = false;

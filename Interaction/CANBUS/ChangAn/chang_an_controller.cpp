@@ -78,31 +78,31 @@ void ChangAnController::Stop()
 	VelocityEnable      = 0;
 }
 
-void ChangAnController::Update(ControlCommand cmd)
-{
-	GearEnable 	        = cmd.ControlEnable.B.GearEnable;
-	if( (0 == SteeringEnable) || (0 == cmd.ControlEnable.B.SteeringEnable) )
-	{
-		SteeringEnable  = cmd.ControlEnable.B.SteeringEnable;
-	}
-	AccelerationEnable  = cmd.ControlEnable.B.AccelerationEnable;
-	DecelerationEnable  = cmd.ControlEnable.B.DecelerationEnable;
-	TorqueEnable 	    = cmd.ControlEnable.B.TorqueEnable;
-	VelocityEnable      = cmd.ControlEnable.B.VelocityEnable;
+//void ChangAnController::Update(ControlCommand cmd)
+//{
+//	GearEnable 	        = cmd.ControlEnable.B.GearEnable;
+//	if( (0 == SteeringEnable) || (0 == cmd.ControlEnable.B.SteeringEnable) )
+//	{
+//		SteeringEnable  = cmd.ControlEnable.B.SteeringEnable;
+//	}
+//	AccelerationEnable  = cmd.ControlEnable.B.AccelerationEnable;
+//	DecelerationEnable  = cmd.ControlEnable.B.DecelerationEnable;
+//	TorqueEnable 	    = cmd.ControlEnable.B.TorqueEnable;
+//	VelocityEnable      = cmd.ControlEnable.B.VelocityEnable;
 
 
-	Gear			  = cmd.Gear;
-	SteeringAngle 	  = cmd.SteeringAngle;
-	SteeringAngleRate = cmd.SteeringAngleRate;
+//	Gear			  = cmd.Gear;
+//	SteeringAngle 	  = cmd.SteeringAngle;
+//	SteeringAngleRate = cmd.SteeringAngleRate;
 
-	if(0 == VelocityEnable)
-	{
-		Acceleration 	  = cmd.Acceleration;
-	}
-	Deceleration 	  = cmd.Deceleration;
-	Torque 			  = cmd.Torque;
-	Velocity          = cmd.Velocity;
-}
+//	if(0 == VelocityEnable)
+//	{
+//		Acceleration 	  = cmd.Acceleration;
+//	}
+//	Deceleration 	  = cmd.Deceleration;
+//	Torque 			  = cmd.Torque;
+//	Velocity          = cmd.Velocity;
+//}
 
 void ChangAnController::Update(APAControlCommand cmd)
 {
@@ -309,7 +309,7 @@ void ChangAnController::VehicleContorl()
 	_rolling_counter_gear_control++;
 }
 
-void ChangAnController::SteeringAngleControl(float dt,float steer_angle)
+void ChangAnController::SteeringAngleControl(float dt)
 {
     float da = SteeringAngleRate * dt;
     float left_target_angle = SteeringAngle - da;

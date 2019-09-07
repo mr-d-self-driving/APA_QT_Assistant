@@ -41,10 +41,10 @@ void BoRuiController::Stop()
    * @param command the control command
    * @return error_code
    */
-void BoRuiController::Update(ControlCommand cmd)
-{
+//void BoRuiController::Update(ControlCommand cmd)
+//{
 
-}
+//}
 
 void BoRuiController::Update(APAControlCommand cmd)
 {

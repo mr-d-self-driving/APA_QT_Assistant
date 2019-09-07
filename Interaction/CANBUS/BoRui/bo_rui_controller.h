@@ -38,7 +38,7 @@ public:
 	   * @param command the control command
 	   * @return error_code
 	   */
-	void Update(ControlCommand cmd) override;
+//	void Update(ControlCommand cmd) override;
 	void Update(APAControlCommand cmd) override;
 
 	void VehicleContorl();
