@@ -10,7 +10,7 @@ class Simulation
 public:
     Simulation();
 
-    void Update();
+    void Update(VehicleController *c,MessageManager *m);
 };
 
 #endif // SIMULATION_H

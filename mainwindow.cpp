@@ -357,6 +357,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gDetectLayout->setColumnStretch(1,9);
 
     /*** Path UI ***/
+    // 车辆初始位置 begin
     QLabel *label_VehicleInitPointX_Text = new QLabel();
     label_VehicleInitPointX_Text->setText("X:");
     QLabel *label_VehicleInitPointY_Text = new QLabel();
@@ -364,11 +365,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QLabel *label_VehicleInitPointYaw_Text = new QLabel();
     label_VehicleInitPointYaw_Text->setText("Yaw:");
 
-    QLineEdit *text_VehicleInitPointX = new QLineEdit();
+    text_VehicleInitPointX = new QLineEdit();
     text_VehicleInitPointX->setText("0");
-    QLineEdit *text_VehicleInitPointY = new QLineEdit();
+    text_VehicleInitPointY = new QLineEdit();
     text_VehicleInitPointY->setText("0");
-    QLineEdit *text_VehicleInitPointYaw = new QLineEdit();
+    text_VehicleInitPointYaw = new QLineEdit();
     text_VehicleInitPointYaw->setText("0");
 
     QGridLayout *gVehicleInitPosition_Layout = new QGridLayout();
@@ -384,11 +385,39 @@ MainWindow::MainWindow(QWidget *parent) :
     gVehicleInitPosition_Group->setTitle("车辆初始位置");
     gVehicleInitPosition_Group->setFixedHeight(120);
     gVehicleInitPosition_Group->setLayout(gVehicleInitPosition_Layout);
+    // 车辆初始位置 end
+
+    // 车位信息 begin
+    QLabel *label_ParkingLength_Text = new QLabel();
+    label_ParkingLength_Text->setText("长:");
+    QLabel *label_ParkingWidth_Text = new QLabel();
+    label_ParkingWidth_Text->setText("宽:");
+
+    text_ParkingLength = new QLineEdit();
+    text_ParkingLength->setText("0");
+    text_ParkingWidth = new QLineEdit();
+    text_ParkingWidth->setText("0");
+
+    QGridLayout *gVehicleParking_Layout = new QGridLayout();
+    gVehicleParking_Layout->addWidget(label_ParkingLength_Text,0,0);
+    gVehicleParking_Layout->addWidget(label_ParkingWidth_Text,1,0);
+    gVehicleParking_Layout->addWidget(text_ParkingLength,0,1);
+    gVehicleParking_Layout->addWidget(text_ParkingWidth,1,1);
+    gVehicleParking_Layout->setColumnStretch(0,1);
+    gVehicleParking_Layout->setColumnStretch(1,3);
+
+    QGroupBox *gVehicleParking_Group = new QGroupBox();
+    gVehicleParking_Group->setTitle("车位信息");
+    gVehicleParking_Group->setFixedHeight(100);
+    gVehicleParking_Group->setLayout(gVehicleParking_Layout);
+    // 车位信息 end
 
     QGridLayout *gPath_IO_Layout = new QGridLayout();
     gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
+    gPath_IO_Layout->addWidget(gVehicleParking_Group,1,0);
     gPath_IO_Layout->setRowStretch(0,1);
     gPath_IO_Layout->setRowStretch(1,1);
+    gPath_IO_Layout->setRowStretch(2,1);
 
 
     mPathPlot = new QCustomPlot();
@@ -457,6 +486,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::sTimer20msTask(void)
 {
+//    mGeometricTrack.VelocityUpdate()
     // calculate and add a new data point to each graph:
     mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
     mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);

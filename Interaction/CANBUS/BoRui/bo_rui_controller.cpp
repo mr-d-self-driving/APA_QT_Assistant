@@ -90,8 +90,7 @@ void BoRuiController::SteeringAngleControl(float dt)
     }
 }
 
-void BoRuiController::Push(float dt)
+void BoRuiController::Push(void)
 {
-	SteeringAngleControl(dt);
-	VehicleContorl();
+
 }

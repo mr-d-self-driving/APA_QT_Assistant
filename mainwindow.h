@@ -23,12 +23,14 @@ public:
 private:
     Ui::MainWindow *ui;
     // plot variable
+    /* Control UI*/
     QCustomPlot *mControlPlot;
     QPointer<QCPGraph> mControlGraph1;
     QPointer<QCPGraph> mControlGraph2;
     AxisTag *mControlTag1;
     AxisTag *mControlTag2;
 
+    /* Detect UI*/
     QCustomPlot *mDetectPlot;
     QPointer<QCPGraph> mDetectGraph1;
     QPointer<QCPGraph> mDetectGraph2;
@@ -47,7 +49,17 @@ private:
     QString obstacle_region[5] = {"左侧", "左中","中间","右中", "右侧"};
     QString obstacle_status[5] = {"正常", "盲区", "超探", "噪声", "无效" };
 
+    /* Path UI*/
+    QLineEdit *text_VehicleInitPointX;
+    QLineEdit *text_VehicleInitPointY;
+    QLineEdit *text_VehicleInitPointYaw;
+
+    QLineEdit *text_ParkingLength;
+    QLineEdit *text_ParkingWidth;
+
     QCustomPlot *mPathPlot;
+
+
 
     QTimer mDataTimer20ms;
     QPushButton *button_timer_control;
@@ -65,6 +77,8 @@ private:
     Terminal mTerminal;
 
     Percaption mPercaption;
+    GeometricTrack mGeometricTrack;
+
 
 private slots:
     // 功能选择激活函数图片选择的槽函数

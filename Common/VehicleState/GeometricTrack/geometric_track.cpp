@@ -15,8 +15,6 @@
 /*****************************************************************************/
 #include "../GeometricTrack/geometric_track.h"
 
-VehilceConfig m_GeometricVehicleConfig;
-
 GeometricTrack::GeometricTrack() {
 
 	SumRearLeftPulse.setContainer(this);
@@ -69,11 +67,11 @@ void GeometricTrack::Init(float x,float y,float yaw)
 void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
 {
 	float radius;
-	LinearRate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft)*0.5;
+    LinearRate = (msg->WheelSpeedRearRight + msg->WheelSpeedRearLeft)*0.5f;
 	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
 					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
-	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((int16_t)fabs(msg->SteeringAngle) < 520))
+    if( (static_cast<int16_t>(fabs(msg->SteeringAngle)) != 0) && (static_cast<int16_t>(fabs(msg->SteeringAngle)) < 520))
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + LinearVelocity * dt / radius;
@@ -167,7 +165,7 @@ void GeometricTrack::PulseUpdate(MessageManager *msg)
 	LinearVelocity = msg->WheelSpeedDirection == Forward ?  LinearRate :
 					 msg->WheelSpeedDirection == Backward ? -LinearRate : 0;
 
-	if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((uint16_t)fabs(msg->SteeringAngle) < 520))
+    if( (static_cast<uint16_t>(fabs(msg->SteeringAngle)) != 0) && (static_cast<uint16_t>(fabs(msg->SteeringAngle)) < 520))
 	{
 		radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
 		Yaw  = _last_yaw + displacement / radius;
@@ -231,8 +229,8 @@ void GeometricTrack::PulseTrackUpdate(MessageManager *msg)
 	{
 		_delta_yaw = (_delta_rear_right_pulse - _delta_rear_left_pulse)/WIDTH;
 		Yaw  = _last_yaw + _delta_yaw;
-		_position.X = _position.X + displacement * cosf(_last_yaw + _delta_yaw*0.5);
-		_position.Y = _position.Y + displacement * sinf(_last_yaw + _delta_yaw*0.5);
+        _position.X = _position.X + displacement * cosf(_last_yaw + _delta_yaw*0.5f);
+        _position.Y = _position.Y + displacement * sinf(_last_yaw + _delta_yaw*0.5f);
 	}
 	_last_yaw = Yaw;
 }
@@ -287,7 +285,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 	 }
 	 else if(_wait_time_cnt >= 25)
 	 {
-		 if((msg->WheelSpeedRearRight < 1.0e-6) && (msg->WheelSpeedRearLeft < 1.0e-6))
+         if((msg->WheelSpeedRearRight < 1.0e-6f) && (msg->WheelSpeedRearLeft < 1.0e-6f))
 		 {
 			 _velocity_lock               = 0xff;
 			 PulseUpdateVelocity          = 0;
@@ -304,7 +302,7 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
 		 }
 	 }
 	 /**************************************************脉冲计算结束****************************************/
-	 if(msg->VehicleMiddleSpeed < 1.0e-6)
+     if(msg->VehicleMiddleSpeed < 1.0e-6f)
 	 {
 		 if( PulseUpdateVelocity < 0.5f )
 		 {
