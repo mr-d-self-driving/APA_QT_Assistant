@@ -44,6 +44,7 @@ SOURCES += \
         Interaction/CANBUS/Interface/message_manager.cpp \
         Interaction/CANBUS/Interface/vehicle_controller.cpp \
         Interaction/HMI/Terminal.cpp \
+        Interaction/HMI/simulation.cpp \
         Interaction/Ultrasonic/Ultrasonic.cpp \
         Percaption/Interface/percaption.cpp \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.cpp \
@@ -85,6 +86,7 @@ HEADERS += \
         Interaction/CANBUS/Interface/message_manager.h \
         Interaction/CANBUS/Interface/vehicle_controller.h \
         Interaction/HMI/Terminal.h \
+        Interaction/HMI/simulation.h \
         Interaction/Ultrasonic/Ultrasonic.h \
         Percaption/Interface/percaption.h \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.h \
