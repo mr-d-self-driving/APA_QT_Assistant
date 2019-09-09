@@ -11,9 +11,10 @@
 #include <QMainWindow>
 #include "./Common/Utils/Inc/property.h"
 #include "./Common/Configure/Configs/vehilce_config.h"
+#include "./Common/VehicleState/Interface/vehicle_state.h"
 
 #include "./Interaction/Ultrasonic/Ultrasonic.h"
-#include "./Common/VehicleState/Interface/vehicle_state.h"
+
 // math
 #include "math.h"
 #include "./Common/Math/vector_2d.h"

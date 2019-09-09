@@ -208,23 +208,23 @@ float VehilceConfig::TurnRadiusCurveFitting(float steering_angle)
 
 float VehilceConfig::TurnRadiusFindingTable(float steering_angle)
 {
-	return steering_angle >=  0 ? SteerAngle2Radius[(uint16_t)steering_angle][0] : -SteerAngle2Radius[(uint16_t)(-steering_angle)][1];
+    return steering_angle >=  0 ? SteerAngle2Radius[static_cast<uint16_t>(-steering_angle)][0] : -SteerAngle2Radius[static_cast<uint16_t>(-steering_angle)][1];
 }
 
 float VehilceConfig::SteeringAngleCurveFitting(float radius)
 {
 	return
-		   radius >   48.308 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A6,FIT_RADIUS_B6) :
-		   radius >   24.018 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A5,FIT_RADIUS_B5) :
-		   radius >   11.910 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A4,FIT_RADIUS_B4) :
-		   radius >   7.6736 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A3,FIT_RADIUS_B3) :
-		   radius >    5.463 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A2,FIT_RADIUS_B2) :
-		   radius >        0 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A1,FIT_RADIUS_B1) :
-		   radius > - 5.4745 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A12,FIT_RADIUS_B12) :
-		   radius > - 7.7214 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A11,FIT_RADIUS_B11):
-		   radius > - 11.975 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A10,FIT_RADIUS_B10):
-		   radius > - 24.975 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A9,FIT_RADIUS_B9):
-		   radius > - 49.975 ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A8,FIT_RADIUS_B8):
+           radius >   48.308f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A6,FIT_RADIUS_B6) :
+           radius >   24.018f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A5,FIT_RADIUS_B5) :
+           radius >   11.910f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A4,FIT_RADIUS_B4) :
+           radius >   7.6736f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A3,FIT_RADIUS_B3) :
+           radius >    5.463f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A2,FIT_RADIUS_B2) :
+           radius >      0.0f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A1,FIT_RADIUS_B1) :
+           radius > - 5.4745f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A12,FIT_RADIUS_B12) :
+           radius > - 7.7214f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A11,FIT_RADIUS_B11):
+           radius > - 11.975f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A10,FIT_RADIUS_B10):
+           radius > - 24.975f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A9,FIT_RADIUS_B9):
+           radius > - 49.975f ? TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A8,FIT_RADIUS_B8):
 							   TurnningRadius2SteeringAngle(radius,FIT_RADIUS_A7,FIT_RADIUS_B7);
 }
 

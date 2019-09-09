@@ -9,8 +9,8 @@
 #define CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_
 
 #include <QMainWindow>
-#include "./Common/Utils/Inc/property.h"
 #include "math.h"
+#include "./Common/Utils/Inc/property.h"
 #include "./Common/Math/vector_2d.h"
 #include "system_config.h"
 

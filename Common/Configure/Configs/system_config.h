@@ -15,8 +15,8 @@
 
 /****************System Configure******************/
 //#define CHANGAN
-//#define BORUI
-#define DONG_FENG_E70
+#define BORUI
+//#define DONG_FENG_E70
 
 #define SIMULATION 0
 /********************是否使用超声波避障使能按钮***********************/

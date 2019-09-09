@@ -51,6 +51,8 @@ public:
 	void    setSumRearRightPulse(int32_t value);
 	Property<GeometricTrack,int32_t,READ_WRITE> SumRearRightPulse;
 private:
+    VehilceConfig m_GeometricVehicleConfig;
+
 	float _last_yaw,_delta_yaw;
 
 	uint16_t _last_rear_left_pulse;
