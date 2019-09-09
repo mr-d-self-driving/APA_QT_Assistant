@@ -69,6 +69,7 @@ private:
     QLabel *label_VehiceTrackYaw_Value;
 
     QCustomPlot *mPathPlot;
+    QPointer<QCPGraph> mPathVehicleGraph;
 
     QTimer mDataTimer20ms;
     QPushButton *button_timer_control;

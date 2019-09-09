@@ -467,6 +467,12 @@ MainWindow::MainWindow(QWidget *parent) :
     gPath_IO_Layout->setRowStretch(3,1);
 
     mPathPlot = new QCustomPlot();
+    mPathPlot->legend->setVisible(true);
+    mPathPlot->legend->setFont(QFont("Helvetica", 9));
+    mPathPlot->legend->setRowSpacing(-3);
+
+    mPathVehicleGraph = mPathPlot->addGraph();
+
     QGridLayout *gPathLayout = new QGridLayout();
     gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
     gPathLayout->addWidget(mPathPlot, 0, 1);
@@ -543,8 +549,14 @@ void MainWindow::sTimer20msTask(void)
 
     label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X)));
     label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y)));
-    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw())));
+    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f)));
 
+    mPathVehicleGraph->addData(mGeometricTrack.getPosition().X,mGeometricTrack.getPosition().Y);
+
+    mPathPlot->xAxis->rescale();
+    mPathVehicleGraph->rescaleValueAxis(false,true);
+    mPathPlot->xAxis->setRange(mPathPlot->xAxis->range().upper,100,Qt::AlignRight);
+    mPathPlot->replot();
 
     // calculate and add a new data point to each graph:
     mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
