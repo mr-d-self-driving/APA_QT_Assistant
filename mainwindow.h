@@ -6,7 +6,14 @@
 #include "QCustomPlot/axistag.h"
 #include "WinZlgCan/win_zlg_can.h"
 #include "Interaction/HMI/Terminal.h"
+#include "Interaction/HMI/simulation.h"
 #include  "WinZlgCan/can_rev_work_thread.h"
+
+#ifdef BORUI
+#include "Interaction/CANBUS/BoRui/bo_rui_message.h"
+#include "Interaction/CANBUS/BoRui/bo_rui_controller.h"
+#endif
+
 
 namespace Ui {
 class MainWindow;
@@ -57,9 +64,11 @@ private:
     QLineEdit *text_ParkingLength;
     QLineEdit *text_ParkingWidth;
 
+    QLabel *label_VehiceTrackX_Value;
+    QLabel *label_VehiceTrackY_Value;
+    QLabel *label_VehiceTrackYaw_Value;
+
     QCustomPlot *mPathPlot;
-
-
 
     QTimer mDataTimer20ms;
     QPushButton *button_timer_control;
@@ -75,9 +84,14 @@ private:
 
     //
     Terminal mTerminal;
+    Simulation mSimulation;
 
     Percaption mPercaption;
     GeometricTrack mGeometricTrack;
+
+    BoRuiMessage mBoRuiMessage;
+    BoRuiController mBoRuiController;
+
 
 
 private slots:

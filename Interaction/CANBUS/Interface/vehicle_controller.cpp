@@ -160,8 +160,8 @@ uint8_t VehicleController::getSteeringEnable()             { return _steering_en
 void    VehicleController::setSteeringEnable(uint8_t value){_steering_enable = value;}
 
 /// Gear
-uint8_t VehicleController::getGear()             { return _gear;}
-void    VehicleController::setGear(uint8_t value){_gear = value;}
+GearStatus VehicleController::getGear()             { return _gear;}
+void    VehicleController::setGear(GearStatus value){_gear = value;}
 
 uint8_t VehicleController::getGearEnable()             { return _gear_enable;}
 void    VehicleController::setGearEnable(uint8_t value){_gear_enable = value;}

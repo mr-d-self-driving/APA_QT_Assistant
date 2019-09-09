@@ -163,9 +163,9 @@ public:
 	Property<VehicleController,uint8_t,READ_WRITE> SteeringEnable;
 
 	/* Gear */
-	uint8_t getGear();
-	void    setGear(uint8_t value);
-	Property<VehicleController,uint8_t,READ_WRITE> Gear;
+    GearStatus getGear();
+    void       setGear(GearStatus value);
+    Property<VehicleController,GearStatus,READ_WRITE> Gear;
 
 	uint8_t getGearEnable();
 	void    setGearEnable(uint8_t value);
@@ -209,7 +209,7 @@ private:
 	uint8_t _steering_enable;
 
 	/* Gear */
-	uint8_t _gear;
+    GearStatus _gear;
 	uint8_t _gear_enable;
 
 	/* APA */

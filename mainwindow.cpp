@@ -412,13 +412,59 @@ MainWindow::MainWindow(QWidget *parent) :
     gVehicleParking_Group->setLayout(gVehicleParking_Layout);
     // 车位信息 end
 
+    // 实时车辆位置跟踪 begin
+    QLabel *label_VehiceTrackX_Text = new QLabel();
+    label_VehiceTrackX_Text->setText("X:");
+    QLabel *label_VehiceTrackY_Text = new QLabel();
+    label_VehiceTrackY_Text->setText("Y:");
+    QLabel *label_VehiceTrackYaw_Text = new QLabel();
+    label_VehiceTrackYaw_Text->setText("Yaw:");
+
+    label_VehiceTrackX_Value = new QLabel();
+    label_VehiceTrackX_Value->setText("0");
+    label_VehiceTrackY_Value = new QLabel();
+    label_VehiceTrackY_Value->setText("0");
+    label_VehiceTrackYaw_Value = new QLabel();
+    label_VehiceTrackYaw_Value->setText("0");//单位 度
+
+    QLabel *label_VehiceTrackX_Unit = new QLabel();
+    label_VehiceTrackX_Unit->setText("m");
+    QLabel *label_VehiceTrackY_Unit = new QLabel();
+    label_VehiceTrackY_Unit->setText("m");
+    QLabel *label_VehiceTrackYaw_Unit = new QLabel();
+    label_VehiceTrackYaw_Unit->setText("°");
+
+    QGridLayout *gVehicleTrack_Layout = new QGridLayout();
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackX_Text,0,0);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackY_Text,1,0);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Text,2,0);
+
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackX_Value,0,1);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackY_Value,1,1);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Value,2,1);
+
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackX_Unit,0,2);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackY_Unit,1,2);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Unit,2,2);
+
+    gVehicleTrack_Layout->setColumnStretch(0,2);
+    gVehicleTrack_Layout->setColumnStretch(1,4);
+    gVehicleTrack_Layout->setColumnStretch(1,1);
+
+    QGroupBox *gVehicleTrack_Group = new QGroupBox();
+    gVehicleTrack_Group->setTitle("实时跟踪");
+    gVehicleTrack_Group->setFixedHeight(120);
+    gVehicleTrack_Group->setLayout(gVehicleTrack_Layout);
+    // 实时车辆位置跟踪 end
+
     QGridLayout *gPath_IO_Layout = new QGridLayout();
     gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
     gPath_IO_Layout->addWidget(gVehicleParking_Group,1,0);
+    gPath_IO_Layout->addWidget(gVehicleTrack_Group,2,0);
     gPath_IO_Layout->setRowStretch(0,1);
     gPath_IO_Layout->setRowStretch(1,1);
     gPath_IO_Layout->setRowStretch(2,1);
-
+    gPath_IO_Layout->setRowStretch(3,1);
 
     mPathPlot = new QCustomPlot();
     QGridLayout *gPathLayout = new QGridLayout();
@@ -486,7 +532,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::sTimer20msTask(void)
 {
-//    mGeometricTrack.VelocityUpdate()
+    mBoRuiController.APAEnable = 1;
+    mBoRuiController.Velocity = 0.3f;
+    mBoRuiController.Gear = Drive;
+    mBoRuiController.SteeringAngle = 500;
+    mBoRuiController.SteeringAngleRate = 300;
+
+    mSimulation.Update(&mBoRuiController,&mBoRuiMessage);
+    mGeometricTrack.VelocityUpdate(&mBoRuiMessage,0.02f);
+
+    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X)));
+    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y)));
+    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw())));
+
+
     // calculate and add a new data point to each graph:
     mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
     mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);
