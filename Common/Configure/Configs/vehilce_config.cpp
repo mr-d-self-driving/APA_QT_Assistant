@@ -208,7 +208,7 @@ float VehilceConfig::TurnRadiusCurveFitting(float steering_angle)
 
 float VehilceConfig::TurnRadiusFindingTable(float steering_angle)
 {
-    return steering_angle >=  0 ? SteerAngle2Radius[static_cast<uint16_t>(-steering_angle)][0] : -SteerAngle2Radius[static_cast<uint16_t>(-steering_angle)][1];
+    return steering_angle >=  0 ? SteerAngle2Radius[static_cast<uint16_t>(steering_angle)][0] : -SteerAngle2Radius[static_cast<uint16_t>(-steering_angle)][1];
 }
 
 float VehilceConfig::SteeringAngleCurveFitting(float radius)
