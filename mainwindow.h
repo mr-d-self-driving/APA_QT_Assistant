@@ -27,6 +27,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void VehicleModule(Vector2d p,float yaw);
 private:
     Ui::MainWindow *ui;
     // plot variable
@@ -70,6 +71,7 @@ private:
 
     QCustomPlot *mPathPlot;
     QPointer<QCPGraph> mPathVehicleGraph;
+    QPointer<QCPGraph> mPathVehicleModuleDownGraph;
 
     QTimer mDataTimer20ms;
     QPushButton *button_timer_control;
@@ -83,17 +85,18 @@ private:
     WinZlgCan mWinZlgCan;
     CanRevWorkThread mCanRevWorkThread;
 
-    //
+    //HMI
     Terminal mTerminal;
     Simulation mSimulation;
 
     Percaption mPercaption;
     GeometricTrack mGeometricTrack;
+    VehilceConfig mVehilceConfig;
 
     BoRuiMessage mBoRuiMessage;
     BoRuiController mBoRuiController;
 
-
+    Vector2d FrontLeftPoint,FrontRightPoint,RearLeftPoint,RearRightPoint;
 
 private slots:
     // 功能选择激活函数图片选择的槽函数

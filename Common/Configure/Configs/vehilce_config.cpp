@@ -52,6 +52,18 @@ VehilceConfig::VehilceConfig() {
 	UltrasonicLocationArray.setContainer(this);
 	UltrasonicLocationArray.getter(&VehilceConfig::getUltrasonicLocationArray);
 
+    FrontLeftDiagonal.setContainer(this);
+    FrontLeftDiagonal.getter(&VehilceConfig::getFrontLeftDiagonal);
+
+    FrontRightDiagonal.setContainer(this);
+    FrontRightDiagonal.getter(&VehilceConfig::getFrontRightDiagonal);
+
+    RearLeftDiagonal.setContainer(this);
+    RearLeftDiagonal.getter(&VehilceConfig::getRearLeftDiagonal);
+
+    RearRightDiagonal.setContainer(this);
+    RearRightDiagonal.getter(&VehilceConfig::getRearRightDiagonal);
+
 	AccelerateTable.setContainer(this);
 	AccelerateTable.getter(&VehilceConfig::getAccelerateTable);
 
@@ -83,6 +95,18 @@ void VehilceConfig::Init()
 
 	FrontDiagonalAngle = atanf(LEFT_EDGE_TO_CENTER/FRONT_EDGE_TO_CENTER);
 	RearDiagonalAngle  = atanf(LEFT_EDGE_TO_CENTER/REAR_EDGE_TO_CENTER);
+
+    _front_left_diagonal.Length = FrontDiagonalAxis;
+    _front_left_diagonal.Angle  = FrontDiagonalAngle;
+
+    _front_right_diagonal.Length =  FrontDiagonalAxis;
+    _front_right_diagonal.Angle  = -FrontDiagonalAngle;
+
+    _rear_left_diagonal.Length = RearDiagonalAxis;
+    _rear_left_diagonal.Angle  = RearDiagonalAngle;
+
+    _rear_right_diagonal.Length =  RearDiagonalAxis;
+    _rear_right_diagonal.Angle  = -RearDiagonalAngle;
 
 	_ultrasonic_location_array[0].Point.X = SENSOR1_X;
 	_ultrasonic_location_array[0].Point.Y = SENSOR1_Y;
@@ -170,8 +194,8 @@ void VehilceConfig::EdgeRadius(float r)
 
 float VehilceConfig::SteeringAngle2TurnningRadius(float steer,float a,float b)
 {
-	return steer < 0 ? -WHEEL_BASE / tanf((a * -steer + b) * PI / 180) :
-			            WHEEL_BASE / tanf((a *  steer + b) * PI / 180) ;
+    return steer < 0 ? -WHEEL_BASE / tanf((a * -steer + b) * PI / 180.0f) :
+                        WHEEL_BASE / tanf((a *  steer + b) * PI / 180.0f) ;
 }
 
 float VehilceConfig::SteeringAngle2TurnningRadiusExp(float steer,float a,float b)
@@ -251,7 +275,7 @@ float VehilceConfig::SteeringAngleFindingCallback(uint16_t left_id,uint16_t righ
 		}
 		else
 		{
-			return (left_id + right_id) * 0.5;
+            return (left_id + right_id) * 0.5f;
 		}
 	}
 	else
@@ -273,7 +297,7 @@ float VehilceConfig::SteeringAngleFindingCallback(uint16_t left_id,uint16_t righ
 		}
 		else
 		{
-			return -(left_id + right_id) * 0.5;
+            return -(left_id + right_id) * 0.5f;
 		}
 	}
 }
@@ -299,13 +323,13 @@ float VehilceConfig::SteeringAngleFindingLoop(uint16_t left_id,uint16_t right_id
 				return middle_id;
 			}
 		}
-		return (left_id + right_id) * 0.5;
+        return (left_id + right_id) * 0.5f;
 	}
 	else
 	{
 		while( (right_id - left_id) > 1)
 		{
-			middle_id = (uint16_t)((left_id + right_id) * 0.5);
+            middle_id = (uint16_t)((left_id + right_id) * 0.5f);
 			if(-radius < SteerAngle2Radius[middle_id][1])
 			{
 				left_id = middle_id;
@@ -319,7 +343,7 @@ float VehilceConfig::SteeringAngleFindingLoop(uint16_t left_id,uint16_t right_id
 				return -middle_id;
 			}
 		}
-		return -(left_id + right_id) * 0.5;
+        return -(left_id + right_id) * 0.5f;
 	}
 }
 
@@ -343,16 +367,21 @@ void  VehilceConfig::setRadiusRearLeft(float value){ _radius_rear_left = value;}
 float VehilceConfig::getRadiusRearRight()           { return  _radius_rear_right;}
 void  VehilceConfig::setRadiusRearRight(float value){ _radius_rear_right = value;}
 
-float VehilceConfig::getFrontDiagonalAxis()           { return  _front_diagonal_axis;}
-void  VehilceConfig::setFrontDiagonalAxis(float value){ _front_diagonal_axis = value;}
-float VehilceConfig::getFrontDiagonalAngle()           { return  _front_diagonal_angle;}
-void  VehilceConfig::setFrontDiagonalAngle(float value){ _front_diagonal_angle = value;}
-float VehilceConfig::getRearDiagonalAxis()           { return  _rear_diagonal_axis;}
-void  VehilceConfig::setRearDiagonalAxis(float value){ _rear_diagonal_axis = value;}
-float VehilceConfig::getRearDiagonalAngle()           { return  _rear_diagonal_angle;}
-void  VehilceConfig::setRearDiagonalAngle(float value){ _rear_diagonal_angle = value;}
+double VehilceConfig::getFrontDiagonalAxis()           { return  _front_diagonal_axis;}
+void  VehilceConfig::setFrontDiagonalAxis(double value){ _front_diagonal_axis = value;}
+double VehilceConfig::getFrontDiagonalAngle()           { return  _front_diagonal_angle;}
+void  VehilceConfig::setFrontDiagonalAngle(double value){ _front_diagonal_angle = value;}
+double VehilceConfig::getRearDiagonalAxis()           { return  _rear_diagonal_axis;}
+void  VehilceConfig::setRearDiagonalAxis(double value){ _rear_diagonal_axis = value;}
+double VehilceConfig::getRearDiagonalAngle()           { return  _rear_diagonal_angle;}
+void  VehilceConfig::setRearDiagonalAngle(double value){ _rear_diagonal_angle = value;}
 
 Location* VehilceConfig::getUltrasonicLocationArray() { return  _ultrasonic_location_array;}
+
+Polar VehilceConfig::getFrontLeftDiagonal()  { return  _front_left_diagonal;}
+Polar VehilceConfig::getFrontRightDiagonal() { return  _front_right_diagonal;}
+Polar VehilceConfig::getRearLeftDiagonal()   { return  _rear_left_diagonal;}
+Polar VehilceConfig::getRearRightDiagonal()  { return  _rear_right_diagonal;}
 
 float* VehilceConfig::getAccelerateTable() { return  _accelerate_table;}
 float* VehilceConfig::getVelocityTable() { return  _velocity_table;}

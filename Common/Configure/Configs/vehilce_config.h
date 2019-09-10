@@ -30,6 +30,12 @@ typedef struct _Location
 	float Angle;
 }Location;
 
+typedef struct _Polar
+{
+    double Length;
+    double Angle;
+}Polar;
+
 class VehilceConfig {
 public:
 	VehilceConfig();
@@ -54,21 +60,21 @@ public:
 	float TurnRadiusCalculate(float steering_angle);
 	float SteeringAngleCalculate(float radius);
 	/**********************************************************************/
-	float getFrontDiagonalAxis();
-	void  setFrontDiagonalAxis(float value);
-	Property<VehilceConfig,float,READ_WRITE> FrontDiagonalAxis;
+    double getFrontDiagonalAxis();
+    void  setFrontDiagonalAxis(double value);
+    Property<VehilceConfig,double,READ_WRITE> FrontDiagonalAxis;
 
-	float getFrontDiagonalAngle();
-	void  setFrontDiagonalAngle(float value);
-	Property<VehilceConfig,float,READ_WRITE> FrontDiagonalAngle;
+    double getFrontDiagonalAngle();
+    void  setFrontDiagonalAngle(double value);
+    Property<VehilceConfig,double,READ_WRITE> FrontDiagonalAngle;
 
-	float getRearDiagonalAxis();
-	void  setRearDiagonalAxis(float value);
-	Property<VehilceConfig,float,READ_WRITE> RearDiagonalAxis;
+    double getRearDiagonalAxis();
+    void  setRearDiagonalAxis(double value);
+    Property<VehilceConfig,double,READ_WRITE> RearDiagonalAxis;
 
-	float getRearDiagonalAngle();
-	void  setRearDiagonalAngle(float value);
-	Property<VehilceConfig,float,READ_WRITE> RearDiagonalAngle;
+    double getRearDiagonalAngle();
+    void  setRearDiagonalAngle(double value);
+    Property<VehilceConfig,double,READ_WRITE> RearDiagonalAngle;
 
 	float getRadiusFrontLeft();
 	void  setRadiusFrontLeft(float value);
@@ -89,6 +95,18 @@ public:
 	Location* getUltrasonicLocationArray();
 	Property<VehilceConfig,Location*,READ_ONLY> UltrasonicLocationArray;
 
+    Polar getFrontLeftDiagonal();
+    Property<VehilceConfig,Polar,READ_ONLY> FrontLeftDiagonal;
+
+    Polar getFrontRightDiagonal();
+    Property<VehilceConfig,Polar,READ_ONLY> FrontRightDiagonal;
+
+    Polar getRearLeftDiagonal();
+    Property<VehilceConfig,Polar,READ_ONLY> RearLeftDiagonal;
+
+    Polar getRearRightDiagonal();
+    Property<VehilceConfig,Polar,READ_ONLY> RearRightDiagonal;
+
 	float* getAccelerateTable();
 	Property<VehilceConfig,float*,READ_ONLY> AccelerateTable;
 
@@ -105,10 +123,10 @@ public:
 	Property<VehilceConfig,uint16_t,READ_ONLY> VlcNum;
 private:
 	// the diagonal axis of the four edge to the center point and the angle
-	float _front_diagonal_axis;
-	float _front_diagonal_angle;
-	float _rear_diagonal_axis;
-	float _rear_diagonal_angle;
+    double _front_diagonal_axis;
+    double _front_diagonal_angle;
+    double _rear_diagonal_axis;
+    double _rear_diagonal_angle;
 
 	float _radius_front_left;
 	float _radius_front_right;
@@ -116,6 +134,11 @@ private:
 	float _radius_rear_right;
 
 	Location _ultrasonic_location_array[12];
+
+    Polar _front_left_diagonal;
+    Polar _front_right_diagonal;
+    Polar _rear_left_diagonal;
+    Polar _rear_right_diagonal;
 
 	uint16_t _acc_num,_vlc_num;
 	float _accelerate_table[ACC_ARRAY_NUM];

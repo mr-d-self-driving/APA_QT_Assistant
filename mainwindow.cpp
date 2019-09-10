@@ -461,6 +461,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
     gPath_IO_Layout->addWidget(gVehicleParking_Group,1,0);
     gPath_IO_Layout->addWidget(gVehicleTrack_Group,2,0);
+    gPath_IO_Layout->setColumnMinimumWidth(0,70);
     gPath_IO_Layout->setRowStretch(0,1);
     gPath_IO_Layout->setRowStretch(1,1);
     gPath_IO_Layout->setRowStretch(2,1);
@@ -470,8 +471,42 @@ MainWindow::MainWindow(QWidget *parent) :
     mPathPlot->legend->setVisible(true);
     mPathPlot->legend->setFont(QFont("Helvetica", 9));
     mPathPlot->legend->setRowSpacing(-3);
+    mPathPlot->xAxis->setLabel("x");
+    mPathPlot->yAxis->setLabel("y");
+    mPathPlot->xAxis->setRange(-8,8);
+    mPathPlot->yAxis->setRange(-6,6);
 
     mPathVehicleGraph = mPathPlot->addGraph();
+    mPathVehicleGraph->setName("车辆模型");
+    mPathVehicleGraph->setLineStyle(QCPGraph::lsLine);
+    mPathVehicleGraph->setScatterStyle(QCPScatterStyle::ssNone);
+    mPathVehicleGraph->setPen(QPen(Qt::green));
+    mPathVehicleGraph->setBrush(QBrush(QColor(0, 30, 255, 20)));
+    mPathVehicleGraph->rescaleAxes();
+
+    mPathVehicleModuleDownGraph = mPathPlot->addGraph();
+    mPathVehicleModuleDownGraph->setLineStyle(QCPGraph::lsLine);
+    mPathVehicleModuleDownGraph->setScatterStyle(QCPScatterStyle::ssNone);
+    mPathVehicleModuleDownGraph->setPen(QPen(Qt::green));
+
+    mPathVehicleGraph->setChannelFillGraph(mPathVehicleModuleDownGraph);
+
+//    mPathPlot->xAxis->rescale();
+//    mPathVehicleGraph->rescaleValueAxis(false,true);
+//    mPathPlot->xAxis->setRange(mPathPlot->xAxis->range().upper,100,Qt::AlignRight);
+//    mPathPlot->yAxis->setRange(mPathPlot->yAxis->range().upper,100,Qt::AlignRight);
+
+//    mPathPlot->xAxis->scaleRange(1.1,mPathPlot->xAxis->range().center());
+//    mPathPlot->yAxis->scaleRange(1.1,mPathPlot->yAxis->range().center());
+//    mPathPlot->xAxis->setTicks(true);
+//    mPathPlot->yAxis->setTicks(true);
+//    mPathPlot->xAxis->setTickLabels(true);
+//    mPathPlot->yAxis->setTickLabels(true);
+//    mPathVehicleGraph->addData(mGeometricTrack.getPosition().X,mGeometricTrack.getPosition().Y);
+    // make key axis range scroll with the data:
+//    mPathPlot->xAxis->rescale();
+//    mPathVehicleGraph->rescaleValueAxis(false, true);
+
 
     QGridLayout *gPathLayout = new QGridLayout();
     gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
@@ -536,6 +571,34 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::VehicleModule(Vector2d p,float yaw)
+{
+    FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + yaw));
+    FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + yaw));
+    RearLeftPoint   = p + Vector2d(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + yaw));
+    RearRightPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + yaw));
+
+    QVector<double> VehiclePointX(3),VehiclePointY(3);
+    VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
+    VehiclePointX[1] = static_cast<double>(RearLeftPoint.getX());
+    VehiclePointX[2] = static_cast<double>(FrontLeftPoint.getX());
+    VehiclePointY[0] = static_cast<double>(RearRightPoint.getY());
+    VehiclePointY[1] = static_cast<double>(RearLeftPoint.getY());
+    VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
+    mPathVehicleGraph->setData(VehiclePointX,VehiclePointY,true);
+
+    QVector<double> VehicleDownPointX(3),VehicleDownPointY(3);
+    VehicleDownPointX[0] = static_cast<double>(RearRightPoint.getX());
+    VehicleDownPointX[1] = static_cast<double>(FrontRightPoint.getX());
+    VehicleDownPointX[2] = static_cast<double>(FrontLeftPoint.getX());
+    VehicleDownPointY[0] = static_cast<double>(RearRightPoint.getY());
+    VehicleDownPointY[1] = static_cast<double>(FrontRightPoint.getY());
+    VehicleDownPointY[2] = static_cast<double>(FrontLeftPoint.getY());
+    mPathVehicleModuleDownGraph->setData(VehicleDownPointX,VehicleDownPointY,true);
+
+    mPathPlot->replot();
+}
+
 void MainWindow::sTimer20msTask(void)
 {
     mBoRuiController.APAEnable = 1;
@@ -545,18 +608,13 @@ void MainWindow::sTimer20msTask(void)
     mBoRuiController.SteeringAngleRate = 300;
 
     mSimulation.Update(&mBoRuiController,&mBoRuiMessage);
-    mGeometricTrack.VelocityUpdate(&mBoRuiMessage,0.02f);
+    mGeometricTrack.VelocityUpdate(&mBoRuiMessage,0.1f);
 
-    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X)));
-    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y)));
-    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f)));
+    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',3));
+    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',3));
+    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',3));
 
-    mPathVehicleGraph->addData(mGeometricTrack.getPosition().X,mGeometricTrack.getPosition().Y);
-
-    mPathPlot->xAxis->rescale();
-    mPathVehicleGraph->rescaleValueAxis(false,true);
-    mPathPlot->xAxis->setRange(mPathPlot->xAxis->range().upper,100,Qt::AlignRight);
-    mPathPlot->replot();
+    VehicleModule(mGeometricTrack.getPosition(),mGeometricTrack.getYaw());
 
     // calculate and add a new data point to each graph:
     mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
