@@ -473,15 +473,15 @@ MainWindow::MainWindow(QWidget *parent) :
     mPathPlot->legend->setRowSpacing(-3);
     mPathPlot->xAxis->setLabel("x");
     mPathPlot->yAxis->setLabel("y");
-    mPathPlot->xAxis->setRange(-8,8);
-    mPathPlot->yAxis->setRange(-6,6);
+    mPathPlot->xAxis->setRange(-10,10);
+    mPathPlot->yAxis->setRange(-10,10);
 
     mPathVehicleGraph = mPathPlot->addGraph();
     mPathVehicleGraph->setName("车辆模型");
     mPathVehicleGraph->setLineStyle(QCPGraph::lsLine);
     mPathVehicleGraph->setScatterStyle(QCPScatterStyle::ssNone);
     mPathVehicleGraph->setPen(QPen(Qt::green));
-    mPathVehicleGraph->setBrush(QBrush(QColor(0, 30, 255, 20)));
+    mPathVehicleGraph->setBrush(QBrush(QColor(80, 30, 255, 20)));
     mPathVehicleGraph->rescaleAxes();
 
     mPathVehicleModuleDownGraph = mPathPlot->addGraph();
