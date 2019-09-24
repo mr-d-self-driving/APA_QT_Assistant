@@ -235,7 +235,7 @@ MainWindow::MainWindow(QWidget *parent) :
     button_timer_control = new QPushButton();
     button_timer_control->setText("开始");
 
-    /*** Control IO Layout ***/
+    /********************* Control IO Layout *********************/
     QGridLayout *gControl_IO_Layout = new QGridLayout();
     gControl_IO_Layout->addWidget(gCanGroup,0,0);
     gControl_IO_Layout->addWidget(gVehicleStatusGroup,1,0);
@@ -252,7 +252,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gControl_IO_Layout->setRowStretch(5,1);
     gControl_IO_Layout->setRowStretch(6,1);
     gControl_IO_Layout->setRowStretch(7,1);
-    // Plot 元素
+    // Control Plot 元素
     mControlPlot = new QCustomPlot();
 
     // configure plot to have two right axes:
@@ -283,7 +283,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gControlLayout->setColumnStretch(1,10);
     gControlLayout->setColumnMinimumWidth(0,100);
 
-    /*** Detect UI ***/
+    /****************** Detect UI ******************/
     label_FrontObstacle_Text = new QLabel();
     label_FrontObstacle_Text->setText("前:");
     label_FrontObstacleDistance_Value = new QLabel();
@@ -356,7 +356,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gDetectLayout->setColumnStretch(0,1);
     gDetectLayout->setColumnStretch(1,9);
 
-    /*** Path UI ***/
+    /************************ Path UI ***************************/
     // 车辆初始位置 begin
     QLabel *label_VehicleInitPointX_Text = new QLabel();
     label_VehicleInitPointX_Text->setText("X:");
@@ -412,6 +412,9 @@ MainWindow::MainWindow(QWidget *parent) :
     gVehicleParking_Group->setLayout(gVehicleParking_Layout);
     // 车位信息 end
 
+    QPushButton *gParkingInformationConfirm = new QPushButton();
+    gParkingInformationConfirm->setText("库位信息确认");
+
     // 实时车辆位置跟踪 begin
     QLabel *label_VehiceTrackX_Text = new QLabel();
     label_VehiceTrackX_Text->setText("X:");
@@ -460,12 +463,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QGridLayout *gPath_IO_Layout = new QGridLayout();
     gPath_IO_Layout->addWidget(gVehicleInitPosition_Group,0,0);
     gPath_IO_Layout->addWidget(gVehicleParking_Group,1,0);
-    gPath_IO_Layout->addWidget(gVehicleTrack_Group,2,0);
+    gPath_IO_Layout->addWidget(gParkingInformationConfirm,2,0);
+    gPath_IO_Layout->addWidget(gVehicleTrack_Group,3,0);
     gPath_IO_Layout->setColumnMinimumWidth(0,70);
     gPath_IO_Layout->setRowStretch(0,1);
     gPath_IO_Layout->setRowStretch(1,1);
     gPath_IO_Layout->setRowStretch(2,1);
     gPath_IO_Layout->setRowStretch(3,1);
+    gPath_IO_Layout->setRowStretch(4,1);
 
     mPathPlot = new QCustomPlot();
     mPathPlot->legend->setVisible(true);
@@ -473,23 +478,61 @@ MainWindow::MainWindow(QWidget *parent) :
     mPathPlot->legend->setRowSpacing(-3);
     mPathPlot->xAxis->setLabel("x");
     mPathPlot->yAxis->setLabel("y");
-    mPathPlot->xAxis->setRange(-10,10);
-    mPathPlot->yAxis->setRange(-10,10);
+    mPathPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
+    mPathPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
 
-    mPathVehicleGraph = mPathPlot->addGraph();
-    mPathVehicleGraph->setName("车辆模型");
-    mPathVehicleGraph->setLineStyle(QCPGraph::lsLine);
-    mPathVehicleGraph->setScatterStyle(QCPScatterStyle::ssNone);
-    mPathVehicleGraph->setPen(QPen(Qt::green));
-    mPathVehicleGraph->setBrush(QBrush(QColor(80, 30, 255, 20)));
-    mPathVehicleGraph->rescaleAxes();
+    mPathVehicleModuleCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathVehicleModuleCurve->setName("车辆模型");
+    mPathVehicleModuleCurve->setPen(QPen(Qt::red,3));
+    mPathVehicleModuleCurve->setBrush(QBrush(QColor(90,35,255,20)));
 
-    mPathVehicleModuleDownGraph = mPathPlot->addGraph();
-    mPathVehicleModuleDownGraph->setLineStyle(QCPGraph::lsLine);
-    mPathVehicleModuleDownGraph->setScatterStyle(QCPScatterStyle::ssNone);
-    mPathVehicleModuleDownGraph->setPen(QPen(Qt::green));
+    mPathParkingCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathParkingCurve->setName("库位");
+    mPathParkingCurve->setPen(QPen(Qt::green,4));
+    mPathParkingCurve->setBrush(QBrush(QColor(90,255,240,80)));
 
-    mPathVehicleGraph->setChannelFillGraph(mPathVehicleModuleDownGraph);
+    mPathVehicleCenterCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathVehicleCenterCurve->setName("后轴中心");
+
+    ParkingPointX.resize(9);
+    ParkingPointX[0] = BOUNDARY_LEFT;
+    ParkingPointX[1] = 0;
+    ParkingPointX[2] = 0;
+    ParkingPointX[3] = 5;
+    ParkingPointX[4] = 5;
+    ParkingPointX[5] = BOUNDARY_RIGHT;
+    ParkingPointX[6] = BOUNDARY_RIGHT;
+    ParkingPointX[7] = BOUNDARY_LEFT;
+    ParkingPointX[8] = BOUNDARY_LEFT;
+
+    ParkingPointY.resize(9);
+
+    ParkingPointY[0] = 0;
+    ParkingPointY[1] = 0;
+    ParkingPointY[2] = -2.3;
+    ParkingPointY[3] = -2.3;
+    ParkingPointY[4] = 0;
+    ParkingPointY[5] = 0;
+    ParkingPointY[6] = BOUNDARY_DOWN;
+    ParkingPointY[7] = BOUNDARY_DOWN;
+    ParkingPointY[8] = 0;
+
+    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
+
+//    mPathVehicleGraph = mPathPlot->addGraph();
+//    mPathVehicleGraph->setName("车辆模型");
+//    mPathVehicleGraph->setLineStyle(QCPGraph::lsLine);
+//    mPathVehicleGraph->setScatterStyle(QCPScatterStyle::ssNone);
+//    mPathVehicleGraph->setPen(QPen(Qt::green));
+//    mPathVehicleGraph->setBrush(QBrush(QColor(80, 30, 255, 20)));
+//    mPathVehicleGraph->rescaleAxes();
+
+//    mPathVehicleModuleDownGraph = mPathPlot->addGraph();
+//    mPathVehicleModuleDownGraph->setLineStyle(QCPGraph::lsLine);
+//    mPathVehicleModuleDownGraph->setScatterStyle(QCPScatterStyle::ssNone);
+//    mPathVehicleModuleDownGraph->setPen(QPen(Qt::green));
+
+//    mPathVehicleGraph->setChannelFillGraph(mPathVehicleModuleDownGraph);
 
 //    mPathPlot->xAxis->rescale();
 //    mPathVehicleGraph->rescaleValueAxis(false,true);
@@ -559,9 +602,13 @@ MainWindow::MainWindow(QWidget *parent) :
     // CAN Close single and the Slot
     connect(button_CanClose,SIGNAL(clicked()),this,SLOT(sCAN_Close()));
 
-    connect(&mCanRevWorkThread,SIGNAL(SendPercaptionMessage(Percaption*)),this,SLOT(DisplayPercaption(Percaption*)));
+    connect(&mCanRevWorkThread,SIGNAL(SendPercaptionMessage(Percaption*)),this,SLOT(sDisplayPercaption(Percaption*)));
+
+    connect(gParkingInformationConfirm,SIGNAL(clicked()),this,SLOT(sParkingConfirm()));
+
     // 定时器20ms
     mDataTimer20ms.start(20);
+    Init();
 }
 
 MainWindow::~MainWindow()
@@ -571,34 +618,61 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::Init()
+{
+    mParallelPlanning.Init();
+}
+
+/****** Function ******/
+
 void MainWindow::VehicleModule(Vector2d p,float yaw)
 {
     FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + yaw));
     FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + yaw));
-    RearLeftPoint   = p + Vector2d(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + yaw));
-    RearRightPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + yaw));
+    RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + yaw));
+    RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + yaw));
 
-    QVector<double> VehiclePointX(3),VehiclePointY(3);
+    mPathVehicleCenterCurve->addData(p.getX(),p.getY());
+
+    QVector<double> VehiclePointX(5),VehiclePointY(5);
     VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
     VehiclePointX[1] = static_cast<double>(RearLeftPoint.getX());
     VehiclePointX[2] = static_cast<double>(FrontLeftPoint.getX());
+    VehiclePointX[3] = static_cast<double>(FrontRightPoint.getX());
+    VehiclePointX[4] = static_cast<double>(RearRightPoint.getX());
+
     VehiclePointY[0] = static_cast<double>(RearRightPoint.getY());
     VehiclePointY[1] = static_cast<double>(RearLeftPoint.getY());
     VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
-    mPathVehicleGraph->setData(VehiclePointX,VehiclePointY,true);
+    VehiclePointY[3] = static_cast<double>(FrontRightPoint.getY());
+    VehiclePointY[4] = static_cast<double>(RearRightPoint.getY());
+    mPathVehicleModuleCurve->setData(VehiclePointX,VehiclePointY);
+//    mPathVehicleGraph->setData(VehiclePointX,VehiclePointY,true);
 
-    QVector<double> VehicleDownPointX(3),VehicleDownPointY(3);
-    VehicleDownPointX[0] = static_cast<double>(RearRightPoint.getX());
-    VehicleDownPointX[1] = static_cast<double>(FrontRightPoint.getX());
-    VehicleDownPointX[2] = static_cast<double>(FrontLeftPoint.getX());
-    VehicleDownPointY[0] = static_cast<double>(RearRightPoint.getY());
-    VehicleDownPointY[1] = static_cast<double>(FrontRightPoint.getY());
-    VehicleDownPointY[2] = static_cast<double>(FrontLeftPoint.getY());
-    mPathVehicleModuleDownGraph->setData(VehicleDownPointX,VehicleDownPointY,true);
+//    QVector<double> VehiclePointX(3),VehiclePointY(3);
+//    VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
+//    VehiclePointX[1] = static_cast<double>(RearLeftPoint.getX());
+//    VehiclePointX[2] = static_cast<double>(FrontLeftPoint.getX());
+//    VehiclePointY[0] = static_cast<double>(RearRightPoint.getY());
+//    VehiclePointY[1] = static_cast<double>(RearLeftPoint.getY());
+//    VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
+//    mPathVehicleGraph->setData(VehiclePointX,VehiclePointY,true);
+
+//    QVector<double> VehicleDownPointX(3),VehicleDownPointY(3);
+//    VehicleDownPointX[0] = static_cast<double>(RearRightPoint.getX());
+//    VehicleDownPointX[1] = static_cast<double>(FrontRightPoint.getX());
+//    VehicleDownPointX[2] = static_cast<double>(FrontLeftPoint.getX());
+//    VehicleDownPointY[0] = static_cast<double>(RearRightPoint.getY());
+//    VehicleDownPointY[1] = static_cast<double>(FrontRightPoint.getY());
+//    VehicleDownPointY[2] = static_cast<double>(FrontLeftPoint.getY());
+//    mPathVehicleModuleDownGraph->setData(VehicleDownPointX,VehicleDownPointY,true);
 
     mPathPlot->replot();
 }
 
+/****** SLOT ******/
+
+// 定时任务
 void MainWindow::sTimer20msTask(void)
 {
     mBoRuiController.APAEnable = 1;
@@ -608,6 +682,9 @@ void MainWindow::sTimer20msTask(void)
     mBoRuiController.SteeringAngleRate = 300;
 
     mSimulation.Update(&mBoRuiController,&mBoRuiMessage);
+
+    mParallelPlanning.Work(&mPercaption);
+
     mGeometricTrack.VelocityUpdate(&mBoRuiMessage,0.1f);
 
     label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',3));
@@ -637,6 +714,7 @@ void MainWindow::sTimer20msTask(void)
     mControlPlot->replot();
 }
 
+// 点击按钮
 void MainWindow::sTimer20ms_Control(void)
 {
     if(mDataTimer20ms.isActive())
@@ -745,7 +823,7 @@ void MainWindow::sCAN_Close(void)
     this->button_CanClose->setEnabled(false);
 }
 
-void MainWindow::DisplayPercaption(Percaption *p)
+void MainWindow::sDisplayPercaption(Percaption *p)
 {
 
     label_FrontObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getFrontObstacleDistance().distance)));
@@ -777,4 +855,15 @@ void MainWindow::DisplayPercaption(Percaption *p)
     mDetectTag2->setText(QString::number(graph2Value, 'f', 2));
 
     mDetectPlot->replot();
+}
+
+// 库位确认按钮
+void MainWindow::sParkingConfirm()
+{
+    mPercaption.PositionX = text_VehicleInitPointX->text().toFloat();
+    mPercaption.PositionY = text_VehicleInitPointY->text().toFloat();
+    mPercaption.AttitudeYaw = text_VehicleInitPointYaw->text().toFloat();
+
+    mPercaption.ParkingLength = text_ParkingLength->text().toFloat();
+    mPercaption.ParkingWidth  = text_ParkingWidth->text().toFloat();
 }

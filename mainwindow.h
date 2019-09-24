@@ -8,12 +8,17 @@
 #include "Interaction/HMI/Terminal.h"
 #include "Interaction/HMI/simulation.h"
 #include  "WinZlgCan/can_rev_work_thread.h"
+#include "Planning/ParallelParking/parallel_planning.h"
 
 #ifdef BORUI
 #include "Interaction/CANBUS/BoRui/bo_rui_message.h"
 #include "Interaction/CANBUS/BoRui/bo_rui_controller.h"
 #endif
 
+#define BOUNDARY_LEFT  (-14.0)
+#define BOUNDARY_RIGHT ( 16.0)
+#define BOUNDARY_TOP   ( 12.0)
+#define BOUNDARY_DOWN  (-12.0)
 
 namespace Ui {
 class MainWindow;
@@ -26,8 +31,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
+    void Init(void);
     void VehicleModule(Vector2d p,float yaw);
+
 private:
     Ui::MainWindow *ui;
     // plot variable
@@ -70,6 +76,13 @@ private:
     QLabel *label_VehiceTrackYaw_Value;
 
     QCustomPlot *mPathPlot;
+    // 用于车辆模型的绘制
+    QCPCurve *mPathVehicleModuleCurve;
+    QCPCurve *mPathParkingCurve;
+    QCPCurve *mPathVehicleCenterCurve;
+
+    QVector<double> ParkingPointX,ParkingPointY;
+
     QPointer<QCPGraph> mPathVehicleGraph;
     QPointer<QCPGraph> mPathVehicleModuleDownGraph;
 
@@ -98,6 +111,9 @@ private:
 
     Vector2d FrontLeftPoint,FrontRightPoint,RearLeftPoint,RearRightPoint;
 
+    // Path
+    ParallelPlanning mParallelPlanning;
+
 private slots:
     // 功能选择激活函数图片选择的槽函数
     void sProcessItemActiveState(QListWidgetItem *current, QListWidgetItem *previous);
@@ -105,12 +121,17 @@ private slots:
     // 50ms Task
     void sTimer20msTask(void);
     void sTimer20ms_Control(void);
+
     // CAN 配置相关的槽函数
     void sCAN_Connect(void);
     void sCAN_Open(void);
     void sCAN_Close(void);
 
-    void DisplayPercaption(Percaption *p);
+    //障碍物感知信息
+    void sDisplayPercaption(Percaption *p);
+
+    //规划
+    void sParkingConfirm();
 };
 
 #endif // MAINWINDOW_H
