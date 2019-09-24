@@ -103,10 +103,10 @@ void VehilceConfig::Init()
     _front_right_diagonal.Angle  = -FrontDiagonalAngle;
 
     _rear_left_diagonal.Length = RearDiagonalAxis;
-    _rear_left_diagonal.Angle  = RearDiagonalAngle;
+    _rear_left_diagonal.Angle  = -RearDiagonalAngle;
 
     _rear_right_diagonal.Length =  RearDiagonalAxis;
-    _rear_right_diagonal.Angle  = -RearDiagonalAngle;
+    _rear_right_diagonal.Angle  =  RearDiagonalAngle;
 
 	_ultrasonic_location_array[0].Point.X = SENSOR1_X;
 	_ultrasonic_location_array[0].Point.Y = SENSOR1_Y;
