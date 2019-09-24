@@ -8,66 +8,75 @@
 #include <./Percaption/Interface/percaption.h>
 
 Percaption::Percaption() {
-	PositionX.setContainer(this);
-	PositionX.getter(&Percaption::getPositionX);
-	PositionX.setter(&Percaption::setPositionX);
+    PositionX.setContainer(this);
+    PositionX.getter(&Percaption::getPositionX);
+    PositionX.setter(&Percaption::setPositionX);
 
-	PositionY.setContainer(this);
-	PositionY.getter(&Percaption::getPositionY);
-	PositionY.setter(&Percaption::setPositionY);
+    PositionY.setContainer(this);
+    PositionY.getter(&Percaption::getPositionY);
+    PositionY.setter(&Percaption::setPositionY);
 
-	AttitudeYaw.setContainer(this);
-	AttitudeYaw.getter(&Percaption::getAttitudeYaw);
-	AttitudeYaw.setter(&Percaption::setAttitudeYaw);
+    AttitudeYaw.setContainer(this);
+    AttitudeYaw.getter(&Percaption::getAttitudeYaw);
+    AttitudeYaw.setter(&Percaption::setAttitudeYaw);
 
-	ParkingLength.setContainer(this);
-	ParkingLength.getter(&Percaption::getParkingLength);
-	ParkingLength.setter(&Percaption::setParkingLength);
+    ParkingLength.setContainer(this);
+    ParkingLength.getter(&Percaption::getParkingLength);
+    ParkingLength.setter(&Percaption::setParkingLength);
 
-	ParkingWidth.setContainer(this);
-	ParkingWidth.getter(&Percaption::getParkingWidth);
-	ParkingWidth.setter(&Percaption::setParkingWidth);
+    ParkingWidth.setContainer(this);
+    ParkingWidth.getter(&Percaption::getParkingWidth);
+    ParkingWidth.setter(&Percaption::setParkingWidth);
 
-	DetectParkingStatus.setContainer(this);
-	DetectParkingStatus.getter(&Percaption::getDetectParkingStatus);
-	DetectParkingStatus.setter(&Percaption::setDetectParkingStatus);
+    DetectParkingStatus.setContainer(this);
+    DetectParkingStatus.getter(&Percaption::getDetectParkingStatus);
+    DetectParkingStatus.setter(&Percaption::setDetectParkingStatus);
 
-	Command.setContainer(this);
-	Command.getter(&Percaption::getCommand);
-	Command.setter(&Percaption::setCommand);
+    Command.setContainer(this);
+    Command.getter(&Percaption::getCommand);
+    Command.setter(&Percaption::setCommand);
 
-	ValidParkingEdgePosition.setContainer(this);
-	ValidParkingEdgePosition.getter(&Percaption::getValidParkingEdgePosition);
-	ValidParkingEdgePosition.setter(&Percaption::setValidParkingEdgePosition);
+    ValidParkingEdgePosition.setContainer(this);
+    ValidParkingEdgePosition.getter(&Percaption::getValidParkingEdgePosition);
+    ValidParkingEdgePosition.setter(&Percaption::setValidParkingEdgePosition);
 
-	ValidParkingCenterPosition.setContainer(this);
-	ValidParkingCenterPosition.getter(&Percaption::getValidParkingCenterPosition);
-	ValidParkingCenterPosition.setter(&Percaption::setValidParkingCenterPosition);
+    ValidParkingCenterPosition.setContainer(this);
+    ValidParkingCenterPosition.getter(&Percaption::getValidParkingCenterPosition);
+    ValidParkingCenterPosition.setter(&Percaption::setValidParkingCenterPosition);
 
-	ObstacleDistance.setContainer(this);
-	ObstacleDistance.getter(&Percaption::getObstacleDistance);
-	ObstacleDistance.setter(&Percaption::setObstacleDistance);
+    ParallelParkingSlotPosition.setContainer(this);
+    ParallelParkingSlotPosition.getter(&Percaption::getParallelParkingSlotPosition);
+    ParallelParkingSlotPosition.setter(&Percaption::setParallelParkingSlotPosition);
 
-	FrontObstacleDistance.setContainer(this);
-	FrontObstacleDistance.getter(&Percaption::getFrontObstacleDistance);
-	FrontObstacleDistance.setter(&Percaption::setFrontObstacleDistance);
+    ObstacleDistance.setContainer(this);
+    ObstacleDistance.getter(&Percaption::getObstacleDistance);
+    ObstacleDistance.setter(&Percaption::setObstacleDistance);
 
-	RearObstacleDistance.setContainer(this);
-	RearObstacleDistance.getter(&Percaption::getRearObstacleDistance);
-	RearObstacleDistance.setter(&Percaption::setRearObstacleDistance);
+    FrontObstacleDistance.setContainer(this);
+    FrontObstacleDistance.getter(&Percaption::getFrontObstacleDistance);
+    FrontObstacleDistance.setter(&Percaption::setFrontObstacleDistance);
 
-	LeftFitLinePacket.setContainer(this);
-	LeftFitLinePacket.getter(&Percaption::getLeftFitLinePacket);
-	LeftFitLinePacket.setter(&Percaption::setLeftFitLinePacket);
+    RearObstacleDistance.setContainer(this);
+    RearObstacleDistance.getter(&Percaption::getRearObstacleDistance);
+    RearObstacleDistance.setter(&Percaption::setRearObstacleDistance);
 
-	RightFitLinePacket.setContainer(this);
-	RightFitLinePacket.getter(&Percaption::getRightFitLinePacket);
-	RightFitLinePacket.setter(&Percaption::setRightFitLinePacket);
+    FrontEdgeFitLinePacket.setContainer(this);
+    FrontEdgeFitLinePacket.getter(&Percaption::getFrontEdgeFitLinePacket);
+    FrontEdgeFitLinePacket.setter(&Percaption::setFrontEdgeFitLinePacket);
 
-	CenterFitLinePacket.setContainer(this);
-	CenterFitLinePacket.getter(&Percaption::getCenterFitLinePacket);
-	CenterFitLinePacket.setter(&Percaption::setCenterFitLinePacket);
-	Init();
+    LeftFitLinePacket.setContainer(this);
+    LeftFitLinePacket.getter(&Percaption::getLeftFitLinePacket);
+    LeftFitLinePacket.setter(&Percaption::setLeftFitLinePacket);
+
+    RightFitLinePacket.setContainer(this);
+    RightFitLinePacket.getter(&Percaption::getRightFitLinePacket);
+    RightFitLinePacket.setter(&Percaption::setRightFitLinePacket);
+
+    CenterFitLinePacket.setContainer(this);
+    CenterFitLinePacket.getter(&Percaption::getCenterFitLinePacket);
+    CenterFitLinePacket.setter(&Percaption::setCenterFitLinePacket);
+
+    Init();
 }
 
 Percaption::~Percaption() {
@@ -75,13 +84,13 @@ Percaption::~Percaption() {
 }
 void Percaption::Init(void)
 {
-	_position_x = 0.0f;
-	_position_y = 0.0f;
-	_attitude_yaw = 0.0f;
-	_parking_length = 0.0f;
-	_parking_width  = 0.0f;
-	_detect_parking_status = false;
-	_command = 0;
+    _position_x = 0.0f;
+    _position_y = 0.0f;
+    _attitude_yaw = 0.0f;
+    _parking_length = 0.0f;
+    _parking_width  = 0.0f;
+    _detect_parking_status = false;
+    _command = 0;
 }
 
 float Percaption::getPositionX()           { return  _position_x;}
@@ -119,6 +128,12 @@ void  Percaption::setFrontObstacleDistance(ObstacleDistancePacket value){ _front
 
 ObstacleDistancePacket Percaption::getRearObstacleDistance()           { return  _rear_obstacle_distance;}
 void  Percaption::setRearObstacleDistance(ObstacleDistancePacket value){ _rear_obstacle_distance = value;}
+
+ParallelParkingInformationPacket Percaption::getParallelParkingSlotPosition()           { return  _parallel_parking_slot_position;}
+void  Percaption::setParallelParkingSlotPosition(ParallelParkingInformationPacket value){ _parallel_parking_slot_position = value;}
+
+LineFitInformationPacket Percaption::getFrontEdgeFitLinePacket()           { return  _front_edge_fit_line_packet;}
+void  Percaption::setFrontEdgeFitLinePacket(LineFitInformationPacket value){ _front_edge_fit_line_packet = value;}
 
 LineFitInformationPacket Percaption::getLeftFitLinePacket()           { return  _left_fit_line_packet;}
 void  Percaption::setLeftFitLinePacket(LineFitInformationPacket value){ _left_fit_line_packet = value;}
