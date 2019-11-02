@@ -52,8 +52,6 @@ SOURCES += \
         Planning/ParallelParking/parallel_planning.cpp \
         Planning/VerticalParking/vertical_planning.cpp \
         QCustomPlot/axistag.cpp \
-        WinZlgCan/can_rev_work_thread.cpp \
-        WinZlgCan/win_zlg_can.cpp \
         main.cpp \
         mainwindow.cpp \
         QCustomPlot/qcustomplot.cpp
@@ -94,9 +92,6 @@ HEADERS += \
         Planning/ParallelParking/parallel_planning.h \
         Planning/VerticalParking/vertical_planning.h \
         QCustomPlot/axistag.h \
-        WinZlgCan/ControlCAN.h \
-        WinZlgCan/can_rev_work_thread.h \
-        WinZlgCan/win_zlg_can.h \
         mainwindow.h \
         QCustomPlot/qcustomplot.h
 
