@@ -43,7 +43,7 @@ typedef enum _UltrasonicStatus
     BlindZone,
     OverDetection,
     Noise,
-	InvalidPoint
+    InvalidPoint
 }UltrasonicStatus;
 
 typedef struct _LIN_STP318_Packet
