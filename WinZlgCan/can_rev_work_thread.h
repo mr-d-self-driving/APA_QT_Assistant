@@ -39,30 +39,6 @@ private:
 
 signals:
     void SendPercaptionMessage(Percaption *p);
-//    void TestSignal(VehInf,int);
-//    void NoData(int);
-//    void SendPInfo(int, int, int, MvParkSlot, int);
-//    void SendPInfoTime(unsigned int,unsigned int,int);
-//    void SendPInfoTimeFisrt(unsigned int,unsigned int,int);
-//    void SendCAInfo(VehInfCA);
-//    void SendSlotInfo(MvParkingInfo);
-//    void SendCurbInfo(MvCurbInfo);
-//    void SendFreePInfo(int, MvWorldPoint);
-
-//    //lin
-//    void SendSignal318(int,int,LIN_STP318_ReadData);
-//    void SendSignal313(int,int,LIN_STP313_ReadData);
-//    void SendSignalD(float,int);
-
-//    void SendACK(int,int);
-//    void SendNxpPosition(int, int, int, int );
-//    void SendNxpUPosition(int, float, float, int );
-//    void SendLaneInfo(LaneInfo);
-//    void SendWarningFlag(bool ,unsigned int);
-//    void SendObst(unsigned int, Obs);
-
-//    void SendNxpACK(int);
-//    void SendNxpCtlStauts(NXPCTRL);
 };
 
 #endif // CAN_REV_WORK_THREAD_H
