@@ -17,9 +17,9 @@ LinkList::LinkList() {
 	// TODO Auto-generated constructor stub
 	_list_length = 0;
 
-	_head_node = NULL;//头节点
-	_end_node  = NULL;//尾节点
-	_node      = NULL;//
+    _head_node = new Node();//头节点
+    _end_node  = new Node();//尾节点
+    _node      = new Node();//
 }
 
 LinkList::~LinkList() {
@@ -29,9 +29,9 @@ LinkList::~LinkList() {
 	delete _end_node;//尾节点
 	delete _node;//
 
-	_head_node = NULL;
-	_end_node  = NULL;
-	_node      = NULL;
+//	_head_node = new Node();
+//	_end_node  = new Node();
+//	_node      = new Node();
 }
 
 void LinkList::Add(ObstacleLocationPacket dat)
@@ -40,7 +40,7 @@ void LinkList::Add(ObstacleLocationPacket dat)
 	if( _node != NULL)
 	{
 		_node->data = dat;
-		if(_end_node == NULL)
+        if(!_end_node)
 		{
 			_head_node = _node;//头节点
 			_end_node  = _node;//尾节点
@@ -59,7 +59,7 @@ void LinkList::Delete(void)
 	Node* _free_node;//
 	if(_list_length > 0)
 	{
-		while(_head_node->next != NULL)
+        while(!_head_node->next)
 		{
 			_free_node = _head_node;
 			_head_node = _head_node->next;
