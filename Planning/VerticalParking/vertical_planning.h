@@ -126,6 +126,7 @@ typedef enum _ParkingCorrectStatus
 
 class VerticalPlanning : public Planning
 {
+    Q_OBJECT
 public:
 	VerticalPlanning();
 	virtual ~VerticalPlanning();
@@ -133,11 +134,11 @@ public:
 	void Init() override;
 	void Work(Percaption *p) override;
 	void Work(Percaption *p,VehicleState *s);
-	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u) override;
+    void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p) override;
 	/*
 	 * 基于感知的
 	 * */
-	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
+//	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p);
 	/************************************************************************************************/
 	/************************************ branch state machine **************************************/
 	/************************************************************************************************/
