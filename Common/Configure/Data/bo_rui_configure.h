@@ -25,8 +25,9 @@
 #define RIGHT_EDGE_TO_CENTER              (0.9275f)
 
 // 最小转弯半径(m)
-#define MIN_RIGHT_TURN_RADIUS             (4.7079f)
-#define MIN_LEFT_TURN_RADIUS              (4.6614f)
+#define MIN_RIGHT_TURN_RADIUS             (4.0244f)
+#define MIN_LEFT_TURN_RADIUS              (4.1319f)
+
 // 转向传动比
 #define STEERING_RATIO                    (16)
 
