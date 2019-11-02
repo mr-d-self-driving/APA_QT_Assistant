@@ -94,20 +94,21 @@ typedef enum _ParkingCompleteState
 
 class ParallelPlanning : public Planning
 {
+    Q_OBJECT
 public:
 	ParallelPlanning();
 	virtual ~ParallelPlanning();
 
 	void Init() override;
 	void Work(Percaption *p) override;
-	void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u) override;
+        void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p) override;
 
 	/***************************************************************/
-	 int8_t InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	 int8_t CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	 int8_t RightFrontTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	 int8_t LeftRearTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
-	 int8_t ParkingCompletedMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u);
+         int8_t InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *u);
+         int8_t CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *u);
+         int8_t RightFrontTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *u);
+         int8_t LeftRearTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *u);
+         int8_t ParkingCompletedMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *u);
 	/***************************************************************/
 
 	void ReversedTrial(Percaption *inf);
@@ -123,7 +124,6 @@ public:
 protected:
 	VehicleBody front_trial_body,rear_trial_body;
 	Vector2d    enter_point;
-
 
 private:
 	ParallelPlanningState _parallel_planning_state;
