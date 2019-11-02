@@ -91,6 +91,15 @@ void Percaption::Init(void)
     _parking_width  = 0.0f;
     _detect_parking_status = false;
     _command = 0;
+
+    _front_obstacle_distance.region = CenterRegion;
+    _front_obstacle_distance.status = OverDetection;
+    _front_obstacle_distance.distance = 3;
+
+    _rear_obstacle_distance.region = CenterRegion;
+    _rear_obstacle_distance.status = OverDetection;
+    _rear_obstacle_distance.distance = 3;
+
 }
 
 float Percaption::getPositionX()           { return  _position_x;}

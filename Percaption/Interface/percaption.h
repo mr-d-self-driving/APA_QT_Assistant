@@ -152,7 +152,7 @@ protected:
     ObstacleDistancePacket _rear_obstacle_distance;
 
     ParallelParkingInformationPacket _parallel_parking_slot_position;
-
+    // 库边沿拟合
     LineFitInformationPacket _front_edge_fit_line_packet;
     LineFitInformationPacket _left_fit_line_packet;
     LineFitInformationPacket _right_fit_line_packet;
