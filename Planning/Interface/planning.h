@@ -12,6 +12,7 @@
 #define INTERFACE_PATH_PLANNING_H_
 // Common
 #include <QMainWindow>
+
 #include "./Common/Utils/Inc/property.h"
 #include "./Percaption/Interface/percaption.h"
 // math
@@ -35,24 +36,24 @@
 #define STEERING_RATE         ( 300 ) // 转向角速度
 #define EMERGENCY_BRAKING	  (-2   ) // 紧急制动的减速度
 #define PLANNING_BRAKING	  (-1  )  // 规划减速度
-#define PLANNING_BRAKING_R	  ( 0.1 ) // 规划减速度的倒数
-#define STRAIGHT_VELOCITY	  ( 0.5 ) // 直线段的速度
-#define CURVE_VELOCITY	      ( 0.3 ) // 曲线段的速度
-#define MOTION_DISTANCE       ( 5.0 ) // 车辆满足运动的距离
-#define TURN_FEEDFORWARD_TIME ( 0.1 ) // 转向角前向反馈的补偿时间
-#define PARKING_CENTER_MARGIN ( 0.05 ) // 泊车中心点余量
+#define PLANNING_BRAKING_R	  ( 0.1f ) // 规划减速度的倒数
+#define STRAIGHT_VELOCITY	  ( 0.8f ) // 直线段的速度
+#define CURVE_VELOCITY	      ( 0.6f ) // 曲线段的速度
+#define MOTION_DISTANCE       ( 5.0f ) // 车辆满足运动的距离
+#define TURN_FEEDFORWARD_TIME ( 0.0f ) // 转向角前向反馈的补偿时间
+#define PARKING_CENTER_MARGIN ( 0.05f ) // 泊车中心点余量
 #define ACC_DISABLE_TIME      ( 50 ) // ACC失效时间
 #define STEER_ANGLE_ARRIVE_ERR ( 5 )  // 转向角允许的到位误差
 #define INIT_POINT_MARGIN      ( 0.3 ) // 初始位置调整的余量
 /**************************速度控制******************************/
-#define POSITION_A            ( 0.4 ) // 速度控制下限点
-#define POSITION_B            ( 0.8 ) // 速度控制上限点
+#define POSITION_A            ( 0.4f ) // 速度控制下限点
+#define POSITION_B            ( 0.8f ) // 速度控制上限点
 /**************************泊车余量******************************/
-#define PARKING_MARGIN        ( 0.2 ) // 停车余量
+#define PARKING_MARGIN        ( 0.2f ) // 停车余量
 /*************************END********************************/
 //extern GeometricTrack    m_GeometricTrack;
 //extern ChangAnController m_ChangAnController;
-#define K  0.0016   //  0.8/500
+#define K  0.0016f   //  0.8/500
 #define RK 625
 //#define K  0.001   //  0.5/500
 //#define RK 1000
@@ -63,14 +64,16 @@ typedef struct _Turn
 	float SteeringAngle;
 }Turn;
 
-class Planning {
+class Planning : public QObject
+{
+    Q_OBJECT
 public:
 	Planning();
 	virtual ~Planning();
 
 	virtual void Init() = 0;
 	virtual void Work(Percaption *p) = 0;
-	virtual void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u) = 0;
+        virtual void Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p) = 0;
 	/***************************************************************************************************/
 	// 圆弧上提前停车判定，使车辆停在停止点
 	int8_t ForecastCircleParking(VehicleState *s,Vector2d stop_point,float radius,uint8_t quadrant);
@@ -135,7 +138,7 @@ public:
 	/***************************************************************************************************/
 	int8_t WaitVehicleStartMove(uint8_t d,MessageManager *msg);
 	/***************************************泊车完成后的车位调整************************************************************/
-	void ParkingCenterAdjustment(VehicleState *s,Ultrasonic *u);
+        void ParkingCenterAdjustment(VehicleState *s,Percaption *p);
 	/***************************************************************************************************/
 	float getMinParkingLength();
 	void  setMinParkingLength(float value);
@@ -272,6 +275,8 @@ private:
 
 
 	VehicleBody _boundary_collision_body;
+Q_SIGNALS:
+    void sCircleCenterPoint(uint8_t id,Circle *c);
 };
 
 #endif /* INTERFACE_PATH_PLANNIG_H_ */

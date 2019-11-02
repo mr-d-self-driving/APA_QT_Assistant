@@ -625,7 +625,7 @@ float Planning::ForecastYawParkingDistance(float target_yaw,VehicleState *s)
 	if(Reverse == _apa_control_command.Gear)
 	{
 		circle_length = fabs(s->Yaw - target_yaw) * radius;
-		if(s->Yaw > target_yaw)
+        if(s->Yaw < target_yaw)
 		{
 			return circle_length;
 		}
@@ -637,7 +637,7 @@ float Planning::ForecastYawParkingDistance(float target_yaw,VehicleState *s)
 	else if(Drive == _apa_control_command.Gear)
 	{
 		circle_length = fabs(s->Yaw - target_yaw) * radius;
-		if(s->Yaw < target_yaw)
+        if(s->Yaw > target_yaw)
 		{
 			return circle_length;
 		}
@@ -1255,7 +1255,7 @@ int8_t Planning::WaitVehicleStartMove(uint8_t d,MessageManager *msg)
  *  0:正常距离;
  *  1:距离太远，无回波;
  * */
-void Planning::ParkingCenterAdjustment(VehicleState *s,Ultrasonic *u)
+void Planning::ParkingCenterAdjustment(VehicleState *s,Percaption *p)
 {
 	float rear_boundary,front_boundary;
 	int8_t rear_state,front_state;
@@ -1264,178 +1264,178 @@ void Planning::ParkingCenterAdjustment(VehicleState *s,Ultrasonic *u)
 	left_id  = 1;
 	right_id = 2;
 
-	if( (0 == u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status))
-	{
-		if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
-		{
-			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER +
-							 u->UltrasonicPacket[left_id].Distance1 < u->UltrasonicPacket[right_id].Distance1 ?
-							 u->UltrasonicPacket[left_id].Distance1 : u->UltrasonicPacket[right_id].Distance1 ;
-			front_state = 0;
-		}
-		else if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 == u->UltrasonicPacket[right_id].Distance1) )
-		{
-			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[left_id].Distance1;
-			front_state = 0;
-		}
-		else if( (0 == u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
-		{
-			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[right_id].Distance1;
-			front_state = 0;
-		}
-		else//无回波 无穷远
-		{
-			front_state = 1;
-		}
-	}
-	else if( (0 == u->UltrasonicPacket[left_id].status) && (0 != u->UltrasonicPacket[right_id].status) )
-	{
-		if(16 == u->UltrasonicPacket[right_id].status)
-		{
-			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER ;
-			front_state = -1;
-		}
-		else
-		{
-			if(0 == u->UltrasonicPacket[left_id].Distance1)
-			{
-				front_state = 1;
-			}
-			else
-			{
-				front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[left_id].Distance1;
-				front_state = 0;
-			}
-		}
-	}
-	else if( (0 != u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status) )
-	{
-		if(16 == u->UltrasonicPacket[left_id].status)
-		{
-			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER ;
-			front_state = -1;
-		}
-		else
-		{
-			if(0 == u->UltrasonicPacket[right_id].Distance1)
-			{
-				front_state = 1;
-			}
-			else
-			{
-				front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[right_id].Distance1;
-				front_state = 0;
-			}
-		}
-	}
-	else
-	{
-		if((16 == u->UltrasonicPacket[left_id].status) || (16 == u->UltrasonicPacket[right_id].status))
-		{
-			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER;
-			front_state = -1;
-		}
-		else
-		{
-			front_state = -2;
-		}
-	}
+//	if( (0 == u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status))
+//	{
+//		if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
+//		{
+//			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER +
+//							 u->UltrasonicPacket[left_id].Distance1 < u->UltrasonicPacket[right_id].Distance1 ?
+//							 u->UltrasonicPacket[left_id].Distance1 : u->UltrasonicPacket[right_id].Distance1 ;
+//			front_state = 0;
+//		}
+//		else if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 == u->UltrasonicPacket[right_id].Distance1) )
+//		{
+//			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[left_id].Distance1;
+//			front_state = 0;
+//		}
+//		else if( (0 == u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
+//		{
+//			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[right_id].Distance1;
+//			front_state = 0;
+//		}
+//		else//无回波 无穷远
+//		{
+//			front_state = 1;
+//		}
+//	}
+//	else if( (0 == u->UltrasonicPacket[left_id].status) && (0 != u->UltrasonicPacket[right_id].status) )
+//	{
+//		if(16 == u->UltrasonicPacket[right_id].status)
+//		{
+//			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER ;
+//			front_state = -1;
+//		}
+//		else
+//		{
+//			if(0 == u->UltrasonicPacket[left_id].Distance1)
+//			{
+//				front_state = 1;
+//			}
+//			else
+//			{
+//				front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[left_id].Distance1;
+//				front_state = 0;
+//			}
+//		}
+//	}
+//	else if( (0 != u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status) )
+//	{
+//		if(16 == u->UltrasonicPacket[left_id].status)
+//		{
+//			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER ;
+//			front_state = -1;
+//		}
+//		else
+//		{
+//			if(0 == u->UltrasonicPacket[right_id].Distance1)
+//			{
+//				front_state = 1;
+//			}
+//			else
+//			{
+//				front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER + u->UltrasonicPacket[right_id].Distance1;
+//				front_state = 0;
+//			}
+//		}
+//	}
+//	else
+//	{
+//		if((16 == u->UltrasonicPacket[left_id].status) || (16 == u->UltrasonicPacket[right_id].status))
+//		{
+//			front_boundary = s->getPosition().getX() + FRONT_EDGE_TO_CENTER;
+//			front_state = -1;
+//		}
+//		else
+//		{
+//			front_state = -2;
+//		}
+//	}
 
-	left_id  = 5;
-	right_id = 6;
-	if( (0 == u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status))
-	{
-		if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
-		{
-			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER -
-							 u->UltrasonicPacket[left_id].Distance1 < u->UltrasonicPacket[right_id].Distance1 ?
-							 u->UltrasonicPacket[left_id].Distance1 : u->UltrasonicPacket[right_id].Distance1 ;
-			rear_state = 0;
-		}
-		else if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 == u->UltrasonicPacket[right_id].Distance1) )
-		{
-			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[left_id].Distance1;
-			rear_state = 0;
-		}
-		else if( (0 == u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
-		{
-			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[right_id].Distance1;
-			rear_state = 0;
-		}
-		else//无回波 无穷远
-		{
-			rear_state = 1;
-		}
-	}
-	else if( (0 == u->UltrasonicPacket[left_id].status) && (0 != u->UltrasonicPacket[right_id].status) )
-	{
-		if(16 == u->UltrasonicPacket[right_id].status)
-		{
-			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER ;
-			rear_state = -1;
-		}
-		else
-		{
-			if(0 == u->UltrasonicPacket[left_id].Distance1)
-			{
-				rear_state = 1;
-			}
-			else
-			{
-				rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[left_id].Distance1;
-				rear_state = 0;
-			}
-		}
-	}
-	else if( (0 != u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status) )
-	{
-		if(16 == u->UltrasonicPacket[left_id].status)
-		{
-			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER ;
-			rear_state = -1;
-		}
-		else
-		{
-			if(0 == u->UltrasonicPacket[right_id].Distance1)
-			{
-				rear_state = 1;
-			}
-			else
-			{
-				rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[right_id].Distance1;
-				rear_state = 0;
-			}
-		}
-	}
-	else
-	{
-		if((16 == u->UltrasonicPacket[left_id].status) || (16 == u->UltrasonicPacket[right_id].status))
-		{
-			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER;
-			rear_state = -1;
-		}
-		else
-		{
-			rear_state = -2;
-		}
-	}
+//	left_id  = 5;
+//	right_id = 6;
+//	if( (0 == u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status))
+//	{
+//		if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
+//		{
+//			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER -
+//							 u->UltrasonicPacket[left_id].Distance1 < u->UltrasonicPacket[right_id].Distance1 ?
+//							 u->UltrasonicPacket[left_id].Distance1 : u->UltrasonicPacket[right_id].Distance1 ;
+//			rear_state = 0;
+//		}
+//		else if( (0 != u->UltrasonicPacket[left_id].Distance1) && (0 == u->UltrasonicPacket[right_id].Distance1) )
+//		{
+//			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[left_id].Distance1;
+//			rear_state = 0;
+//		}
+//		else if( (0 == u->UltrasonicPacket[left_id].Distance1) && (0 != u->UltrasonicPacket[right_id].Distance1) )
+//		{
+//			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[right_id].Distance1;
+//			rear_state = 0;
+//		}
+//		else//无回波 无穷远
+//		{
+//			rear_state = 1;
+//		}
+//	}
+//	else if( (0 == u->UltrasonicPacket[left_id].status) && (0 != u->UltrasonicPacket[right_id].status) )
+//	{
+//		if(16 == u->UltrasonicPacket[right_id].status)
+//		{
+//			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER ;
+//			rear_state = -1;
+//		}
+//		else
+//		{
+//			if(0 == u->UltrasonicPacket[left_id].Distance1)
+//			{
+//				rear_state = 1;
+//			}
+//			else
+//			{
+//				rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[left_id].Distance1;
+//				rear_state = 0;
+//			}
+//		}
+//	}
+//	else if( (0 != u->UltrasonicPacket[left_id].status) && (0 == u->UltrasonicPacket[right_id].status) )
+//	{
+//		if(16 == u->UltrasonicPacket[left_id].status)
+//		{
+//			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER ;
+//			rear_state = -1;
+//		}
+//		else
+//		{
+//			if(0 == u->UltrasonicPacket[right_id].Distance1)
+//			{
+//				rear_state = 1;
+//			}
+//			else
+//			{
+//				rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER - u->UltrasonicPacket[right_id].Distance1;
+//				rear_state = 0;
+//			}
+//		}
+//	}
+//	else
+//	{
+//		if((16 == u->UltrasonicPacket[left_id].status) || (16 == u->UltrasonicPacket[right_id].status))
+//		{
+//			rear_boundary = s->getPosition().getX() - REAR_EDGE_TO_CENTER;
+//			rear_state = -1;
+//		}
+//		else
+//		{
+//			rear_state = -2;
+//		}
+//	}
 
-	if((1 == front_state) && (1 != rear_state))
-	{
-		_parking_center_point.X = rear_boundary + 0.6f + REAR_EDGE_TO_CENTER;
-	}
-	else if((1 != front_state) && (1 == rear_state))
-	{
-		_parking_center_point.X = front_boundary - 0.6f + FRONT_EDGE_TO_CENTER;
-	}
-	else if((1 != front_state) && (1 != rear_state))
-	{
-		_parking_center_point.X = rear_boundary + (front_boundary - rear_boundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER;
-	}
-	else//无穷远
-	{
+//	if((1 == front_state) && (1 != rear_state))
+//	{
+//		_parking_center_point.X = rear_boundary + 0.6f + REAR_EDGE_TO_CENTER;
+//	}
+//	else if((1 != front_state) && (1 == rear_state))
+//	{
+//		_parking_center_point.X = front_boundary - 0.6f + FRONT_EDGE_TO_CENTER;
+//	}
+//	else if((1 != front_state) && (1 != rear_state))
+//	{
+//		_parking_center_point.X = rear_boundary + (front_boundary - rear_boundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER;
+//	}
+//	else//无穷远
+//	{
 
-	}
+//	}
 }
 
 /**************************************************************************************************/
