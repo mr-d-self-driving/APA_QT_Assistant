@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    Init();
     ui->setupUi(this);
     // 重新配置窗体大小
 //    this->resize(1366,768);
@@ -366,9 +367,9 @@ MainWindow::MainWindow(QWidget *parent) :
     label_VehicleInitPointYaw_Text->setText("Yaw:");
 
     text_VehicleInitPointX = new QLineEdit();
-    text_VehicleInitPointX->setText("0");
+    text_VehicleInitPointX->setText("8");
     text_VehicleInitPointY = new QLineEdit();
-    text_VehicleInitPointY->setText("0");
+    text_VehicleInitPointY->setText("3");
     text_VehicleInitPointYaw = new QLineEdit();
     text_VehicleInitPointYaw->setText("0");
 
@@ -394,9 +395,9 @@ MainWindow::MainWindow(QWidget *parent) :
     label_ParkingWidth_Text->setText("宽:");
 
     text_ParkingLength = new QLineEdit();
-    text_ParkingLength->setText("0");
+    text_ParkingLength->setText("6");
     text_ParkingWidth = new QLineEdit();
-    text_ParkingWidth->setText("0");
+    text_ParkingWidth->setText("2.4");
 
     QGridLayout *gVehicleParking_Layout = new QGridLayout();
     gVehicleParking_Layout->addWidget(label_ParkingLength_Text,0,0);
@@ -472,6 +473,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gPath_IO_Layout->setRowStretch(3,1);
     gPath_IO_Layout->setRowStretch(4,1);
 
+
     mPathPlot = new QCustomPlot();
     mPathPlot->legend->setVisible(true);
     mPathPlot->legend->setFont(QFont("Helvetica", 9));
@@ -493,6 +495,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mPathVehicleCenterCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
     mPathVehicleCenterCurve->setName("后轴中心");
+
+    mPathLeftCircle = new QCPItemEllipse(mPathPlot);
+    mPathLeftCircle->setPen(QPen(Qt::yellow,1));
+    mPathLeftCircle->setBrush(QBrush(QColor(90,125,140,20)));
+
+    mPathRightCircle = new QCPItemEllipse(mPathPlot);
+    mPathRightCircle->setPen(QPen(Qt::black,1));
+    mPathRightCircle->setBrush(QBrush(QColor(20,25,140,20)));
 
     ParkingPointX.resize(9);
     ParkingPointX[0] = BOUNDARY_LEFT;
@@ -519,44 +529,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
 
-//    mPathVehicleGraph = mPathPlot->addGraph();
-//    mPathVehicleGraph->setName("车辆模型");
-//    mPathVehicleGraph->setLineStyle(QCPGraph::lsLine);
-//    mPathVehicleGraph->setScatterStyle(QCPScatterStyle::ssNone);
-//    mPathVehicleGraph->setPen(QPen(Qt::green));
-//    mPathVehicleGraph->setBrush(QBrush(QColor(80, 30, 255, 20)));
-//    mPathVehicleGraph->rescaleAxes();
+    gPathLayout = new QGridLayout();
 
-//    mPathVehicleModuleDownGraph = mPathPlot->addGraph();
-//    mPathVehicleModuleDownGraph->setLineStyle(QCPGraph::lsLine);
-//    mPathVehicleModuleDownGraph->setScatterStyle(QCPScatterStyle::ssNone);
-//    mPathVehicleModuleDownGraph->setPen(QPen(Qt::green));
-
-//    mPathVehicleGraph->setChannelFillGraph(mPathVehicleModuleDownGraph);
-
-//    mPathPlot->xAxis->rescale();
-//    mPathVehicleGraph->rescaleValueAxis(false,true);
-//    mPathPlot->xAxis->setRange(mPathPlot->xAxis->range().upper,100,Qt::AlignRight);
-//    mPathPlot->yAxis->setRange(mPathPlot->yAxis->range().upper,100,Qt::AlignRight);
-
-//    mPathPlot->xAxis->scaleRange(1.1,mPathPlot->xAxis->range().center());
-//    mPathPlot->yAxis->scaleRange(1.1,mPathPlot->yAxis->range().center());
-//    mPathPlot->xAxis->setTicks(true);
-//    mPathPlot->yAxis->setTicks(true);
-//    mPathPlot->xAxis->setTickLabels(true);
-//    mPathPlot->yAxis->setTickLabels(true);
-//    mPathVehicleGraph->addData(mGeometricTrack.getPosition().X,mGeometricTrack.getPosition().Y);
-    // make key axis range scroll with the data:
-//    mPathPlot->xAxis->rescale();
-//    mPathVehicleGraph->rescaleValueAxis(false, true);
-
-
-    QGridLayout *gPathLayout = new QGridLayout();
     gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
     gPathLayout->addWidget(mPathPlot, 0, 1);
     gPathLayout->setColumnStretch(0,1);
     gPathLayout->setColumnStretch(1,9);
-
 
     QWidget *pControlWidget = new QWidget();
     QWidget *pDetectWidget = new QWidget();
@@ -582,8 +560,6 @@ MainWindow::MainWindow(QWidget *parent) :
     PMainWidget->setLayout(pMainLayout);
 
     setCentralWidget(PMainWidget);
-
-
     /****************** single connect slot *********************/
     /*** List Widget ***/
     // list 选择变动与 stack widget 界面更新的连接
@@ -602,25 +578,45 @@ MainWindow::MainWindow(QWidget *parent) :
     // CAN Close single and the Slot
     connect(button_CanClose,SIGNAL(clicked()),this,SLOT(sCAN_Close()));
 
-    connect(&mCanRevWorkThread,SIGNAL(SendPercaptionMessage(Percaption*)),this,SLOT(sDisplayPercaption(Percaption*)));
+//    connect(&mCanRevWorkThread,SIGNAL(SendPercaptionMessage(Percaption*)),this,SLOT(sDisplayPercaption(Percaption*)));
 
     connect(gParkingInformationConfirm,SIGNAL(clicked()),this,SLOT(sParkingConfirm()));
 
+    connect(mParallelPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
+    connect(mVerticalPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
+
     // 定时器20ms
     mDataTimer20ms.start(20);
-    Init();
 }
 
 MainWindow::~MainWindow()
 {
-    mCanRevWorkThread.quit();
-    mWinZlgCan.CanClose();
+//    mCanRevWorkThread.quit();
+//    mWinZlgCan.CanClose();
     delete ui;
 }
 
 void MainWindow::Init()
 {
-    mParallelPlanning.Init();
+     mTerminal = new Terminal();
+     mSimulation = new Simulation();
+
+//    Percaption mPercaption;
+//    GeometricTrack mGeometricTrack;
+//    VehilceConfig mVehilceConfig;
+
+     mBoRuiMessage = new BoRuiMessage();
+     mBoRuiController= new BoRuiController();
+
+
+
+//    // Path
+//    ParallelPlanning mParallelPlanning;
+    mParallelPlanning = new ParallelPlanning();
+    mVerticalPlanning = new VerticalPlanning();
+
+    mParallelPlanning->Init();
+    mVerticalPlanning->Init();
 }
 
 /****** Function ******/
@@ -675,17 +671,24 @@ void MainWindow::VehicleModule(Vector2d p,float yaw)
 // 定时任务
 void MainWindow::sTimer20msTask(void)
 {
-    mBoRuiController.APAEnable = 1;
-    mBoRuiController.Velocity = 0.3f;
-    mBoRuiController.Gear = Drive;
-    mBoRuiController.SteeringAngle = 500;
-    mBoRuiController.SteeringAngleRate = 300;
+    float distance[6]={3.2f,4.2f,6.15f,2.3f,3.4f,1.3f};
+    uint8_t min_index[6];
+    SortSmallToBig(distance,min_index,4);
+//    mBoRuiController.APAEnable = 1;
+//    mBoRuiController.Velocity = 0.3f;
+//    mBoRuiController.Gear = Drive;
+//    mBoRuiController.SteeringAngle = 500;
+//    mBoRuiController.SteeringAngleRate = 300;
 
-    mSimulation.Update(&mBoRuiController,&mBoRuiMessage);
+//    mParallelPlanning->Work(&mPercaption);
+//    mParallelPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
-    mParallelPlanning.Work(&mPercaption);
+    mVerticalPlanning->Work(&mPercaption,&mGeometricTrack);
+    mVerticalPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
-    mGeometricTrack.VelocityUpdate(&mBoRuiMessage,0.1f);
+    mSimulation->Update(mBoRuiController,mBoRuiMessage);
+
+    mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
 
     label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',3));
     label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',3));
@@ -693,25 +696,26 @@ void MainWindow::sTimer20msTask(void)
 
     VehicleModule(mGeometricTrack.getPosition(),mGeometricTrack.getYaw());
 
-    // calculate and add a new data point to each graph:
-    mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
-    mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);
 
-    // make key axis range scroll with the data:
-    mControlPlot->xAxis->rescale();
-    mControlGraph1->rescaleValueAxis(false, true);
-    mControlGraph2->rescaleValueAxis(false, true);
-    mControlPlot->xAxis->setRange(mControlPlot->xAxis->range().upper, 100, Qt::AlignRight);
+//    // calculate and add a new data point to each graph:
+//    mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
+//    mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);
 
-    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
-    double graph1Value = mControlGraph1->dataMainValue(mControlGraph1->dataCount()-1);
-    double graph2Value = mControlGraph2->dataMainValue(mControlGraph2->dataCount()-1);
-    mControlTag1->updatePosition(graph1Value);
-    mControlTag2->updatePosition(graph2Value);
-    mControlTag1->setText(QString::number(graph1Value, 'f', 2));
-    mControlTag2->setText(QString::number(graph2Value, 'f', 2));
+//    // make key axis range scroll with the data:
+//    mControlPlot->xAxis->rescale();
+//    mControlGraph1->rescaleValueAxis(false, true);
+//    mControlGraph2->rescaleValueAxis(false, true);
+//    mControlPlot->xAxis->setRange(mControlPlot->xAxis->range().upper, 100, Qt::AlignRight);
 
-    mControlPlot->replot();
+//    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
+//    double graph1Value = mControlGraph1->dataMainValue(mControlGraph1->dataCount()-1);
+//    double graph2Value = mControlGraph2->dataMainValue(mControlGraph2->dataCount()-1);
+//    mControlTag1->updatePosition(graph1Value);
+//    mControlTag2->updatePosition(graph2Value);
+//    mControlTag1->setText(QString::number(graph1Value, 'f', 2));
+//    mControlTag2->setText(QString::number(graph2Value, 'f', 2));
+
+//    mControlPlot->replot();
 }
 
 // 点击按钮
@@ -774,53 +778,53 @@ void MainWindow::sProcessItemActiveState(QListWidgetItem *current, QListWidgetIt
 
 void MainWindow::sCAN_Connect(void)
 {
-    if(1 == mWinZlgCan.getConnectStatus())
-    {
-        mWinZlgCan.CanClose();
-        mCanRevWorkThread.quit();
-        this->button_CanOpen->setEnabled(false);
-        this->button_CanClose->setEnabled(false);
-        this->button_CanConnect->setText("连接");
-    }
-    else
-    {
-        mWinZlgCan.CanConnect();
-        if(1 == mWinZlgCan.getConnectStatus())
-        {
-            this->button_CanOpen->setEnabled(true);
-            this->button_CanClose->setEnabled(false);
-            this->button_CanConnect->setText("断开");
-        }
-    }
+//    if(1 == mWinZlgCan.getConnectStatus())
+//    {
+//        mWinZlgCan.CanClose();
+//        mCanRevWorkThread.quit();
+//        this->button_CanOpen->setEnabled(false);
+//        this->button_CanClose->setEnabled(false);
+//        this->button_CanConnect->setText("连接");
+//    }
+//    else
+//    {
+//        mWinZlgCan.CanConnect();
+//        if(1 == mWinZlgCan.getConnectStatus())
+//        {
+//            this->button_CanOpen->setEnabled(true);
+//            this->button_CanClose->setEnabled(false);
+//            this->button_CanConnect->setText("断开");
+//        }
+//    }
 }
 
 void MainWindow::sCAN_Open(void)
 {
-    if((0 == mWinZlgCan.CanOpen(0)) && (0 == mWinZlgCan.CanOpen(1)) && (0 == mWinZlgCan.CanOpen(2)))
-    {
-        mCanRevWorkThread.start();
-        mWinZlgCan.setOpenStatus(1);
-        this->button_CanOpen->setEnabled(false);
-        this->button_CanClose->setEnabled(true);
-    }
-    else
-    {
-        QMessageBox::information(this, "错误", "CAN设备启动失败");
-        mWinZlgCan.setOpenStatus(0);
-        this->button_CanClose->setEnabled(false);
-        this->button_CanOpen->setEnabled(false);
-    }
+//    if((0 == mWinZlgCan.CanOpen(0)) && (0 == mWinZlgCan.CanOpen(1)) && (0 == mWinZlgCan.CanOpen(2)))
+//    {
+//        mCanRevWorkThread.start();
+//        mWinZlgCan.setOpenStatus(1);
+//        this->button_CanOpen->setEnabled(false);
+//        this->button_CanClose->setEnabled(true);
+//    }
+//    else
+//    {
+//        QMessageBox::information(this, "错误", "CAN设备启动失败");
+//        mWinZlgCan.setOpenStatus(0);
+//        this->button_CanClose->setEnabled(false);
+//        this->button_CanOpen->setEnabled(false);
+//    }
 }
 
 void MainWindow::sCAN_Close(void)
 {
-    mWinZlgCan.CanReset(0);
-    mWinZlgCan.CanReset(1);
-    mWinZlgCan.CanReset(2);
-    mWinZlgCan.setOpenStatus(0);
-    mCanRevWorkThread.quit();
-    this->button_CanOpen->setEnabled(true);
-    this->button_CanClose->setEnabled(false);
+//    mWinZlgCan.CanReset(0);
+//    mWinZlgCan.CanReset(1);
+//    mWinZlgCan.CanReset(2);
+//    mWinZlgCan.setOpenStatus(0);
+//    mCanRevWorkThread.quit();
+//    this->button_CanOpen->setEnabled(true);
+//    this->button_CanClose->setEnabled(false);
 }
 
 void MainWindow::sDisplayPercaption(Percaption *p)
@@ -866,4 +870,78 @@ void MainWindow::sParkingConfirm()
 
     mPercaption.ParkingLength = text_ParkingLength->text().toFloat();
     mPercaption.ParkingWidth  = text_ParkingWidth->text().toFloat();
+
+    mGeometricTrack.Init(mPercaption.PositionX,mPercaption.PositionY,mPercaption.AttitudeYaw);
+
+    ParkingPointX[1] = 0;
+    ParkingPointX[2] = 0;
+    ParkingPointX[3] = mPercaption.ParkingLength;
+    ParkingPointX[4] = mPercaption.ParkingLength;
+
+    ParkingPointY[1] = 0;
+    ParkingPointY[2] = -mPercaption.ParkingWidth;
+    ParkingPointY[3] = -mPercaption.ParkingWidth;
+    ParkingPointY[4] = 0;
+
+    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
+
+    QVector<double> ParkingTrackPointX(1),ParkingTrackPointY(1);
+    ParkingTrackPointX[0] = mGeometricTrack.getPosition().getX();
+    ParkingTrackPointY[0] = mGeometricTrack.getPosition().getY();
+    mPathVehicleCenterCurve->setData(ParkingTrackPointX,ParkingTrackPointY);
+
+//    mParallelPlanning->Command = 0x60;
+    mVerticalPlanning->Init();
+    mVerticalPlanning->Command = 0x60;
+}
+
+//id:
+// 0 -> right circle
+// 1 -> left  circle
+void MainWindow::sPathCirclePoint(uint8_t id,Circle *c)
+{
+    switch(id)
+    {
+        case 0:
+        mPathRightCircle->topLeft->setCoords(c->Center.getX() - c->Radius,c->Center.getY() + c->Radius);
+        mPathRightCircle->bottomRight->setCoords(c->Center.getX() + c->Radius,c->Center.getY() - c->Radius);
+            break;
+
+        case 1:
+        mPathLeftCircle->topLeft->setCoords(c->Center.getX() - c->Radius,c->Center.getY() + c->Radius);
+        mPathLeftCircle->bottomRight->setCoords(c->Center.getX() + c->Radius,c->Center.getY() - c->Radius);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void MainWindow::SortSmallToBig(float *array,uint8_t *index_array,uint8_t cnt)
+{
+    float distance_temp = 0;
+    uint8_t index_temp = 0;
+    uint8_t i,j;
+
+    for(i = 0; i < cnt;i++)
+    {
+        index_array[i] = i;
+    }
+
+    for(i=0;i < (cnt - 1);i++)
+    {
+        for(j=i;j < cnt;j++)
+        {
+            if(array[j] < array[i])
+            {
+                distance_temp = array[i];
+                array[i] = array[j];
+                array[j] = distance_temp;
+
+                index_temp = index_array[i];
+                index_array[i] = index_array[j];
+                index_array[j] = index_temp;
+            }
+        }
+    }
 }

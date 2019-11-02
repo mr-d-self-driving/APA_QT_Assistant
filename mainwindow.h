@@ -9,6 +9,7 @@
 #include "Interaction/HMI/simulation.h"
 #include  "WinZlgCan/can_rev_work_thread.h"
 #include "Planning/ParallelParking/parallel_planning.h"
+#include "Planning/VerticalParking/vertical_planning.h"
 
 #ifdef BORUI
 #include "Interaction/CANBUS/BoRui/bo_rui_message.h"
@@ -75,11 +76,15 @@ private:
     QLabel *label_VehiceTrackY_Value;
     QLabel *label_VehiceTrackYaw_Value;
 
+    QGridLayout *gPathLayout;
+
     QCustomPlot *mPathPlot;
     // 用于车辆模型的绘制
     QCPCurve *mPathVehicleModuleCurve;
     QCPCurve *mPathParkingCurve;
     QCPCurve *mPathVehicleCenterCurve;
+    QCPItemEllipse *mPathLeftCircle;
+    QCPItemEllipse *mPathRightCircle;
 
     QVector<double> ParkingPointX,ParkingPointY;
 
@@ -95,24 +100,25 @@ private:
     QPushButton *button_CanConnect;
     QPushButton *button_CanOpen;
     QPushButton *button_CanClose;
-    WinZlgCan mWinZlgCan;
-    CanRevWorkThread mCanRevWorkThread;
+//    WinZlgCan mWinZlgCan;
+//    CanRevWorkThread mCanRevWorkThread;
 
     //HMI
-    Terminal mTerminal;
-    Simulation mSimulation;
+    Terminal *mTerminal;
+    Simulation *mSimulation;
 
     Percaption mPercaption;
     GeometricTrack mGeometricTrack;
     VehilceConfig mVehilceConfig;
 
-    BoRuiMessage mBoRuiMessage;
-    BoRuiController mBoRuiController;
+    BoRuiMessage *mBoRuiMessage;
+    BoRuiController *mBoRuiController;
 
     Vector2d FrontLeftPoint,FrontRightPoint,RearLeftPoint,RearRightPoint;
 
     // Path
-    ParallelPlanning mParallelPlanning;
+    ParallelPlanning *mParallelPlanning;
+    VerticalPlanning *mVerticalPlanning;
 
 private slots:
     // 功能选择激活函数图片选择的槽函数
@@ -132,6 +138,10 @@ private slots:
 
     //规划
     void sParkingConfirm();
+
+    void sPathCirclePoint(uint8_t id,Circle *c);
+
+    void SortSmallToBig(float *array,uint8_t *index_array,uint8_t cnt);
 };
 
 #endif // MAINWINDOW_H
