@@ -28,6 +28,7 @@ SOURCES += \
         Common/Math/algebraic_geometry.cpp \
         Common/Math/crc_compute.cpp \
         Common/Math/curve_fitting.cpp \
+        Common/Math/huogh.cpp \
         Common/Math/interpolation.cpp \
         Common/Math/solve_equation.cpp \
         Common/Math/vector_2d.cpp \
@@ -66,6 +67,7 @@ HEADERS += \
         Common/Math/algebraic_geometry.h \
         Common/Math/crc_compute.h \
         Common/Math/curve_fitting.h \
+        Common/Math/huogh.h \
         Common/Math/interpolation.h \
         Common/Math/solve_equation.h \
         Common/Math/vector_2d.h \
