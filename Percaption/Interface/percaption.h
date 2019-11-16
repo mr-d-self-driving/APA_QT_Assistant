@@ -20,6 +20,7 @@
 #include "./Common/Math/vector_2d.h"
 #include "./Common/Utils/Inc/link_list.h"
 #include "./Common/Math/curve_fitting.h"
+#include "Common/Math/huogh.h"
 
 typedef enum _ObstacleRegion
 {
@@ -35,6 +36,7 @@ typedef struct _LineFitInformationPacket
     float angle;
     float offset;
     uint8_t valid_flag;
+    float variance;
 }LineFitInformationPacket;
 
 typedef struct _EdgeInformationPacket
