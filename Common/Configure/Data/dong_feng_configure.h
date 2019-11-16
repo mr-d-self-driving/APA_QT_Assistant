@@ -104,54 +104,22 @@
 #define FIT_RADIUS_B12 		(-1.586f)
 
 /**********************************Ultrasonic Location Information***********************************************/
-//#define SENSOR1_X     (-0.20f )
-//#define SENSOR1_Y     ( 0.68f )
-//#define SENSOR1_ANGLE ( 0.00f )
-//
-//#define SENSOR2_X     ( 0.00f )
-//#define SENSOR2_Y     ( 0.32f )
-//#define SENSOR2_ANGLE ( 0.00f )
-//
-//#define SENSOR3_X     ( 0.00f )
-//#define SENSOR3_Y     (-0.32f )
-//#define SENSOR3_ANGLE ( 0.00f )
-//
-//#define SENSOR4_X     (-0.20f )
-//#define SENSOR4_Y     (-0.68f )
-//#define SENSOR4_ANGLE ( 0.00f )
-//实验室测试
-//#define SENSOR1_X     ( 0.00f )
-//#define SENSOR1_Y     ( 0.45f )
-//#define SENSOR1_ANGLE ( 0.00f )
-//
-//#define SENSOR2_X     ( 0.00f )
-//#define SENSOR2_Y     ( 0.18f )
-//#define SENSOR2_ANGLE ( 0.00f )
-//
-//#define SENSOR3_X     ( 0.00f )
-//#define SENSOR3_Y     (-0.18f )
-//#define SENSOR3_ANGLE ( 0.00f )
-//
-//#define SENSOR4_X     ( 0.00f )
-//#define SENSOR4_Y     (-0.50f )
-//#define SENSOR4_ANGLE ( 0.00f )
-
 //实际车辆的超声安装位置
 #define SENSOR1_X     ( 3.4f )
 #define SENSOR1_Y     ( 0.73f )
-#define SENSOR1_ANGLE ( 0.00f )
+#define SENSOR1_ANGLE ( 6.283185307179586476925286766559 )
 
 #define SENSOR2_X     ( 3.5f )
 #define SENSOR2_Y     ( 0.32f )
-#define SENSOR2_ANGLE ( 0.00f )
+#define SENSOR2_ANGLE ( 6.283185307179586476925286766559 )
 
 #define SENSOR3_X     ( 3.5f )
 #define SENSOR3_Y     (-0.32f )
-#define SENSOR3_ANGLE ( 0.00f )
+#define SENSOR3_ANGLE ( 6.283185307179586476925286766559 )
 
 #define SENSOR4_X     ( 3.4f )
 #define SENSOR4_Y     (-0.73f )
-#define SENSOR4_ANGLE ( 0.00f )
+#define SENSOR4_ANGLE ( 6.283185307179586476925286766559 )
 
 #define SENSOR5_X     (-0.9f )
 #define SENSOR5_Y     ( 0.66f )
@@ -175,7 +143,7 @@
 
 #define SENSOR10_X     ( 3.02f )
 #define SENSOR10_Y     (-0.80f )
-#define SENSOR10_ANGLE (-1.5707963267948966192313216916398 )
+#define SENSOR10_ANGLE (4.7123889803846898576939650749193 )
 
 #define SENSOR11_X     (-0.35f)
 #define SENSOR11_Y     ( 0.80f)
@@ -183,7 +151,7 @@
 
 #define SENSOR12_X     (-0.35f)
 #define SENSOR12_Y     (-0.80f)
-#define SENSOR12_ANGLE (-1.5707963267948966192313216916398)
+#define SENSOR12_ANGLE (4.7123889803846898576939650749193)
 
 
 #define MAX_ARRAY_ID  (520)
@@ -714,10 +682,10 @@ const float SteerAngle2Radius[521][2]=
     {3.76781f, 3.867427f}
 };
 
-#define ACC_ARRAY_NUM  		( 10 )
+#define ACC_ARRAY_NUM  		( 12 )
 #define VELOCITY_ARRAY_NUM  (  7 )
 
-const float acc_table[ACC_ARRAY_NUM]           = {0.06f,0.09f,0.1f,0.12f,0.13f,0.15f,0.2f,0.21f,0.24f,0.26f};
+const float acc_table[ACC_ARRAY_NUM]           = {0.06f,0.09f,0.1f,0.12f,0.13f,0.15f,0.2f,0.21f,0.24f,0.26f,0.52f,0.58f};
 const float velocity_table[VELOCITY_ARRAY_NUM] = {0.1f,0.2f,0.3f,0.4f,0.5f,0.6f,0.7f};
 
 const float torque_table[ACC_ARRAY_NUM][VELOCITY_ARRAY_NUM]=
@@ -731,6 +699,9 @@ const float torque_table[ACC_ARRAY_NUM][VELOCITY_ARRAY_NUM]=
         {140,140,140,140,120,100,80},
         {140,140,140,140,140,120,100},
         {140,140,140,140,140,140,120},
-		{270,240,220,200,180,150,140}
+        {270,240,220,200,180,150,140},
+        {540,480,440,400,360,300,280},
+        {800,650,620,580,520,500,460}
 };
+
 #endif /* CONFIGURE_DATA_BO_RUI_CONFIGURE_H_ */
