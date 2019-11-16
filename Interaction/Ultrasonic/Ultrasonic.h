@@ -78,6 +78,12 @@ typedef struct _ObstacleLocationPacket
 	UltrasonicStatus  Status;
 }ObstacleLocationPacket;
 
+typedef struct _ParkingEdgeBufferLocationPacket
+{
+    Vector2d Position;
+    Ultrasonic_Packet  UltrasonicData;
+}ParkingEdgeBufferLocationPacket;
+
 class Ultrasonic {
 public:
 	Ultrasonic();
@@ -101,7 +107,8 @@ public:
 	 * data_ur:三角定位测量的右边长值
 	 * location:障碍物定位坐标
 	 * */
-	void BodyTriangleCalculate(int8_t type,Location position_a,Location position_b,Ultrasonic_Packet data_ul,Ultrasonic_Packet data_ur,ObstacleLocationPacket *location);
+    void BodyTriangleCalculate(Location position_a,Location position_b,Ultrasonic_Packet data_ul,Ultrasonic_Packet data_ur,ObstacleLocationPacket *location);
+    void BodyTriangleCalculate(VehicleState *vehicle,Vector2d last_position,Location sensor_position,Ultrasonic_Packet data_ul,Ultrasonic_Packet data_ur,ObstacleLocationPacket *location);
 
 	/*
 	 * 三角定位地面坐标系的转换
@@ -125,6 +132,17 @@ public:
 	 * 地面坐标超声波数据定位
 	 * */
 	void GroundTriangleLocation(VehicleState *vehicle_state);
+
+    /*
+     * base on triangle parking location
+     *
+     * */
+    void ParkingEdgeTriangleLocation(VehicleState *vehicle_state);
+
+    void ParkingEdgeCalculate( VehicleState *vehicle,Vector2d *last_position,
+                               Location position,Ultrasonic_Packet u_data,
+                               ParkingEdgeBufferLocationPacket *buf_dat,ObstacleLocationPacket *body_location);
+
 
 	/// Property
 	uint8_t getScheduleTimeCnt();
@@ -171,6 +189,8 @@ private:
 	ObstacleLocationPacket _abstacle_ground_position_triangle[12];
 
 	VehilceConfig _abstacle_config;
+
+    ParkingEdgeBufferLocationPacket _ultrasonic_data_buffer[4];
 };
 
 #endif /* ULTRASONIC_H_ */
