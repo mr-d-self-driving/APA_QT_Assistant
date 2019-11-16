@@ -323,33 +323,87 @@ MainWindow::MainWindow(QWidget *parent) :
     gObstacleDistance->setFixedHeight(90);
     gObstacleDistance->setLayout(gObstacleDistanceLayout);
 
+    button_file_select = new QPushButton();
+    button_file_select->setText("打开文件");
+
+    button_start_calculate = new QPushButton();
+    button_start_calculate->setText("开始计算");
+
     QGridLayout *gDetect_Show_Layout = new QGridLayout();
     gDetect_Show_Layout->addWidget(gObstacleDistance,0,0);
+    gDetect_Show_Layout->addWidget(button_file_select,1,0);
+    gDetect_Show_Layout->addWidget(button_start_calculate,2,0);
+
     gDetect_Show_Layout->setRowStretch(0,1);
     gDetect_Show_Layout->setRowStretch(1,1);
-
+    gDetect_Show_Layout->setRowStretch(2,1);
+    gDetect_Show_Layout->setRowStretch(3,1);
+    // 感知检测图形绘制 begin
     mDetectPlot = new QCustomPlot();
-    // configure plot to have two right axes:
-    mDetectPlot->yAxis->setTickLabels(false);
-    connect(mDetectPlot->yAxis2, SIGNAL(rangeChanged(QCPRange)), mDetectPlot->yAxis, SLOT(setRange(QCPRange))); // left axis only mirrors inner right axis
-    mDetectPlot->yAxis2->setVisible(true);
-    mDetectPlot->axisRect()->addAxis(QCPAxis::atRight);
-    mDetectPlot->axisRect()->axis(QCPAxis::atRight, 0)->setPadding(30); // add some padding to have space for tags
-    mDetectPlot->axisRect()->axis(QCPAxis::atRight, 1)->setPadding(30); // add some padding to have space for tags
-
     mDetectPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
-    // create graphs:
-    mDetectGraph1 = mDetectPlot->addGraph(mDetectPlot->xAxis, mDetectPlot->axisRect()->axis(QCPAxis::atRight, 0));
-    mDetectGraph2 = mDetectPlot->addGraph(mDetectPlot->xAxis, mDetectPlot->axisRect()->axis(QCPAxis::atRight, 1));
-    mDetectGraph1->setPen(QPen(QColor(250, 120, 0)));
-    mDetectGraph2->setPen(QPen(QColor(0, 180, 60)));
+    mDetectPlot->legend->setVisible(true);
+    mDetectPlot->legend->setFont(QFont("Helvetica", 9));
+//    mDetectPlot->legend->setRowSpacing(-3);
+    mDetectPlot->xAxis->setLabel("x");
+    mDetectPlot->yAxis->setLabel("y");
+//    mDetectPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
+//    mDetectPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
 
-    // create tags with newly introduced AxisTag class (see axistag.h/.cpp):
-    mDetectTag1 = new AxisTag(mDetectGraph1->valueAxis());
-    mDetectTag1->setPen(mDetectGraph1->pen());
-    mDetectTag2 = new AxisTag(mDetectGraph2->valueAxis());
-    mDetectTag2->setPen(mDetectGraph2->pen());
+    mDetectVehicleModuleCurve = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectVehicleModuleCurve->setName("车辆模型");
+    mDetectVehicleModuleCurve->setPen(QPen(Qt::red,3));
+    mDetectVehicleModuleCurve->setBrush(QBrush(QColor(190,35,155,30)));
 
+    mDetectVehicleCenterCurve = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectVehicleCenterCurve->setName("后轴中心");
+    mDetectVehicleCenterCurve->setPen(QPen(Qt::gray,3));
+    mDetectVehicleCenterCurve->setLineStyle(QCPCurve::lsNone);
+    mDetectVehicleCenterCurve->setScatterStyle(QCPScatterStyle::ssStar);
+
+    mDetectEdgePoint = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectEdgePoint->setName("障碍物边沿");
+    mDetectEdgePoint->setPen(QPen(Qt::blue,3));
+    mDetectEdgePoint->setLineStyle(QCPCurve::lsNone);
+    mDetectEdgePoint->setScatterStyle(QCPScatterStyle::ssStar);
+
+    mDetectEdgeGroundPositionPoint = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectEdgeGroundPositionPoint->setName("地面坐标");
+    mDetectEdgeGroundPositionPoint->setPen(QPen(Qt::yellow,3));
+    mDetectEdgeGroundPositionPoint->setLineStyle(QCPCurve::lsNone);
+    mDetectEdgeGroundPositionPoint->setScatterStyle(QCPScatterStyle::ssStar);
+
+    mDetectSensorPosition = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectSensorPosition->setName("传感器位置");
+    mDetectSensorPosition->setPen(QPen(Qt::black,2));
+    mDetectSensorPosition->setLineStyle(QCPCurve::lsNone);
+    mDetectSensorPosition->setScatterStyle(QCPScatterStyle::ssStar);
+
+    mDetectLeftEdgeGroundPosition = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectLeftEdgeGroundPosition->setName("左边沿");
+    mDetectLeftEdgeGroundPosition->setPen(QPen(Qt::darkCyan,2));
+    mDetectLeftEdgeGroundPosition->setLineStyle(QCPCurve::lsNone);
+    mDetectLeftEdgeGroundPosition->setScatterStyle(QCPScatterStyle::ssStar);
+
+    mDetectRightEdgeGroundPosition = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectRightEdgeGroundPosition->setName("右边沿");
+    mDetectRightEdgeGroundPosition->setPen(QPen(Qt::darkRed,2));
+    mDetectRightEdgeGroundPosition->setLineStyle(QCPCurve::lsNone);
+    mDetectRightEdgeGroundPosition->setScatterStyle(QCPScatterStyle::ssStar);
+
+
+    mDetectLeftEdgeFitLine = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectLeftEdgeFitLine->setName("左边沿拟合");
+    mDetectLeftEdgeFitLine->setPen(QPen(Qt::darkGreen,2));
+    mDetectLeftEdgeFitLine->setLineStyle(QCPCurve::lsLine);
+    mDetectLeftEdgeFitLine->setScatterStyle(QCPScatterStyle::ssPlus);
+
+    mDetectRightEdgeFitLine = new QCPCurve(mDetectPlot->xAxis,mDetectPlot->yAxis);
+    mDetectRightEdgeFitLine->setName("右边沿拟合");
+    mDetectRightEdgeFitLine->setPen(QPen(Qt::darkYellow,2));
+    mDetectRightEdgeFitLine->setLineStyle(QCPCurve::lsLine);
+    mDetectRightEdgeFitLine->setScatterStyle(QCPScatterStyle::ssPlus);
+
+    // 感知检测图形绘制 end
 
     QGridLayout *gDetectLayout = new QGridLayout();
     gDetectLayout->addLayout(gDetect_Show_Layout, 0,0);
@@ -452,7 +506,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Unit,2,2);
 
     gVehicleTrack_Layout->setColumnStretch(0,2);
-    gVehicleTrack_Layout->setColumnStretch(1,4);
+    gVehicleTrack_Layout->setColumnStretch(1,5);
     gVehicleTrack_Layout->setColumnStretch(1,1);
 
     QGroupBox *gVehicleTrack_Group = new QGroupBox();
@@ -466,7 +520,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gPath_IO_Layout->addWidget(gVehicleParking_Group,1,0);
     gPath_IO_Layout->addWidget(gParkingInformationConfirm,2,0);
     gPath_IO_Layout->addWidget(gVehicleTrack_Group,3,0);
-    gPath_IO_Layout->setColumnMinimumWidth(0,70);
+    gPath_IO_Layout->setColumnMinimumWidth(0,200);
     gPath_IO_Layout->setRowStretch(0,1);
     gPath_IO_Layout->setRowStretch(1,1);
     gPath_IO_Layout->setRowStretch(2,1);
@@ -533,6 +587,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
     gPathLayout->addWidget(mPathPlot, 0, 1);
+    gPathLayout->setColumnMinimumWidth(0,200);
     gPathLayout->setColumnStretch(0,1);
     gPathLayout->setColumnStretch(1,9);
 
@@ -543,7 +598,7 @@ MainWindow::MainWindow(QWidget *parent) :
     pDetectWidget->setLayout(gDetectLayout);
     pPathWidget->setLayout(gPathLayout);
 
-    QStackedWidget *stack_Widget = new QStackedWidget();
+    stack_Widget = new QStackedWidget();
     stack_Widget->addWidget(pControlWidget);
     stack_Widget->addWidget(pDetectWidget);
     stack_Widget->addWidget(pPathWidget);
@@ -580,13 +635,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //    connect(&mCanRevWorkThread,SIGNAL(SendPercaptionMessage(Percaption*)),this,SLOT(sDisplayPercaption(Percaption*)));
 
+    /*** 感知检测 ***/
+    connect(button_file_select,SIGNAL(clicked()),this,SLOT(sPercaptionDataFileSelect()));
+    connect(button_start_calculate,SIGNAL(clicked()),this,SLOT(sCalculateDetect()));
+
     connect(gParkingInformationConfirm,SIGNAL(clicked()),this,SLOT(sParkingConfirm()));
 
     connect(mParallelPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
     connect(mVerticalPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
 
     // 定时器20ms
-    mDataTimer20ms.start(20);
+    mDataTimer20ms.start(100);
 }
 
 MainWindow::~MainWindow()
@@ -608,10 +667,11 @@ void MainWindow::Init()
      mBoRuiMessage = new BoRuiMessage();
      mBoRuiController= new BoRuiController();
 
+    NewFileUpdateFlag = 0;
+    time_step_cnt     = 0;
 
+    // Path
 
-//    // Path
-//    ParallelPlanning mParallelPlanning;
     mParallelPlanning = new ParallelPlanning();
     mVerticalPlanning = new VerticalPlanning();
 
@@ -620,15 +680,40 @@ void MainWindow::Init()
 }
 
 /****** Function ******/
-
-void MainWindow::VehicleModule(Vector2d p,float yaw)
+void MainWindow::DetectVehicleModule(Vector2d p,float yaw)
 {
-    FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + yaw));
-    FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + yaw));
-    RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + yaw));
-    RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + yaw));
+    FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + static_cast<double>(yaw)));
+    FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + static_cast<double>(yaw)));
+    RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + static_cast<double>(yaw)));
+    RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + static_cast<double>(yaw)));
 
-    mPathVehicleCenterCurve->addData(p.getX(),p.getY());
+    mDetectVehicleCenterCurve->addData(static_cast<double>(p.getX()),static_cast<double>(p.getY()));
+
+    QVector<double> VehiclePointX(5),VehiclePointY(5);
+    VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
+    VehiclePointX[1] = static_cast<double>(RearLeftPoint.getX());
+    VehiclePointX[2] = static_cast<double>(FrontLeftPoint.getX());
+    VehiclePointX[3] = static_cast<double>(FrontRightPoint.getX());
+    VehiclePointX[4] = static_cast<double>(RearRightPoint.getX());
+
+    VehiclePointY[0] = static_cast<double>(RearRightPoint.getY());
+    VehiclePointY[1] = static_cast<double>(RearLeftPoint.getY());
+    VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
+    VehiclePointY[3] = static_cast<double>(FrontRightPoint.getY());
+    VehiclePointY[4] = static_cast<double>(RearRightPoint.getY());
+    mDetectVehicleModuleCurve->setData(VehiclePointX,VehiclePointY);
+
+    mDetectPlot->replot();
+}
+
+void MainWindow::PathVehicleModule(Vector2d p,float yaw)
+{
+    FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + static_cast<double>(yaw)));
+    FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + static_cast<double>(yaw)));
+    RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + static_cast<double>(yaw)));
+    RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + static_cast<double>(yaw)));
+
+    mPathVehicleCenterCurve->addData(static_cast<double>(p.getX()),static_cast<double>(p.getY()));
 
     QVector<double> VehiclePointX(5),VehiclePointY(5);
     VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
@@ -666,56 +751,263 @@ void MainWindow::VehicleModule(Vector2d p,float yaw)
     mPathPlot->replot();
 }
 
+void MainWindow::FileDataInit(void)
+{
+    uint8_t i;
+
+    VehicleTrackList.clear();
+
+    for(i=0;i < 12;i++)
+    {
+       LRU_List[i].clear();
+       LRU_PositionList[i].clear();
+    }
+   for(i=0;i<4;i++)
+   {
+       ObstacleBody_List[i].clear();
+       _ultrasonic_data_buffer[i].Position.setX(0.0f);
+       _ultrasonic_data_buffer[i].Position.setY(0.0f);
+       _ultrasonic_data_buffer[i].UltrasonicData.Distance1 = 0.0f;
+       _ultrasonic_data_buffer[i].UltrasonicData.Distance2 = 0.0f;
+       _ultrasonic_data_buffer[i].UltrasonicData.Level = 0.0f;
+       _ultrasonic_data_buffer[i].UltrasonicData.Width = 0.0f;
+       _ultrasonic_data_buffer[i].UltrasonicData.status = 0;
+       _ultrasonic_data_buffer[i].UltrasonicData.Time_Tx = 0;
+       _ultrasonic_data_buffer[i].UltrasonicData.Time_Ms = 0.0f;
+    }
+    time_step_cnt = 0;
+
+    mDetectVehicleCenterCurve->data().data()->clear();
+    mDetectEdgePoint->data().data()->clear();
+    mDetectEdgeGroundPositionPoint->data().data()->clear();
+    mDetectSensorPosition->data().data()->clear();
+
+    mDetectLeftEdgeGroundPosition->data().data()->clear();
+    mDetectRightEdgeGroundPosition->data().data()->clear();
+
+    mDetectLeftEdgeFitLine->data().data()->clear();
+    mDetectRightEdgeFitLine->data().data()->clear();
+}
+
+void MainWindow::AnalyzeOneLine(const QByteArray &baLine)
+{
+    QList<QByteArray> detect_list = baLine.split(' ');
+
+    ObstacleLocationPacket temp_position;
+
+    temp_position.Position.X = detect_list[13].toFloat();
+    temp_position.Position.Y = detect_list[14].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[15].toUShort());
+    LRU_PositionList[4].append(temp_position);
+
+    temp_position.Position.X = detect_list[16].toFloat();
+    temp_position.Position.Y = detect_list[17].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[18].toUShort());
+    LRU_PositionList[5].append(temp_position);
+
+    temp_position.Position.X = detect_list[19].toFloat();
+    temp_position.Position.Y = detect_list[20].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[21].toUShort());
+    LRU_PositionList[6].append(temp_position);
+
+    temp_position.Position.X = detect_list[22].toFloat();
+    temp_position.Position.Y = detect_list[23].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[24].toUShort());
+    LRU_PositionList[7].append(temp_position);
+
+    temp_position.Position.X = detect_list[25].toFloat();
+    temp_position.Position.Y = detect_list[26].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[27].toUShort());
+    LRU_PositionList[8].append(temp_position);
+
+    temp_position.Position.X = detect_list[28].toFloat();
+    temp_position.Position.Y = detect_list[29].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[30].toUShort());
+    LRU_PositionList[9].append(temp_position);
+
+    temp_position.Position.X = detect_list[31].toFloat();
+    temp_position.Position.Y = detect_list[32].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[33].toUShort());
+    LRU_PositionList[10].append(temp_position);
+
+    temp_position.Position.X = detect_list[34].toFloat();
+    temp_position.Position.Y = detect_list[35].toFloat();
+    temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[36].toUShort());
+    LRU_PositionList[11].append(temp_position);
+
+    GeometricTrack *temp_track = new GeometricTrack();
+    temp_track->getPosition().X = detect_list[37].toFloat();
+    temp_track->getPosition().Y = detect_list[38].toFloat();
+    temp_track->Yaw = detect_list[39].toFloat();
+    VehicleTrackList.append(*temp_track);
+
+    Ultrasonic_Packet LRU_temp;
+    LRU_temp.Distance1 = detect_list[40].toFloat();
+    LRU_temp.Distance2 = detect_list[41].toFloat();
+    LRU_temp.Level     = detect_list[42].toFloat();
+    LRU_temp.Width     = detect_list[43].toFloat();
+    LRU_temp.status    = static_cast<uint8_t>(detect_list[44].toUShort());
+    LRU_List[8].append(LRU_temp);
+
+    LRU_temp.Distance1 = detect_list[45].toFloat();
+    LRU_temp.Distance2 = detect_list[46].toFloat();
+    LRU_temp.Level     = detect_list[47].toFloat();
+    LRU_temp.Width     = detect_list[48].toFloat();
+    LRU_temp.status    = static_cast<uint8_t>(detect_list[49].toUShort());
+    LRU_List[9].append(LRU_temp);
+
+    LRU_temp.Distance1 = detect_list[50].toFloat();
+    LRU_temp.Distance2 = detect_list[51].toFloat();
+    LRU_temp.Level     = detect_list[52].toFloat();
+    LRU_temp.Width     = detect_list[53].toFloat();
+    LRU_temp.status    = static_cast<uint8_t>(detect_list[54].toUShort());
+    LRU_List[10].append(LRU_temp);
+
+    LRU_temp.Distance1 = detect_list[55].toFloat();
+    LRU_temp.Distance2 = detect_list[56].toFloat();
+    LRU_temp.Level     = detect_list[57].toFloat();
+    LRU_temp.Width     = detect_list[58].toFloat();
+    LRU_temp.status    = static_cast<uint8_t>(detect_list[59].toUShort());
+    LRU_List[11].append(LRU_temp);
+
+    LRU_List[4].append(LRU_temp);
+    LRU_List[5].append(LRU_temp);
+    LRU_List[6].append(LRU_temp);
+    LRU_List[7].append(LRU_temp);
+}
 /****** SLOT ******/
 
 // 定时任务
 void MainWindow::sTimer20msTask(void)
 {
-    float distance[6]={3.2f,4.2f,6.15f,2.3f,3.4f,1.3f};
-    uint8_t min_index[6];
-    SortSmallToBig(distance,min_index,4);
+    int32_t len;
+    uint16_t i;
+//    float distance[6]={3.2f,4.2f,6.15f,2.3f,3.4f,1.3f};
+//    uint8_t min_index[6];
+//    SortSmallToBig(distance,min_index,4);
 //    mBoRuiController.APAEnable = 1;
 //    mBoRuiController.Velocity = 0.3f;
 //    mBoRuiController.Gear = Drive;
 //    mBoRuiController.SteeringAngle = 500;
 //    mBoRuiController.SteeringAngleRate = 300;
+    if(0 == stack_Widget->currentIndex())
+    {
 
-//    mParallelPlanning->Work(&mPercaption);
-//    mParallelPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
+    }
+    else if(1 == stack_Widget->currentIndex())
+    {
+        if(0xA5 == NewFileUpdateFlag)
+        {
+            len = VehicleTrackList.length();
+//            for(i = 0;i < len;i++)
+//            {
+//                mUltrasonic.ParkingEdgeCalculate(&VehicleTrackList[time_step_cnt],&vehicle_last_position[3],
+//                                                  mVehilceConfig.UltrasonicLocationArray[11],LRU_List[3][time_step_cnt],
+//                                                 &_ultrasonic_data_buffer[3],&temp_obstacle_body);
+//                ObstacleBody_List[3].append(temp_obstacle_body);
+//                if(Normal == temp_obstacle_body.Status)
+//                {
+//                   mDetectEdgePoint->addData(temp_obstacle_body.Position.getX(),temp_obstacle_body.Position.getY());
+//                }
 
-    mVerticalPlanning->Work(&mPercaption,&mGeometricTrack);
-    mVerticalPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
+//                if(Normal == LRU_PositionList[3][time_step_cnt].Status)
+//                {
+//                    mDetectEdgeGroundPositionPoint->addData(LRU_PositionList[3][time_step_cnt].Position.getX(),LRU_PositionList[3][time_step_cnt].Position.getY());
+//                }
+//                Vector2d sensor_position = VehicleTrackList[time_step_cnt].getPosition() + mVehilceConfig.UltrasonicLocationArray[11].Point.rotate(VehicleTrackList[time_step_cnt].getYaw());
+//                mDetectSensorPosition->addData(sensor_position.getX(),sensor_position.getY());
+//                DetectVehicleModule(VehicleTrackList[time_step_cnt].getPosition(),VehicleTrackList[time_step_cnt].getYaw());
+//            }
+            for(i=4;i<12;i++)
+            {
+                mUltrasonicObstaclePercption.DataPushStateMachine(LRU_List[i][time_step_cnt],LRU_PositionList[i][time_step_cnt],i);
+            }
 
-    mSimulation->Update(mBoRuiController,mBoRuiMessage);
+            if(Normal == LRU_PositionList[10][time_step_cnt].Status)
+            {
+                mDetectLeftEdgeGroundPosition->addData(LRU_PositionList[10][time_step_cnt].Position.getX(),LRU_PositionList[10][time_step_cnt].Position.getY());
+            }
+            if(Normal == LRU_PositionList[11][time_step_cnt].Status)
+            {
+                mDetectRightEdgeGroundPosition->addData(LRU_PositionList[11][time_step_cnt].Position.getX(),LRU_PositionList[11][time_step_cnt].Position.getY());
+            }
+            DetectVehicleModule(VehicleTrackList[time_step_cnt].getPosition(),VehicleTrackList[time_step_cnt].getYaw());
+            time_step_cnt++;
+            qDebug() << "the left list length:" << mUltrasonicObstaclePercption.getLeftEdgeListLength();
+            qDebug() << "the right list length:" << mUltrasonicObstaclePercption.getRightEdgeListLength();
+            if(time_step_cnt >= len)
+            {
+                NewFileUpdateFlag = 0x5A;
+                mUltrasonicObstaclePercption.Command = 0x56;
+            }
+        }
+        else if(0x5A == NewFileUpdateFlag)
+        {
+            for(i=4;i<12;i++)
+            {
+                mUltrasonicObstaclePercption.DataPushStateMachine(LRU_List[i][time_step_cnt-1],LRU_PositionList[i][time_step_cnt-1],i);
+            }
+        }
 
-    mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
+        if(SUCCESS == mUltrasonicObstaclePercption.ParkingCalculateStateMachine())
+        {
+            qDebug() << "Left fit line variance:" << mUltrasonicObstaclePercption.getLeftFitLinePacket().variance;
+            qDebug() << "Left fit line variance:" << mUltrasonicObstaclePercption.getRightFitLinePacket().variance;
 
-    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',3));
-    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',3));
-    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',3));
+            mDetectLeftEdgeFitLine->data().data()->clear();
+            mDetectRightEdgeFitLine->data().data()->clear();
+            Vector2d line_point;
+            // left line fit
+            if(0xAA == mUltrasonicObstaclePercption.getLeftFitLinePacket().valid_flag)
+            {
+                line_point.setX(VehicleTrackList[0].getPosition().getX());
+                line_point.setY(tanf(mUltrasonicObstaclePercption.getLeftFitLinePacket().angle) * line_point.getX() +
+                                     mUltrasonicObstaclePercption.getLeftFitLinePacket().offset);
+                mDetectLeftEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
 
-    VehicleModule(mGeometricTrack.getPosition(),mGeometricTrack.getYaw());
+                line_point.setX(VehicleTrackList[time_step_cnt-1].getPosition().getX());
+                line_point.setY(tanf(mUltrasonicObstaclePercption.getLeftFitLinePacket().angle) * line_point.getX() +
+                                     mUltrasonicObstaclePercption.getLeftFitLinePacket().offset);
+                mDetectLeftEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
+            }
+            // right line fit
+            if(0xAA == mUltrasonicObstaclePercption.getRightFitLinePacket().valid_flag)
+            {
+                line_point.setX(VehicleTrackList[0].getPosition().getX());
+                line_point.setY(tanf(mUltrasonicObstaclePercption.getRightFitLinePacket().angle) * line_point.getX() +
+                                     mUltrasonicObstaclePercption.getRightFitLinePacket().offset);
+                mDetectRightEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
 
+                line_point.setX(VehicleTrackList[time_step_cnt-1].getPosition().getX());
+                line_point.setY(tanf(mUltrasonicObstaclePercption.getRightFitLinePacket().angle) * line_point.getX() +
+                                     mUltrasonicObstaclePercption.getRightFitLinePacket().offset);
+                mDetectRightEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
+            }
+            mDetectPlot->replot();
+        }
+    }
+    else if(2 == stack_Widget->currentIndex())
+    {
+//        mParallelPlanning->Work(&mPercaption);
+//        mParallelPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
-//    // calculate and add a new data point to each graph:
-//    mControlGraph1->addData(mControlGraph1->dataCount(), qSin(mControlGraph1->dataCount()/50.0)+qSin(mControlGraph1->dataCount()/50.0/0.3843)*0.25);
-//    mControlGraph2->addData(mControlGraph2->dataCount(), qCos(mControlGraph2->dataCount()/50.0)+qSin(mControlGraph2->dataCount()/50.0/0.4364)*0.15);
+        mVerticalPlanning->Work(&mPercaption,&mGeometricTrack);
+        mVerticalPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
-//    // make key axis range scroll with the data:
-//    mControlPlot->xAxis->rescale();
-//    mControlGraph1->rescaleValueAxis(false, true);
-//    mControlGraph2->rescaleValueAxis(false, true);
-//    mControlPlot->xAxis->setRange(mControlPlot->xAxis->range().upper, 100, Qt::AlignRight);
+        mSimulation->Update(mBoRuiController,mBoRuiMessage);
 
-//    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
-//    double graph1Value = mControlGraph1->dataMainValue(mControlGraph1->dataCount()-1);
-//    double graph2Value = mControlGraph2->dataMainValue(mControlGraph2->dataCount()-1);
-//    mControlTag1->updatePosition(graph1Value);
-//    mControlTag2->updatePosition(graph2Value);
-//    mControlTag1->setText(QString::number(graph1Value, 'f', 2));
-//    mControlTag2->setText(QString::number(graph2Value, 'f', 2));
+        mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
 
-//    mControlPlot->replot();
+        label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',2));
+        label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',2));
+        label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
+
+        PathVehicleModule(mGeometricTrack.getPosition(),mGeometricTrack.getYaw());
+    }
+    else
+    {
+        qDebug() << "索引超出范围";
+    }
 }
 
 // 点击按钮
@@ -829,38 +1121,83 @@ void MainWindow::sCAN_Close(void)
 
 void MainWindow::sDisplayPercaption(Percaption *p)
 {
+//    label_FrontObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getFrontObstacleDistance().distance)));
+//    label_FrontObstacleRegion_Value->setText(obstacle_region[p->getFrontObstacleDistance().region]);
+//    label_FrontObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
 
-    label_FrontObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getFrontObstacleDistance().distance)));
-    label_FrontObstacleRegion_Value->setText(obstacle_region[p->getFrontObstacleDistance().region]);
-    label_FrontObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
-
-    label_RearObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getRearObstacleDistance().distance)));
-    label_RearObstacleRegion_Value->setText(obstacle_region[p->getRearObstacleDistance().region]);
-    label_RearObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
+//    label_RearObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getRearObstacleDistance().distance)));
+//    label_RearObstacleRegion_Value->setText(obstacle_region[p->getRearObstacleDistance().region]);
+//    label_RearObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
 
     // calculate and add a new data point to each graph:
 //    mDetectGraph1->addData(mDetectGraph1->dataCount(), qSin(mDetectGraph1->dataCount()/50.0)+qSin(mDetectGraph1->dataCount()/50.0/0.3843)*0.25);
 //    mDetectGraph2->addData(mDetectGraph2->dataCount(), qCos(mDetectGraph2->dataCount()/50.0)+qSin(mDetectGraph2->dataCount()/50.0/0.4364)*0.15);
-    mDetectGraph1->addData(mDetectGraph1->dataCount(), static_cast<double>(p->getFrontObstacleDistance().distance));
-    mDetectGraph2->addData(mDetectGraph2->dataCount(), static_cast<double>(p->getRearObstacleDistance().distance));
+//    mDetectGraph1->addData(mDetectGraph1->dataCount(), static_cast<double>(p->getFrontObstacleDistance().distance));
+//    mDetectGraph2->addData(mDetectGraph2->dataCount(), static_cast<double>(p->getRearObstacleDistance().distance));
 
-    // make key axis range scroll with the data:
-    mDetectPlot->xAxis->rescale();
-    mDetectGraph1->rescaleValueAxis(false, true);
-    mDetectGraph2->rescaleValueAxis(false, true);
-    mDetectPlot->xAxis->setRange(mDetectPlot->xAxis->range().upper, 100, Qt::AlignRight);
+//    // make key axis range scroll with the data:
+//    mDetectPlot->xAxis->rescale();
+//    mDetectGraph1->rescaleValueAxis(false, true);
+//    mDetectGraph2->rescaleValueAxis(false, true);
+//    mDetectPlot->xAxis->setRange(mDetectPlot->xAxis->range().upper, 100, Qt::AlignRight);
 
-    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
-    double graph1Value = mDetectGraph1->dataMainValue(mDetectGraph1->dataCount()-1);
-    double graph2Value = mDetectGraph2->dataMainValue(mDetectGraph2->dataCount()-1);
-    mDetectTag1->updatePosition(graph1Value);
-    mDetectTag2->updatePosition(graph2Value);
-    mDetectTag1->setText(QString::number(graph1Value, 'f', 2));
-    mDetectTag2->setText(QString::number(graph2Value, 'f', 2));
+//    // update the vertical axis tag positions and texts to match the rightmost data point of the graphs:
+//    double graph1Value = mDetectGraph1->dataMainValue(mDetectGraph1->dataCount()-1);
+//    double graph2Value = mDetectGraph2->dataMainValue(mDetectGraph2->dataCount()-1);
+//    mDetectTag1->updatePosition(graph1Value);
+//    mDetectTag2->updatePosition(graph2Value);
+//    mDetectTag1->setText(QString::number(graph1Value, 'f', 2));
+//    mDetectTag2->setText(QString::number(graph2Value, 'f', 2));
 
-    mDetectPlot->replot();
+//    mDetectPlot->replot();
 }
 
+// 注入文件选择
+void MainWindow::sPercaptionDataFileSelect(void)
+{
+    QString file_name;
+    file_name = QFileDialog::getOpenFileName(this,tr("数据注入文件"),"",tr("text(*.txt)"));
+
+    if(!file_name.isNull())
+    {
+        detect_file = new QFile(file_name);
+        if(detect_file->exists())
+        {
+            if(!detect_file->open(QIODevice::ReadOnly))
+            {
+                QMessageBox::warning(this,tr("打开错误"),tr("打开文件错误：") + detect_file->errorString());
+                return;
+            }
+            else//打开成功
+            {
+                FileDataInit();
+                while(!detect_file->atEnd())
+                {
+                    QByteArray baLine = detect_file->readLine();
+                    AnalyzeOneLine(baLine);
+                }
+                NewFileUpdateFlag = 0xA5;
+                time_step_cnt     = 0;
+                mUltrasonicObstaclePercption.Command = 0x55;
+                detect_file->close();
+            }
+        }
+        else
+        {
+            qDebug() << "文件不存在！";
+            return;
+        }
+    }
+    else
+    {
+        qDebug("取消");
+    }
+}
+// 执行感知检测的相关计算
+void MainWindow::sCalculateDetect(void)
+{
+    mUltrasonicObstaclePercption.Command = 0x57;
+}
 // 库位确认按钮
 void MainWindow::sParkingConfirm()
 {
@@ -875,19 +1212,19 @@ void MainWindow::sParkingConfirm()
 
     ParkingPointX[1] = 0;
     ParkingPointX[2] = 0;
-    ParkingPointX[3] = mPercaption.ParkingLength;
-    ParkingPointX[4] = mPercaption.ParkingLength;
+    ParkingPointX[3] = static_cast<double>(mPercaption.ParkingLength);
+    ParkingPointX[4] = static_cast<double>(mPercaption.ParkingLength);
 
     ParkingPointY[1] = 0;
-    ParkingPointY[2] = -mPercaption.ParkingWidth;
-    ParkingPointY[3] = -mPercaption.ParkingWidth;
+    ParkingPointY[2] = static_cast<double>(-mPercaption.ParkingWidth);
+    ParkingPointY[3] = static_cast<double>(-mPercaption.ParkingWidth);
     ParkingPointY[4] = 0;
 
     mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
 
     QVector<double> ParkingTrackPointX(1),ParkingTrackPointY(1);
-    ParkingTrackPointX[0] = mGeometricTrack.getPosition().getX();
-    ParkingTrackPointY[0] = mGeometricTrack.getPosition().getY();
+    ParkingTrackPointX[0] = static_cast<double>(mGeometricTrack.getPosition().getX());
+    ParkingTrackPointY[0] = static_cast<double>(mGeometricTrack.getPosition().getY());
     mPathVehicleCenterCurve->setData(ParkingTrackPointX,ParkingTrackPointY);
 
 //    mParallelPlanning->Command = 0x60;

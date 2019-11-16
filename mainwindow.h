@@ -7,6 +7,7 @@
 #include "WinZlgCan/win_zlg_can.h"
 #include "Interaction/HMI/Terminal.h"
 #include "Interaction/HMI/simulation.h"
+#include "Interaction/Ultrasonic/Ultrasonic.h"
 #include  "WinZlgCan/can_rev_work_thread.h"
 #include "Planning/ParallelParking/parallel_planning.h"
 #include "Planning/VerticalParking/vertical_planning.h"
@@ -33,8 +34,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void Init(void);
-    void VehicleModule(Vector2d p,float yaw);
+    void DetectVehicleModule(Vector2d p,float yaw);
+    void PathVehicleModule(Vector2d p,float yaw);
 
+    //文件解析
+    void FileDataInit(void);
+    void AnalyzeOneLine(const QByteArray &baLine);
 private:
     Ui::MainWindow *ui;
     // plot variable
@@ -47,10 +52,17 @@ private:
 
     /* Detect UI*/
     QCustomPlot *mDetectPlot;
-    QPointer<QCPGraph> mDetectGraph1;
-    QPointer<QCPGraph> mDetectGraph2;
-    AxisTag *mDetectTag1;
-    AxisTag *mDetectTag2;
+    QCPCurve *mDetectVehicleModuleCurve;
+    QCPCurve *mDetectVehicleCenterCurve;
+    QCPCurve *mDetectEdgePoint;
+    QCPCurve *mDetectEdgeGroundPositionPoint;
+    QCPCurve *mDetectSensorPosition;
+
+    QCPCurve *mDetectLeftEdgeGroundPosition;
+    QCPCurve *mDetectRightEdgeGroundPosition;
+
+    QCPCurve *mDetectLeftEdgeFitLine;
+    QCPCurve *mDetectRightEdgeFitLine;
 
     QLabel *label_FrontObstacle_Text;
     QLabel *label_FrontObstacleDistance_Value;
@@ -63,6 +75,10 @@ private:
 
     QString obstacle_region[5] = {"左侧", "左中","中间","右中", "右侧"};
     QString obstacle_status[5] = {"正常", "盲区", "超探", "噪声", "无效" };
+
+    QPushButton *button_file_select;
+    QFile *detect_file;
+    QPushButton *button_start_calculate;
 
     /* Path UI*/
     QLineEdit *text_VehicleInitPointX;
@@ -95,7 +111,7 @@ private:
     QPushButton *button_timer_control;
 
     QListWidget *list_function;
-
+    QStackedWidget *stack_Widget;
     /* CAN Configure */
     QPushButton *button_CanConnect;
     QPushButton *button_CanOpen;
@@ -103,18 +119,37 @@ private:
 //    WinZlgCan mWinZlgCan;
 //    CanRevWorkThread mCanRevWorkThread;
 
+    // 跟踪
+    GeometricTrack mGeometricTrack;
+    // 配置
+    VehilceConfig mVehilceConfig;
     //HMI
     Terminal *mTerminal;
     Simulation *mSimulation;
-
-    Percaption mPercaption;
-    GeometricTrack mGeometricTrack;
-    VehilceConfig mVehilceConfig;
-
     BoRuiMessage *mBoRuiMessage;
     BoRuiController *mBoRuiController;
+    // 感知
+    Percaption mPercaption;
+    UltrasonicObstaclePercption mUltrasonicObstaclePercption;
+    // Detect Module
+    Ultrasonic mUltrasonic;
+    QList<Ultrasonic_Packet> LRU_List[12];
+    QList<ObstacleLocationPacket> LRU_PositionList[12];
+    QList<ObstacleLocationPacket> ObstacleBody_List[4];
+    ObstacleLocationPacket temp_obstacle_body;
+
+    Vector2d vehicle_last_position[4];
+    ParkingEdgeBufferLocationPacket _ultrasonic_data_buffer[4];
+
+    QList<GeometricTrack> VehicleTrackList;
+    uint8_t NewFileUpdateFlag;
+    int32_t time_step_cnt;
+
+
+
 
     Vector2d FrontLeftPoint,FrontRightPoint,RearLeftPoint,RearRightPoint;
+
 
     // Path
     ParallelPlanning *mParallelPlanning;
@@ -133,8 +168,14 @@ private slots:
     void sCAN_Open(void);
     void sCAN_Close(void);
 
-    //障碍物感知信息
+    // 障碍物感知信息
     void sDisplayPercaption(Percaption *p);
+
+    // 感知区域的文件数据载入
+    void sPercaptionDataFileSelect(void);
+
+    // 感知检测相关计算
+    void sCalculateDetect(void);
 
     //规划
     void sParkingConfirm();
