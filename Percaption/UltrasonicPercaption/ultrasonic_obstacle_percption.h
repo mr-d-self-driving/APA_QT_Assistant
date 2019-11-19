@@ -29,20 +29,31 @@
 #define Y_AXIS_ENTER				   (1)
 #define ENTER_PARK_DIRECTION           (X_AXIS_ENTER)
 
+// 泊车控制命令
+#define RIGHT_PARKING_START_CMD        (0x50)
+#define LEFT_PARKING_START_CMD         (0x51)
+#define ENTER_PARKING_START_CMD        (0x52)
+
+#define RIGHT_PARKING_STOP_CMD         (0x58)
+#define LEFT_PARKING_STOP_CMD          (0x59)
+#define ENTER_PARKING_STOP_CMD         (0x5A)
+
+#define LEFT_RIGHT_PARKING_CAL_CMD     (0x60)
+#define ENTER_PARKING_CAL_CMD          (0x62)
 // 入库过程库位调整相关参数
 #define DISTANCE_ERR_THRESHOLD        (0.6f)
 #define LEVEL_THRESHOLD               (2.2f)
 #define WIDTH_THRESHOLD               (30.0f)
-#define DISTANCE_THRESHOLD            (0.5f)
-#define STEP_DISTANCE                 (0.1f)
+#define DISTANCE_THRESHOLD            (0.6f)
+#define STEP_DISTANCE                 (0.05f)
 #define MIN_EDGE_FIT_NUM              (10)
 #define MIN_EDGE_FIT_DISTANCE         (0.6f)
 #define MIN_LOCATION_NUM              (30)
 // 进库后的相关参数调整
 #define FIT_LINE_STEP_DISTANCE        (0.05f)
 #define FIT_LINE_STEP_LEVEL_THRESHOLD (3.0f)
-#define MIN_FIT_NUM                   (15)
-#define MIN_FIT_DISTANCE              (0.8f)
+#define MIN_FIT_NUM                   (10)
+#define MIN_FIT_DISTANCE              (0.6f)
 
 // 霍夫滤波参数
 #define DELTA_RHO                     (0.02f)
@@ -81,8 +92,7 @@ typedef enum _UltrasonicLocationPushState
     WaitPushStart= 0,
     ParkingLeftEdgeUltrasonicDataPush,
     ParkingRightEdgeUltrasonicDataPush,
-    ParkingCenterUltrasonicDataPush,
-    ParaParkingEdgeRecalculateDataPush,
+    ParkingCenterUltrasonicDataPush
 }UltrasonicLocationPushState;
 
 typedef enum _UltrasonicLocationCalculateState
@@ -108,7 +118,31 @@ public:
     virtual ~UltrasonicObstaclePercption();
 
     void Init();
+    /******************************库位重新定位的状态机***************************************/
+    // 库位重新定位
+    /*
+     * 数据推送状态机，负责有效超声数据的推送；
+     * PC端需50ms调用一次该函数,嵌入式直接放入5ms定时器即可
+     * */
+    void DataPushStateMachine(Ultrasonic_Packet* p_dat,ObstacleLocationPacket *ug_dat,uint16_t index);
 
+    // PC端数据注入测试使用该函数
+    void DataPushStateMachine(Ultrasonic_Packet p_dat,ObstacleLocationPacket ug_dat,uint16_t index);
+    /*
+     * 库位位置和中心点位置，重新计算的状态机
+     * 使用时无时序要求，放入最低优先级任务中即可，比如While(1)死循环中
+     * 该状态机有返回值
+     * 如果返回值为:-1 -> 计算未完成；0 -> 计算完成
+     * */
+    int8_t ParkingCalculateStateMachine(void);
+    /*********************************************基础函数***************************************/
+    uint32_t getFrontEdgeListLength();
+    uint32_t getRearEdgeListLength();
+    uint32_t getLeftEdgeListLength();
+    uint32_t getRightEdgeListLength();
+    LocationStatus getUltrasonicLocationStatus();
+private:
+    /*** the function of private ***/
     void Push(ObstacleLinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
     /*
      * 有序数据的推送
@@ -125,54 +159,41 @@ public:
 
     void ParkingCenterPush(ObstacleLinkList *list,Ultrasonic_Packet u_dat,ObstacleLocationPacket p_dat);
     /*******************************************************************************************/
-
-    /////////////////////////////////////////////////////////////////////////////////////////////
-    void EdgeFinding(ObstacleLinkList *list);
+    /**************************************** 边沿提取算法 ***************************************/
+    /*******************************************************************************************/
     void EdgeFinding_V1_0(ObstacleLinkList *list);
     void EdgeFinding_V1_1(ObstacleLinkList *list,ObstacleLinkList *vehicle_list);//增加车辆链表
+    /*******************************************************************************************/
+    /**************************************** 数据分布算法 ***************************************/
+    /*******************************************************************************************/
     // 求取最高分布值的最优解
-    float HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value);
+    float HighestDistribution(uint16_t group_number,uint16_t* group_value_array,float min_value);
     // 求取最高分布的索引值
     uint8_t HighestDistributionBase(uint8_t group_number,uint16_t* group_value_array);
-    void ValueDistributed(ObstacleLinkList *valid_list);
 
+    void FindPositionListMinValue(ObstacleLinkList *valid_list,float *min_x,uint16_t *num_x,float *min_y,uint16_t *num_y);
+    void PositionPointDistributed(ObstacleLinkList *valid_list,
+                                  float min_x,uint16_t x_array_len,uint16_t *x_value_array,
+                                  float min_y,uint16_t y_array_len,uint16_t *y_value_array);
+    void EdgePositionValueDistributed(ObstacleLinkList *valid_list);
+    /*******************************************************************************************/
+    /**************************************** 霍夫变换算法 ***************************************/
+    /*******************************************************************************************/
     // 基于霍夫变换的边沿线滤波
     void EdgeLineFit_HoughFilter(ObstacleLinkList *line_point,LineFitInformationPacket *line);
-
+    /*******************************************************************************************/
+    /**************************************** 重定位算法 *****************************************/
+    /*******************************************************************************************/
     // 入库过程中的前后边界拟合
     void FrontRearEdgeLineFit();
     // 进库后的库位边沿线拟合
     void ParkingCenterEdgeLineFit();
-    /******************************库位重新定位的状态机***************************************/
-    // 库位重新定位
-    /*
-     * 数据推送状态机，负责有效超声数据的推送；
-     * PC端需50ms调用一次该函数,嵌入式直接放入5ms定时器即可
-     * */
-    void DataPushStateMachine(Ultrasonic_Packet* p_dat,ObstacleLocationPacket *ug_dat,uint16_t index);
-
-    // PC端数据注入使用
-    void DataPushStateMachine(Ultrasonic_Packet p_dat,ObstacleLocationPacket ug_dat,uint16_t index);
-    /*
-     * 库位位置和中心点位置，重新计算的状态机
-     * 使用时无时序要求，放入最低优先级任务中即可，比如While(1)死循环中
-     * 该状态机有返回值
-     * 如果返回值为:-1 -> 计算未完成；0 -> 计算完成
-     * */
-    int8_t ParkingCalculateStateMachine(void);
-    /*********************************************基础函数***************************************/
-    uint32_t getFrontEdgeListLength();
-    uint32_t getRearEdgeListLength();
-    uint32_t getLeftEdgeListLength();
-    uint32_t getRightEdgeListLength();
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    LocationStatus getUltrasonicLocationStatus();
-
-
-private:
+    /*******************************************************************************************/
+    /**************************************** 私有变量 ******************************************/
+    /*******************************************************************************************/
     uint8_t _calculate_command;
-
     LocationStatus _ultrasonic_location_sts;
+
     EdgeFindingState _edge_finding_state;
     EdgeFindingStateV1_0 _edge_finding_state_v1_0;
 

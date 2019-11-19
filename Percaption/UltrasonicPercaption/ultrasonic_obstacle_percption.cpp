@@ -31,18 +31,15 @@ void UltrasonicObstaclePercption::Init()
     _parking_calculate_state = WaitCommandForCalculate;
 
     _edge_finding_state = ObstacleWaitEdge;
-
-    _parking_position.First_Position  = Vector2d(0,0);
-    _parking_position.Second_Position = Vector2d(0,0);
-    _parking_position.Length = 0.0f;
-
-    _vehicle_position.First_Position  = Vector2d(0,0);
-    _vehicle_position.Second_Position = Vector2d(0,0);
-    _vehicle_position.Length = 0.0f;
+    _edge_finding_state_v1_0 = EdgeJudge;
     // 最终输出的库位信息
-    _valid_parking_edge_position.First_Position  = Vector2d(0,0);
-    _valid_parking_edge_position.Second_Position = Vector2d(0,0);
-    _valid_parking_edge_position.Length = 0.0f;
+    _valid_parking_edge_position.FrontOutSide.position = Vector2d(0,0);
+    _valid_parking_edge_position.FrontOutSide.angle = 0.0f;
+    _valid_parking_edge_position.FrontOutSide.valid_flag = 0;
+
+    _valid_parking_edge_position.RearOutSide.position  = Vector2d(0,0);
+    _valid_parking_edge_position.RearOutSide.angle = 0.0f;
+    _valid_parking_edge_position.RearOutSide.valid_flag = 0;
     // 进库后的库位中心调整
     _valid_parking_center_position.position = Vector2d(0,0);
     _valid_parking_center_position.angle    = 0;
@@ -183,98 +180,6 @@ void UltrasonicObstaclePercption::ParkingCenterPush(ObstacleLinkList *list,Ultra
 /******************************************************************************************************************************/
 /***                                                    边沿查找                                                             ***/
 /******************************************************************************************************************************/
-void UltrasonicObstaclePercption::EdgeFinding(ObstacleLinkList *list)
-{
-    Node<ObstacleLocationPacket>* _current_node;//当前节点
-    Node<ObstacleLocationPacket>* _last_node;//上一节点
-    ObstacleInformationPacket parking_position_temp;
-    ObstacleInformationPacket vehicle_position_temp;
-    float max_y_axis_value;
-    float _err_distance;
-
-    if(!list->getHeadNode())
-    {
-        return;
-    }
-    _current_node = list->getHeadNode();//当前节点
-    _last_node    = list->getHeadNode();//上一节点
-
-    while(_current_node->next != NULL)
-    {
-        _err_distance = (_current_node->data.Position - _last_node->data.Position).Length();
-        switch(_edge_finding_state)
-        {
-            case ObstacleWaitEdge:
-                if(_err_distance < DISTANCE_THRESHOLD)
-                {
-                    vehicle_position_temp.First_Position = _last_node->data.Position;
-                    max_y_axis_value = _current_node->data.Position.getY();
-                    _edge_finding_state = VehicleEdgeWaitstate;
-                }
-                break;
-
-            case VehicleEdgeWaitstate:
-                if(_err_distance > DISTANCE_THRESHOLD)
-                {
-                    vehicle_position_temp.Second_Position = _last_node->data.Position;
-                    parking_position_temp.First_Position  = _current_node->data.Position;
-
-                    _vehicle_position.Length          = fabs(vehicle_position_temp.First_Position.getX() - vehicle_position_temp.Second_Position.getX());
-                    _vehicle_position.First_Position  = vehicle_position_temp.First_Position;
-                    _vehicle_position.Second_Position = vehicle_position_temp.Second_Position;
-                    _edge_finding_state = WaitEnterDenseArea;
-                }
-                else
-                {
-                    max_y_axis_value = _current_node->data.Position.getY() > max_y_axis_value ? _current_node->data.Position.getY() : max_y_axis_value;
-                }
-                break;
-
-            case WaitEnterDenseArea:
-                if( (_err_distance < DISTANCE_THRESHOLD) && (_err_distance != 0 ))
-                {
-                    parking_position_temp.Second_Position = _last_node->data.Position;
-                    vehicle_position_temp.First_Position  = _last_node->data.Position;
-                    _edge_finding_state = JudgeParkingValid;
-                }
-                break;
-
-            case JudgeParkingValid:
-                if(_err_distance < DISTANCE_THRESHOLD)
-                {
-                    vehicle_position_temp.Second_Position = _current_node->data.Position;
-                    if((vehicle_position_temp.First_Position - vehicle_position_temp.Second_Position).Length() > DISTANCE_THRESHOLD)
-                    {
-                        _parking_position.Length          = fabs(parking_position_temp.First_Position.getX() - parking_position_temp.Second_Position.getX());
-                        _parking_position.First_Position  = parking_position_temp.First_Position;
-                        _parking_position.Second_Position = parking_position_temp.Second_Position;
-                        _edge_finding_state = VehicleEdgeWaitstate;
-                    }
-                }
-                else//突然出现稀疏点
-                {
-                    _edge_finding_state = WaitEnterDenseArea;
-                }
-                break;
-
-            default:
-
-                break;
-        }
-        _last_node = _current_node;
-        _current_node = _current_node->next;
-    }
-    if(VehicleEdgeWaitstate == _edge_finding_state)
-    {
-        _vehicle_position.First_Position  = vehicle_position_temp.First_Position;
-        _vehicle_position.Second_Position = _current_node->data.Position;
-        _vehicle_position.Length          = fabs(_vehicle_position.First_Position.getX() - _vehicle_position.Second_Position.getX());
-    }
-    _valid_parking_edge_position.First_Position.setX( _vehicle_position.Second_Position.getX() );
-    _valid_parking_edge_position.First_Position.setY( max_y_axis_value );
-    list->Delete();
-}
-
 void UltrasonicObstaclePercption::EdgeFinding_V1_0(ObstacleLinkList *list)
 {
     Node<ObstacleLocationPacket>* _current_node;//当前节点
@@ -299,30 +204,30 @@ void UltrasonicObstaclePercption::EdgeFinding_V1_0(ObstacleLinkList *list)
             case EdgeJudge:
                 if(_err_distance > DISTANCE_THRESHOLD)
                 {
-                    vehicle_position_temp.First_Position = _current_node->data.Position;
+                    vehicle_position_temp.FrontOutSide.position = _current_node->data.Position;
                 }
                 else
                 {
-                    vehicle_position_temp.First_Position = _last_node->data.Position;
+                    vehicle_position_temp.FrontOutSide.position = _last_node->data.Position;
                 }
-                max_y_axis_value = vehicle_position_temp.First_Position.getY();
+                max_y_axis_value = vehicle_position_temp.FrontOutSide.position.getY();
                 _edge_finding_state_v1_0 = EdgeLooking;
                 break;
 
             case EdgeLooking:
                 if(_err_distance > DISTANCE_THRESHOLD)
                 {
-                    vehicle_position_temp.Second_Position = _last_node->data.Position;
+                    vehicle_position_temp.RearOutSide.position = _last_node->data.Position;
 
-                    _valid_parking_edge_position.First_Position.setX( vehicle_position_temp.Second_Position.getX() );
-                    _valid_parking_edge_position.First_Position.setY( max_y_axis_value );
+                    _valid_parking_edge_position.FrontOutSide.position.setX( vehicle_position_temp.RearOutSide.position.getX() );
+                    _valid_parking_edge_position.FrontOutSide.position.setY( max_y_axis_value );
 
-                    vehicle_position_temp.First_Position = _current_node->data.Position;
-                    max_y_axis_value = vehicle_position_temp.First_Position.getY();
+                    vehicle_position_temp.FrontOutSide.position = _current_node->data.Position;
+                    max_y_axis_value = vehicle_position_temp.FrontOutSide.position.getY();
                 }
                 else
                 {
-                    vehicle_position_temp.Second_Position = _current_node->data.Position;
+                    vehicle_position_temp.RearOutSide.position = _current_node->data.Position;
                     max_y_axis_value = _current_node->data.Position.getY() > max_y_axis_value ? _current_node->data.Position.getY() : max_y_axis_value;
                 }
                 break;
@@ -332,8 +237,8 @@ void UltrasonicObstaclePercption::EdgeFinding_V1_0(ObstacleLinkList *list)
         }
         if(_err_distance < DISTANCE_THRESHOLD)
         {
-            _valid_parking_edge_position.First_Position.setX( vehicle_position_temp.Second_Position.getX() );
-            _valid_parking_edge_position.First_Position.setY( max_y_axis_value );
+            _valid_parking_edge_position.FrontOutSide.position.setX( vehicle_position_temp.RearOutSide.position.getX() );
+            _valid_parking_edge_position.FrontOutSide.position.setY( max_y_axis_value );
         }
         _last_node = _current_node;
         _current_node = _current_node->next;
@@ -346,7 +251,7 @@ void UltrasonicObstaclePercption::EdgeFinding_V1_1(ObstacleLinkList *list,Obstac
     Node<ObstacleLocationPacket>* _current_node;//当前节点
     Node<ObstacleLocationPacket>* _last_node;//上一节点
     ObstacleInformationPacket vehicle_position_temp;
-    float max_y_axis_value;
+    float max_y_axis_value = -10;
     float _err_distance;
 
     if(0 == list->Length())
@@ -356,7 +261,8 @@ void UltrasonicObstaclePercption::EdgeFinding_V1_1(ObstacleLinkList *list,Obstac
 
     _last_node    = list->getHeadNode();//上一节点
     _current_node = _last_node->next;//当前节点
-
+    if(vehicle_list->Length() != 0){vehicle_list->Delete();}
+    _edge_finding_state_v1_0 = EdgeJudge;
     while(_current_node->next != NULL)
     {
         _err_distance = (_current_node->data.Position - _last_node->data.Position).Length();
@@ -365,58 +271,123 @@ void UltrasonicObstaclePercption::EdgeFinding_V1_1(ObstacleLinkList *list,Obstac
             case EdgeJudge:
                 if(_err_distance > DISTANCE_THRESHOLD)
                 {
-                    vehicle_position_temp.First_Position = _current_node->data.Position;
+                    vehicle_position_temp.FrontOutSide.position = _current_node->data.Position;
                     vehicle_list->Add(_current_node->data);
                 }
                 else
                 {
-                    vehicle_position_temp.First_Position = _last_node->data.Position;
+                    vehicle_position_temp.FrontOutSide.position = _last_node->data.Position;
                     vehicle_list->Add(_last_node->data);
                 }
-                max_y_axis_value = vehicle_position_temp.First_Position.getY();
+                max_y_axis_value = vehicle_position_temp.FrontOutSide.position.getY();
                 _edge_finding_state_v1_0 = EdgeLooking;
                 break;
 
             case EdgeLooking:
                 if(_err_distance > DISTANCE_THRESHOLD)
                 {
-                    vehicle_position_temp.Second_Position = _last_node->data.Position;
-                    _valid_parking_edge_position.First_Position.setX( vehicle_position_temp.Second_Position.getX() );
-                    _valid_parking_edge_position.First_Position.setY( max_y_axis_value );
-                    vehicle_position_temp.First_Position = _current_node->data.Position;
-                    max_y_axis_value = vehicle_position_temp.First_Position.getY();
+                    vehicle_position_temp.RearOutSide.position = _last_node->data.Position;
+                    _valid_parking_edge_position.FrontOutSide.position.setX( vehicle_position_temp.RearOutSide.position.getX() );
+                    _valid_parking_edge_position.FrontOutSide.position.setY( max_y_axis_value );
+                    _valid_parking_edge_position.FrontOutSide.valid_flag = 0xA5;
+                    vehicle_position_temp.FrontOutSide.position = _current_node->data.Position;
+                    max_y_axis_value = vehicle_position_temp.FrontOutSide.position.getY();
                     vehicle_list->Delete();
                 }
                 else
                 {
-                    vehicle_position_temp.Second_Position = _current_node->data.Position;
+                    vehicle_position_temp.RearOutSide.position = _current_node->data.Position;
                     vehicle_list->Add(_current_node->data);
                     max_y_axis_value = _current_node->data.Position.getY() > max_y_axis_value ? _current_node->data.Position.getY() : max_y_axis_value;
                 }
                 break;
 
             default:
+
                 break;
         }
         if(_err_distance < DISTANCE_THRESHOLD)
         {
-            _valid_parking_edge_position.First_Position.setX( vehicle_position_temp.Second_Position.getX() );
-            _valid_parking_edge_position.First_Position.setY( max_y_axis_value );
+            _valid_parking_edge_position.FrontOutSide.position.setX( vehicle_position_temp.RearOutSide.position.getX() );
+            _valid_parking_edge_position.FrontOutSide.position.setY( max_y_axis_value );
+            _valid_parking_edge_position.FrontOutSide.valid_flag = 0xA5;
         }
         _last_node = _current_node;
         _current_node = _current_node->next;
     }
-    if(list->Length() != 0){list->Delete();}
+//    if(list->Length() != 0){list->Delete();}
 }
 
 /******************************************************************************************************************************/
 /***                                                    数值分布                                                             ***/
 /******************************************************************************************************************************/
-float UltrasonicObstaclePercption::HighestDistribution(uint8_t group_number,uint16_t* group_value_array,float min_value)
+void UltrasonicObstaclePercption::FindPositionListMinValue(ObstacleLinkList *valid_list,float *min_x,uint16_t *num_x,float *min_y,uint16_t *num_y)
+{
+    float max_x,max_y;
+
+    if(0 == valid_list->Length()){return;}
+    //当前节点零时变量
+    Node<ObstacleLocationPacket> *_current_node_triangle = valid_list->getHeadNode();
+    *min_x = _current_node_triangle->data.Position.getX();
+    *min_y = _current_node_triangle->data.Position.getY();
+     max_x = _current_node_triangle->data.Position.getX();
+     max_y = _current_node_triangle->data.Position.getY();
+
+    while(_current_node_triangle->next != NULL)
+    {
+        *min_x = _current_node_triangle->data.Position.getX() < *min_x ? _current_node_triangle->data.Position.getX() : *min_x;
+        *min_y = _current_node_triangle->data.Position.getY() < *min_y ? _current_node_triangle->data.Position.getY() : *min_y;
+         max_x = _current_node_triangle->data.Position.getX() >  max_x ? _current_node_triangle->data.Position.getX() :  max_x;
+         max_y = _current_node_triangle->data.Position.getY() >  max_y ? _current_node_triangle->data.Position.getY() :  max_y;
+        _current_node_triangle = _current_node_triangle->next;
+    }
+    *num_x = static_cast<uint16_t>((max_x - *min_x)/STEP_DISTANCE) + 1;
+    *num_y = static_cast<uint16_t>((max_y - *min_y)/STEP_DISTANCE) + 1;
+}
+
+void UltrasonicObstaclePercption::PositionPointDistributed(ObstacleLinkList *valid_list,
+                                                           float min_x,uint16_t x_array_len,uint16_t *x_value_array,
+                                                           float min_y,uint16_t y_array_len,uint16_t *y_value_array)
+{
+    uint16_t i;
+    if(0 == valid_list->Length()){return;}
+    for(i = 0;i<x_array_len;i++)
+    {
+        x_value_array[i] = 0;
+    }
+    for(i = 0;i<y_array_len;i++)
+    {
+        y_value_array[i] = 0;
+    }
+    //当前节点零时变量
+    Node<ObstacleLocationPacket> *_current_node_triangle = valid_list->getHeadNode();
+    while(_current_node_triangle->next != NULL)
+    {
+        for(i = 0;i<x_array_len;i++)
+        {
+            if( (_current_node_triangle->data.Position.getX() >= (min_x + STEP_DISTANCE*i)) && (_current_node_triangle->data.Position.getX() < (min_x + STEP_DISTANCE*(i + 1))))
+            {
+                x_value_array[i]++;
+                break;
+            }
+        }
+        for(i = 0;i<y_array_len;i++)
+        {
+            if( (_current_node_triangle->data.Position.getY() >= (min_y + STEP_DISTANCE*i)) && (_current_node_triangle->data.Position.getY() < (min_y + STEP_DISTANCE*(i + 1))))
+            {
+                y_value_array[i]++;
+                break;
+            }
+        }
+        _current_node_triangle = _current_node_triangle->next;
+    }
+}
+
+float UltrasonicObstaclePercption::HighestDistribution(uint16_t group_number,uint16_t* group_value_array,float min_value)
 {
     uint8_t i;
-    uint8_t max_distribute_number_id;
-    uint16_t max_distribute_number_value;
+    uint8_t max_distribute_number_id = 0;
+    uint16_t max_distribute_number_value = 0;
 
     uint16_t sum_value;
     float master_ratio,slave_ratio;
@@ -499,106 +470,26 @@ float UltrasonicObstaclePercption::HighestDistribution(uint8_t group_number,uint
     }
 }
 
-uint8_t UltrasonicObstaclePercption::HighestDistributionBase(uint8_t group_number,uint16_t* group_value_array)
+void  UltrasonicObstaclePercption::EdgePositionValueDistributed(ObstacleLinkList *valid_list)
 {
-    uint8_t i;
-    uint8_t max_distribute_number_id;
-    uint16_t max_distribute_number_value;
+    float min_x,min_y;
+    uint16_t  x_group_number,y_group_number;
 
-    for(i = 0; i < group_number; i++)
-    {
-        if(i == 0)
-        {
-            max_distribute_number_id = i;
-            max_distribute_number_value = group_value_array[i];
-        }
-        else
-        {
-            if(group_value_array[i] > max_distribute_number_value)
-            {
-                max_distribute_number_value = group_value_array[i];
-                max_distribute_number_id    = i;
-            }
-        }
-    }
-    return max_distribute_number_id;
+    FindPositionListMinValue(valid_list,&min_x,&x_group_number,&min_y,&y_group_number);
+
+    uint16_t distribute_number_x[x_group_number];
+    uint16_t distribute_number_y[y_group_number];
+
+    PositionPointDistributed(valid_list,
+                             min_x,x_group_number,distribute_number_x,
+                             min_y,y_group_number,distribute_number_y);
+
+    _valid_parking_edge_position.RearOutSide.position.setX(HighestDistribution(x_group_number,distribute_number_x,min_x));
+    _valid_parking_edge_position.RearOutSide.position.setY(HighestDistribution(y_group_number,distribute_number_y,min_y));
+    _valid_parking_edge_position.RearOutSide.valid_flag = 0xA5;
+
+//    valid_list->Delete();
 }
-
-void  UltrasonicObstaclePercption::ValueDistributed(ObstacleLinkList *valid_list)
-{
-    uint8_t i;
-    float min_x,max_x;
-    float min_y,max_y;
-    uint8_t  x_group_number,y_group_number;
-    Node<ObstacleLocationPacket>* _current_node_triangle;//当前节点零时变量
-
-    if(0 == valid_list->Length())
-    {
-        return;
-    }
-
-    _current_node_triangle = valid_list->getHeadNode();
-    min_x = _current_node_triangle->data.Position.getX();
-    max_x = _current_node_triangle->data.Position.getX();
-    min_y = _current_node_triangle->data.Position.getY();
-    max_y = _current_node_triangle->data.Position.getY();
-
-    while(_current_node_triangle->next != NULL)
-    {
-        min_x = _current_node_triangle->data.Position.getX() < min_x ? _current_node_triangle->data.Position.getX() : min_x;
-        max_x = _current_node_triangle->data.Position.getX() > max_x ? _current_node_triangle->data.Position.getX() : max_x;
-        min_y = _current_node_triangle->data.Position.getY() < min_y ? _current_node_triangle->data.Position.getY() : min_y;
-        max_y = _current_node_triangle->data.Position.getY() > max_y ? _current_node_triangle->data.Position.getY() : max_y;
-
-        _current_node_triangle = _current_node_triangle->next;
-    }
-
-    x_group_number = (uint8_t)((max_x - min_x)/STEP_DISTANCE) + 1;
-    y_group_number = (uint8_t)((max_y - min_y)/STEP_DISTANCE) + 1;
-
-    _current_node_triangle = valid_list->getHeadNode();
-
-    uint16_t *distribute_number_x = new uint16_t[x_group_number];
-    uint16_t *distribute_number_y = new uint16_t[y_group_number];
-
-    for(i = 0;i<x_group_number;i++)
-    {
-        distribute_number_x[i] = 0;
-    }
-    for(i = 0;i<y_group_number;i++)
-    {
-        distribute_number_y[i] = 0;
-    }
-
-    while(_current_node_triangle->next != NULL)
-    {
-        for(i = 0;i<x_group_number;i++)
-        {
-            if( (_current_node_triangle->data.Position.getX() >= (min_x + STEP_DISTANCE*i)) && (_current_node_triangle->data.Position.getX() < (min_x + STEP_DISTANCE*(i + 1))))
-            {
-                distribute_number_x[i]++;
-                break;
-            }
-        }
-        for(i = 0;i<y_group_number;i++)
-        {
-            if( (_current_node_triangle->data.Position.getY() >= (min_y + STEP_DISTANCE*i)) && (_current_node_triangle->data.Position.getY() < (min_y + STEP_DISTANCE*(i + 1))))
-            {
-                distribute_number_y[i]++;
-                break;
-            }
-        }
-        _current_node_triangle = _current_node_triangle->next;
-    }
-
-    _valid_parking_edge_position.Second_Position.setX(HighestDistribution(x_group_number,distribute_number_x,min_x));
-    _valid_parking_edge_position.Second_Position.setY(HighestDistribution(y_group_number,distribute_number_y,min_y));
-
-    delete []distribute_number_x;
-    delete []distribute_number_y;
-    valid_list->Delete();
-}
-
 /******************************************************************************************************************************/
 /***                                                    数据滤波                                                             ***/
 /******************************************************************************************************************************/
@@ -616,6 +507,7 @@ void UltrasonicObstaclePercption::EdgeLineFit_HoughFilter(ObstacleLinkList *line
     else {
         line->angle = 0.0f;
         line->offset = 0.0f;
+        line->variance = 0.0f;
         line->valid_flag = 0x55;
         qDebug("Parking Edge too Small");
     }
@@ -623,15 +515,16 @@ void UltrasonicObstaclePercption::EdgeLineFit_HoughFilter(ObstacleLinkList *line
 /******************************************************************************************************************************/
 /***                                                    线性拟合                                                             ***/
 /******************************************************************************************************************************/
-
+// 入库过程中前后库边沿定位函数
 void UltrasonicObstaclePercption::FrontRearEdgeLineFit()
 {
     // 库位边界点计算
+    if(_ultrasonic_front_edge_list->Length() == 0){return;}
     EdgeFinding_V1_1(_ultrasonic_front_edge_list,_ultrasonic_front_edge_list_first_vehicle);
-    //斜率计算
+    //车辆斜率计算
     EdgeLineFit_HoughFilter(_ultrasonic_front_edge_list_first_vehicle,&_front_edge_fit_line_packet);
-
-    ValueDistributed(_ultrasonic_rear_edge_list_triangle_location);
+    // 车辆尾部数值分布
+    EdgePositionValueDistributed(_ultrasonic_rear_edge_list_triangle_location);
 }
 
 
@@ -652,21 +545,21 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet* p_dat
     switch(_data_push_state)
     {
         case WaitPushStart:
-            if(0x50 == Command)//泊车右侧入库
+            if(RIGHT_PARKING_START_CMD == Command)//泊车右侧入库
             {
                 if(0 != _ultrasonic_front_edge_list->Length()){_ultrasonic_front_edge_list->Delete();}
                 if(0 != _ultrasonic_rear_edge_list_triangle_location->Length()){_ultrasonic_rear_edge_list_triangle_location->Delete();}
                 _ultrasonic_location_sts = LocationDataPush;
                 _data_push_state = ParkingRightEdgeUltrasonicDataPush;
             }
-            else if(0x51 == Command)//泊车左侧入库
+            else if(LEFT_PARKING_START_CMD == Command)//泊车左侧入库
             {
                 if(0 != _ultrasonic_front_edge_list->Length()){_ultrasonic_front_edge_list->Delete();}
                 if(0 != _ultrasonic_rear_edge_list_triangle_location->Length()){_ultrasonic_rear_edge_list_triangle_location->Delete();}
                 _ultrasonic_location_sts = LocationDataPush;
                 _data_push_state = ParkingLeftEdgeUltrasonicDataPush;
             }
-            else if(0x55 == Command)//泊车进库
+            else if(ENTER_PARKING_START_CMD == Command)//泊车进库
             {
                 if(0 != _left_edge_position_list->Length()){_left_edge_position_list->Delete();}
                 if(0 != _right_edge_position_list->Length()){_right_edge_position_list->Delete();}
@@ -674,42 +567,6 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet* p_dat
                 _data_push_state = ParkingCenterUltrasonicDataPush;
             }
             break;
-
-      case ParkingLeftEdgeUltrasonicDataPush:
-#if RUNNING_PLATFORM == Embedded_PLATFORM
-            if((0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
-            {
-                Push(_ultrasonic_front_edge_list,p_dat[11],ug_dat[11]);
-            }
-            if(23 == u_dat->ScheduleTimeCnt)
-            {
-                Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
-                Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
-            }
-#elif RUNNING_PLATFORM == PC_PLATFORM
-            switch(index)
-            {
-                case 10:
-                    Push(_ultrasonic_front_edge_list,p_dat[10],ug_dat[10]);
-                break;
-
-                case 5:
-                    DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
-                break;
-
-                case 6:
-                    DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
-                break;
-                default:
-                break;
-            }
-#endif
-            if(0x52 == Command)
-            {
-                _calculate_command = 0x70;//库位计算命令
-                _data_push_state = WaitPushStart;
-            }
-          break;
 
         case ParkingRightEdgeUltrasonicDataPush:
 #if RUNNING_PLATFORM == Embedded_PLATFORM
@@ -725,10 +582,6 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet* p_dat
 #elif RUNNING_PLATFORM == PC_PLATFORM
             switch(index)
             {
-                case 11:
-                    Push(_ultrasonic_front_edge_list,p_dat[11],ug_dat[11]);
-                break;
-
                 case 5:
                     DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
                 break;
@@ -737,20 +590,60 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet* p_dat
                     DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
                 break;
 
+                case 11:
+                    Push(_ultrasonic_front_edge_list,p_dat[11],ug_dat[11]);
+                break;
+
                 default:
                 break;
             }
 #endif
-            if(0x52 == Command)//垂直结束
+            if(RIGHT_PARKING_STOP_CMD == Command)//垂直结束
             {
-                _calculate_command = 0x70;//库位计算命令
+                _calculate_command = LEFT_RIGHT_PARKING_CAL_CMD;//库位计算命令
+                _data_push_state = WaitPushStart;
+            }
+            break;
+
+        case ParkingLeftEdgeUltrasonicDataPush:
+    #if RUNNING_PLATFORM == Embedded_PLATFORM
+            if((12 == u_dat->ScheduleTimeCnt) || (26 == u_dat->ScheduleTimeCnt))
+            {
+                Push(_ultrasonic_front_edge_list,p_dat[10],ug_dat[10]);
+            }
+            if(23 == u_dat->ScheduleTimeCnt)
+            {
+                Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
+                Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
+            }
+    #elif RUNNING_PLATFORM == PC_PLATFORM
+            switch(index)
+            {
+                case 5:
+                    DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
+                break;
+
+                case 6:
+                    DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
+                break;
+
+                case 10:
+                    Push(_ultrasonic_front_edge_list,p_dat[10],ug_dat[10]);
+                break;
+                default:
+                break;
+            }
+    #endif
+            if(LEFT_PARKING_STOP_CMD == Command)
+            {
+                _calculate_command = LEFT_RIGHT_PARKING_CAL_CMD;//库位计算命令
                 _data_push_state = WaitPushStart;
             }
             break;
 
         case ParkingCenterUltrasonicDataPush:
 #if RUNNING_PLATFORM == Embedded_PLATFORM
-            if((26 == u_dat->ScheduleTimeCnt) || (12 == u_dat->ScheduleTimeCnt))
+            if((12 == u_dat->ScheduleTimeCnt) || (26 == u_dat->ScheduleTimeCnt))
             {
                 ParkingCenterPush(_left_edge_position_list,p_dat[10],ug_dat[10]);
             }
@@ -773,14 +666,14 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet* p_dat
                 break;
             }
 #endif
-            if(0x56 == Command)//进库完成，开始计算
+            if(ENTER_PARKING_STOP_CMD == Command)//进库完成，开始计算
             {
-                _calculate_command = 0x75;//进库计算命令
+                _calculate_command = ENTER_PARKING_CAL_CMD;//进库计算命令
                 _data_push_state = WaitPushStart;
             }
             break;
-        default:
 
+        default:
             break;
     }
 }
@@ -790,21 +683,21 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet p_dat,
     switch(_data_push_state)
     {
         case WaitPushStart:
-            if(0x50 == Command)//垂直泊车右侧入库
+            if(RIGHT_PARKING_START_CMD == Command)//垂直泊车右侧入库
             {
                 if(0 != _ultrasonic_front_edge_list->Length()){_ultrasonic_front_edge_list->Delete();}
                 if(0 != _ultrasonic_rear_edge_list_triangle_location->Length()){_ultrasonic_rear_edge_list_triangle_location->Delete();}
                 _ultrasonic_location_sts = LocationDataPush;
                 _data_push_state = ParkingRightEdgeUltrasonicDataPush;
             }
-            else if(0x51 == Command)//垂直泊车左侧入库
+            else if(LEFT_PARKING_START_CMD == Command)//垂直泊车左侧入库
             {
                 if(0 != _ultrasonic_front_edge_list->Length()){_ultrasonic_front_edge_list->Delete();}
                 if(0 != _ultrasonic_rear_edge_list_triangle_location->Length()){_ultrasonic_rear_edge_list_triangle_location->Delete();}
                 _ultrasonic_location_sts = LocationDataPush;
                 _data_push_state = ParkingLeftEdgeUltrasonicDataPush;
             }
-            else if(0x55 == Command)//垂直泊车进库
+            else if(ENTER_PARKING_START_CMD == Command)//垂直泊车进库
             {
                 if(0 != _left_edge_position_list->Length()){_left_edge_position_list->Delete();}
                 if(0 != _right_edge_position_list->Length()){_right_edge_position_list->Delete();}
@@ -813,9 +706,9 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet p_dat,
             }
             break;
 
-      case ParkingLeftEdgeUltrasonicDataPush:
+        case ParkingRightEdgeUltrasonicDataPush:
 #if RUNNING_PLATFORM == Embedded_PLATFORM
-            if((0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
+            if( (12 == u_dat->ScheduleTimeCnt) || (26 == u_dat->ScheduleTimeCnt))
             {
                 Push(_ultrasonic_front_edge_list,p_dat[11],ug_dat[11]);
             }
@@ -827,10 +720,6 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet p_dat,
 #elif RUNNING_PLATFORM == PC_PLATFORM
             switch(index)
             {
-                case 10:
-                    Push(_ultrasonic_front_edge_list,p_dat,ug_dat);
-                break;
-
                 case 5:
                     DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat);
                 break;
@@ -839,35 +728,36 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet p_dat,
                     DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat);
                 break;
 
-                default:
-                break;
-            }
-#endif
-            if(0x52 == Command)
-            {
-                _calculate_command = 0x70;//库位计算命令
-                _data_push_state = WaitPushStart;
-            }
-          break;
-
-        case ParkingRightEdgeUltrasonicDataPush:
-#if RUNNING_PLATFORM == Embedded_PLATFORM
-            if( (0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
-            {
-                Push(_ultrasonic_front_edge_list,p_dat[11],ug_dat[11]);
-            }
-            if(23 == u_dat->ScheduleTimeCnt)
-            {
-                Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
-                Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
-            }
-#elif RUNNING_PLATFORM == PC_PLATFORM
-            switch(index)
-            {
                 case 11:
                     Push(_ultrasonic_front_edge_list,p_dat,ug_dat);
                 break;
 
+                default:
+
+                break;
+            }
+#endif
+            if(RIGHT_PARKING_STOP_CMD == Command)//数据推送结束
+            {
+                _calculate_command = LEFT_RIGHT_PARKING_CAL_CMD;//库位计算命令
+                _data_push_state = WaitPushStart;
+            }
+            break;
+
+        case ParkingLeftEdgeUltrasonicDataPush:
+#if RUNNING_PLATFORM == Embedded_PLATFORM
+            if((0 == u_dat->ScheduleTimeCnt) || (14 == u_dat->ScheduleTimeCnt))
+            {
+              Push(_ultrasonic_front_edge_list,p_dat[10],ug_dat[10]);
+            }
+            if(23 == u_dat->ScheduleTimeCnt)
+            {
+              Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[5]);
+              Push(_ultrasonic_rear_edge_list_triangle_location,ug_dat[6]);
+            }
+#elif RUNNING_PLATFORM == PC_PLATFORM
+            switch(index)
+            {
                 case 5:
                     DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat);
                 break;
@@ -876,16 +766,20 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet p_dat,
                     DisorderPush(_ultrasonic_rear_edge_list_triangle_location,ug_dat);
                 break;
 
+                case 10:
+                    Push(_ultrasonic_front_edge_list,p_dat,ug_dat);
+                break;
+
                 default:
                 break;
             }
 #endif
-            if(0x52 == Command)//数据推送结束
+            if(LEFT_PARKING_STOP_CMD == Command)
             {
-                _calculate_command = 0x70;//库位计算命令
+                _calculate_command = LEFT_RIGHT_PARKING_CAL_CMD;//库位计算命令
                 _data_push_state = WaitPushStart;
             }
-            break;
+        break;
 
         case ParkingCenterUltrasonicDataPush:
 #if RUNNING_PLATFORM == Embedded_PLATFORM
@@ -912,14 +806,14 @@ void  UltrasonicObstaclePercption::DataPushStateMachine(Ultrasonic_Packet p_dat,
                 break;
             }
 #endif
-            if(0x56 == Command)//进库完成，开始计算
+            if(ENTER_PARKING_STOP_CMD == Command)//进库完成，开始计算
             {
-                _calculate_command = 0x75;//进库计算命令
+                _calculate_command = ENTER_PARKING_CAL_CMD;//进库计算命令
                 _data_push_state = WaitPushStart;
             }
             break;
-        default:
 
+        default:
             break;
     }
 }
@@ -929,12 +823,12 @@ int8_t UltrasonicObstaclePercption::ParkingCalculateStateMachine(void)
     switch(_parking_calculate_state)
     {
         case WaitCommandForCalculate:
-            if(0x70 == _calculate_command)
+            if(LEFT_RIGHT_PARKING_CAL_CMD == _calculate_command)
             {
                 _ultrasonic_location_sts = LocationCalculate;
                 _parking_calculate_state = FrontRearEdgeCalculate;
             }
-            else if(0x75 == _calculate_command)
+            else if(ENTER_PARKING_CAL_CMD == _calculate_command)
             {
                 _ultrasonic_location_sts = LocationCalculate;
                 _parking_calculate_state = ParkingCenterCalculate;

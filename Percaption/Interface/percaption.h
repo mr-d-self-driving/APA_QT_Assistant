@@ -43,13 +43,13 @@ typedef struct _EdgeInformationPacket
 {
     Vector2d position;
     float    angle;
+    uint8_t  valid_flag;
 }EdgeInformationPacket;
 
 typedef struct _ObstacleInformationPacket
 {
-    Vector2d First_Position;
-    Vector2d Second_Position;
-    float    Length;
+    EdgeInformationPacket FrontOutSide;
+    EdgeInformationPacket RearOutSide;
 }ObstacleInformationPacket;
 
 typedef struct _ParallelParkingInformationPacket
