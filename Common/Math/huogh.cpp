@@ -146,8 +146,4 @@ void Huogh::HoughLinesStandard(LinkList<ObstacleLocationPacket> *list,LinkList<O
         }
         head_list = head_list->next;
     }
-
-//    delete []accum;
-//    delete []tabSin;
-//    delete []tabCos;
 }
