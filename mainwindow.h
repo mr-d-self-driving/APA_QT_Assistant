@@ -33,17 +33,29 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+private:
+    /********************************************************************************/
+    /********************************* UI function **********************************/
+    /********************************************************************************/
+    void ControlUI(void);
+    void DetectUI(void);
+    void PathUI(void);
+    // init function
     void Init(void);
+
     void DetectVehicleModule(Vector2d p,float yaw);
     void PathVehicleModule(Vector2d p,float yaw);
 
     //文件解析
     void FileDataInit(void);
     void AnalyzeOneLine(const QByteArray &baLine);
-private:
+
+    void DetectTask(void);
+    void PathTask(void);
     Ui::MainWindow *ui;
     // plot variable
     /* Control UI*/
+    QGridLayout *gControlLayout;
     QCustomPlot *mControlPlot;
     QPointer<QCPGraph> mControlGraph1;
     QPointer<QCPGraph> mControlGraph2;
@@ -51,12 +63,13 @@ private:
     AxisTag *mControlTag2;
 
     /* Detect UI*/
+    QGridLayout *gDetectLayout;
     QCustomPlot *mDetectPlot;
     QCPCurve *mDetectVehicleModuleCurve;
     QCPCurve *mDetectVehicleCenterCurve;
     QCPCurve *mDetectEdgePoint;
-    QCPCurve *mDetectEdgeGroundPositionPoint;
-    QCPCurve *mDetectSensorPosition;
+    QCPCurve *mDetectValidEdgePoint;
+    QCPCurve *mDetectRearEdgeTrianglePosition;
 
     QCPCurve *mDetectLeftEdgeGroundPosition;
     QCPCurve *mDetectRightEdgeGroundPosition;
@@ -76,6 +89,10 @@ private:
     QString obstacle_region[5] = {"左侧", "左中","中间","右中", "右侧"};
     QString obstacle_status[5] = {"正常", "盲区", "超探", "噪声", "无效" };
 
+    QRadioButton *radio_right_enter_location;
+    QRadioButton *radio_left_enter_location;
+    QRadioButton *radio_center_enter_location;
+
     QPushButton *button_file_select;
     QFile *detect_file;
     QPushButton *button_start_calculate;
@@ -91,6 +108,8 @@ private:
     QLabel *label_VehiceTrackX_Value;
     QLabel *label_VehiceTrackY_Value;
     QLabel *label_VehiceTrackYaw_Value;
+
+    QPushButton *gParkingInformationConfirm;
 
     QGridLayout *gPathLayout;
 
@@ -144,13 +163,7 @@ private:
     QList<GeometricTrack> VehicleTrackList;
     uint8_t NewFileUpdateFlag;
     int32_t time_step_cnt;
-
-
-
-
     Vector2d FrontLeftPoint,FrontRightPoint,RearLeftPoint,RearRightPoint;
-
-
     // Path
     ParallelPlanning *mParallelPlanning;
     VerticalPlanning *mVerticalPlanning;
