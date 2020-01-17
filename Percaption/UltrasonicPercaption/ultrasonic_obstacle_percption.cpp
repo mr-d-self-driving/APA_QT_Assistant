@@ -292,7 +292,7 @@ void UltrasonicObstaclePercption::EdgeFinding_V1_1(ObstacleLinkList *list,Obstac
                     _valid_parking_edge_position.FrontOutSide.valid_flag = 0xA5;
                     vehicle_position_temp.FrontOutSide.position = _current_node->data.Position;
                     max_y_axis_value = vehicle_position_temp.FrontOutSide.position.getY();
-                    vehicle_list->Delete();
+                    if(vehicle_list->Length() != 0){vehicle_list->Delete();}
                 }
                 else
                 {

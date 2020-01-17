@@ -56,8 +56,8 @@
 #define MIN_FIT_DISTANCE              (0.6f)
 
 // 霍夫滤波参数
-#define DELTA_RHO                     (0.02f)
-#define DELTA_THETA                   (0.05f)
+#define DELTA_RHO                     (0.2f)
+#define DELTA_THETA                   (0.5f)
 #define DISTRIBUTION_THRESHOLD        (5)
 #define LINES_MAX                     (1)
 #define MIN_THETA                     (0.0f)
