@@ -85,8 +85,10 @@ void Huogh::HoughLinesStandard(LinkList<ObstacleLocationPacket> *list,LinkList<O
         return;
     }
 
-    float tabSin[numangle];
-    float tabCos[numangle];
+//    float tabSin[numangle];
+//    float tabCos[numangle];
+    float *tabSin = new float[numangle];
+    float *tabCos = new float[numangle];
     for(uint32_t i=0;i < numangle;i++)
     {
         tabSin[i] = 0.0f;
@@ -95,7 +97,8 @@ void Huogh::HoughLinesStandard(LinkList<ObstacleLocationPacket> *list,LinkList<O
     // create the sin and cos table
     this->createTrigTable(numangle,min_theta,theta,irho,tabSin,tabCos);
     uint32_t array_demension = (numangle + 2)*(numrho + 2);
-    uint16_t accum[array_demension];
+//    uint16_t accum[array_demension];
+    uint16_t *accum = new uint16_t[array_demension];
     for(uint32_t i=0;i < array_demension;i++)
     {
         accum[i] = 0;
@@ -125,7 +128,7 @@ void Huogh::HoughLinesStandard(LinkList<ObstacleLocationPacket> *list,LinkList<O
     {
         return;
     }
-    sort_buf->Delete();
+    if(0 != sort_buf->Length()){sort_buf->Delete();}
 
     // 获取特征提取后的直线点
 //    uint16_t LinesMax = lines_max < sort_buf->Length() ? lines_max : sort_buf->Length();
@@ -146,4 +149,8 @@ void Huogh::HoughLinesStandard(LinkList<ObstacleLocationPacket> *list,LinkList<O
         }
         head_list = head_list->next;
     }
+    delete[] accum;
+
+    delete[] tabSin;
+    delete[] tabCos;
 }
