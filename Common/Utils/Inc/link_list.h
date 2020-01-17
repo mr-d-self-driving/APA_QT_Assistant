@@ -83,7 +83,7 @@ void LinkList<TYPE>::Delete(void)
     Node<TYPE>* _free_node;//
     if(_list_length > 0)
     {
-        while(!_head_node->next)
+        while(NULL != _head_node->next)
         {
             _free_node = _head_node;
             _head_node = _head_node->next;
