@@ -8,8 +8,9 @@
 #ifndef PID_H_
 #define PID_H_
 
-#include "derivative.h"
-#include "property.h"
+//#include "derivative.h"
+//#include "property.h"
+#include <QMainWindow>
 #include <math.h>
 
 class PID {
@@ -26,42 +27,42 @@ public:
     /* KP */
     float getKP();
     void  setKP(float value);
-    Property<PID,float,READ_WRITE> KP;
+//    Property<PID,float,READ_WRITE> KP;
 
     /* KI */
     float getKI();
     void  setKI(float value);
-    Property<PID,float,READ_WRITE> KI;
+//    Property<PID,float,READ_WRITE> KI;
 
     /* KD */
     float getKD();
     void  setKD(float value);
-    Property<PID,float,READ_WRITE> KD;
+//    Property<PID,float,READ_WRITE> KD;
 
     /* Desired */
     float getDesired();
     void  setDesired(float value);
-    Property<PID,float,READ_WRITE> Desired;
+//    Property<PID,float,READ_WRITE> Desired;
 
     /* ILimit */
     float getILimit();
     void  setILimit(float value);
-    Property<PID,float,READ_WRITE> ILimit;
+//    Property<PID,float,READ_WRITE> ILimit;
 
     /* OutputLimit */
     float getOutputLimit();
     void  setOutputLimit(float value);
-    Property<PID,float,READ_WRITE> OutputLimit;
+//    Property<PID,float,READ_WRITE> OutputLimit;
 
     /* Dt */
     float getDt();
     void  setDt(float value);
-    Property<PID,float,READ_WRITE> Dt;
+//    Property<PID,float,READ_WRITE> Dt;
 
     /* OutputOffset */
     float getThreshold();
     void  setThreshold(float value);
-    Property<PID,float,READ_WRITE> Threshold;
+//    Property<PID,float,READ_WRITE> Threshold;
 private:
     float _desired;      //< set point
     float _error;        //< error

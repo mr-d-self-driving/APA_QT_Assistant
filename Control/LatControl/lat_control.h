@@ -8,14 +8,13 @@
 #ifndef LATCONTROL_LAT_CONTROL_H_
 #define LATCONTROL_LAT_CONTROL_H_
 
-#include "derivative.h"
-#include "property.h"
-#include "controller.h"
-#include "pid.h"
+//#include "property.h"
+#include "Control/Interface/controller.h"
+
 #include "math.h"
-#include "vector_2d.h"
-#include "GeometricTrack/geometric_track.h"
-#include "vehilce_config.h"
+#include "Common/Math/vector_2d.h"
+#include "Common/VehicleState/GeometricTrack/geometric_track.h"
+#include "Common/Configure/Configs/vehilce_config.h"
 
 #define COEFFICIENT_TLS 	( 0.4f  )	// 目标曲线曲率因子
 #define COEFFICIENT_SMV 	( 12.0f )	// 滑模变量系数

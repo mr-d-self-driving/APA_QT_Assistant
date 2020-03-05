@@ -6,5 +6,7 @@
         <file>Icon/unactive_detect.png</file>
         <file>Icon/active_path.png</file>
         <file>Icon/unactive_path.png</file>
+        <file>Icon/active_track.png</file>
+        <file>Icon/unactive_track.png</file>
     </qresource>
 </RCC>

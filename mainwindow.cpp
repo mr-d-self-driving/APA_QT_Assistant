@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+using Eigen::MatrixXd;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -10,17 +12,29 @@ MainWindow::MainWindow(QWidget *parent) :
     // 重新配置窗体大小
     this->resize(1500,845);
 
-    /**************************************************/
+    /****************** Control UI ******************/
+    ControlUI();
+    /****************** Detect UI ******************/
+    DetectUI();
+    /****************** plan UI ******************/
+    PlanUI();
+    /****************** Track UI ******************/
+    TrackUI();
+
+    /********************** 申请功能图标列表 ****************************/
     list_function = new QListWidget();
-    /*车辆控制*/
+    /* 车辆控制 */
     QListWidgetItem *control_item = new QListWidgetItem(QIcon(":/Icon/unactive_car.png"),tr("控制"));
     list_function->addItem(control_item);
-    /*检测模块*/
+    /* 检测模块 */
     QListWidgetItem *detect_item = new QListWidgetItem(QIcon(":/Icon/unactive_detect.png"),tr("检测"));
     list_function->addItem(detect_item);
-    /*路径规划模块*/
-    QListWidgetItem *path_item = new QListWidgetItem(QIcon(":/Icon/unactive_path.png"),tr("路径"));
-    list_function->addItem(path_item);
+    /* 路径规划模块 */
+    QListWidgetItem *plan_item = new QListWidgetItem(QIcon(":/Icon/unactive_path.png"),tr("规划"));
+    list_function->addItem(plan_item);
+    /* 路径跟踪模块 */
+    QListWidgetItem *track_item = new QListWidgetItem(QIcon(":/Icon/unactive_track.png"),tr("跟踪"));
+    list_function->addItem(track_item);
 
     /*整体列表配置*/
     list_function->setViewMode(QListWidget::IconMode);//设置显示模式为图片模式
@@ -35,24 +49,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     list_function->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//关闭水平滚动条
     list_function->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//关闭垂直滚动条
-    /****************** Control UI ******************/
-    ControlUI();
-    /****************** Detect UI ******************/
-    DetectUI();
-    /****************** Path UI ******************/
-    PathUI();
 
+    /****************** 申请各个功能模块的部件 ******************/
     QWidget *pControlWidget = new QWidget();
-    QWidget *pDetectWidget = new QWidget();
-    QWidget *pPathWidget = new QWidget();
+    QWidget *pDetectWidget  = new QWidget();
+    QWidget *pPlanWidget    = new QWidget();
+    QWidget *pTrackWidget   = new QWidget();
+
     pControlWidget->setLayout(gControlLayout);
     pDetectWidget->setLayout(gDetectLayout);
-    pPathWidget->setLayout(gPathLayout);
+    pPlanWidget->setLayout(gPlanLayout);
+    pTrackWidget->setLayout(gTrackLayout);
 
     stack_Widget = new QStackedWidget();
     stack_Widget->addWidget(pControlWidget);
     stack_Widget->addWidget(pDetectWidget);
-    stack_Widget->addWidget(pPathWidget);
+    stack_Widget->addWidget(pPlanWidget);
+    stack_Widget->addWidget(pTrackWidget);
 
     QGridLayout *pMainLayout = new QGridLayout();
     pMainLayout->addWidget(list_function,0,0);
@@ -501,7 +514,7 @@ void MainWindow::DetectUI(void)
     gDetectLayout->setColumnStretch(0,1);
     gDetectLayout->setColumnStretch(1,9);
 }
-void MainWindow::PathUI(void)
+void MainWindow::PlanUI(void)
 {
     // 车辆初始位置 begin
     QLabel *label_VehicleInitPointX_Text = new QLabel();
@@ -661,7 +674,6 @@ void MainWindow::PathUI(void)
     ParkingPointX[8] = BOUNDARY_LEFT;
 
     ParkingPointY.resize(9);
-
     ParkingPointY[0] = 0;
     ParkingPointY[1] = 0;
     ParkingPointY[2] = -2.3;
@@ -674,14 +686,53 @@ void MainWindow::PathUI(void)
 
     mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
 
-    gPathLayout = new QGridLayout();
-
-    gPathLayout->addLayout(gPath_IO_Layout, 0, 0);
-    gPathLayout->addWidget(mPathPlot, 0, 1);
-    gPathLayout->setColumnMinimumWidth(0,200);
-    gPathLayout->setColumnStretch(0,1);
-    gPathLayout->setColumnStretch(1,9);
+    gPlanLayout = new QGridLayout();
+    gPlanLayout->addLayout(gPath_IO_Layout, 0, 0);
+    gPlanLayout->addWidget(mPathPlot, 0, 1);
+    gPlanLayout->setColumnMinimumWidth(0,200);
+    gPlanLayout->setColumnStretch(0,1);
+    gPlanLayout->setColumnStretch(1,9);
 }
+
+/*
+ 跟踪UI配置函数
+ */
+void MainWindow::TrackUI(void)
+{
+    QGridLayout *gTrack_IO_Layout = new QGridLayout();
+    // 绘图界面配置
+    mTrackPlot = new QCustomPlot();
+    mTrackPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+    mTrackPlot->legend->setVisible(true);
+    mTrackPlot->legend->setFont(QFont("Helvetica", 9));
+    mTrackPlot->legend->setRowSpacing(-3);
+    mTrackPlot->xAxis->setLabel("x");
+    mTrackPlot->yAxis->setLabel("y");
+//    mTrackPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
+//    mTrackPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
+
+    mTrackVehicleModuleCurve = new QCPCurve(mTrackPlot->xAxis,mTrackPlot->yAxis);
+    mTrackVehicleModuleCurve->setName("车辆模型");
+    mTrackVehicleModuleCurve->setPen(QPen(Qt::red,3));
+    mTrackVehicleModuleCurve->setBrush(QBrush(QColor(90,35,255,20)));
+
+    mTrackParkingCurve = new QCPCurve(mTrackPlot->xAxis,mTrackPlot->yAxis);
+    mTrackParkingCurve->setName("库位");
+    mTrackParkingCurve->setPen(QPen(Qt::green,4));
+    mTrackParkingCurve->setBrush(QBrush(QColor(90,255,240,80)));
+
+    mTrackVehicleCenterCurve = new QCPCurve(mTrackPlot->xAxis,mTrackPlot->yAxis);
+    mTrackVehicleCenterCurve->setName("后轴中心");
+
+    gTrackLayout = new QGridLayout();
+    gTrackLayout = new QGridLayout();
+    gTrackLayout->addLayout(gTrack_IO_Layout, 0, 0);
+    gTrackLayout->addWidget(mTrackPlot, 0, 1);
+    gTrackLayout->setColumnMinimumWidth(0,200);
+    gTrackLayout->setColumnStretch(0,1);
+    gTrackLayout->setColumnStretch(1,9);
+}
+
 void MainWindow::Init()
 {
      mTerminal = new Terminal();
@@ -692,7 +743,7 @@ void MainWindow::Init()
 //    VehilceConfig mVehilceConfig;
 
      mBoRuiMessage = new BoRuiMessage();
-     mBoRuiController= new BoRuiController();
+     mBoRuiController = new BoRuiController();
 
     NewFileUpdateFlag = 0;
     time_step_cnt     = 0;
@@ -707,14 +758,23 @@ void MainWindow::Init()
 }
 
 /****** Function ******/
-void MainWindow::DetectVehicleModule(Vector2d p,float yaw)
+/**
+ * @brief 显示车辆模型和后轴中心
+ * @param p:车辆位置
+ * @param yaw:车辆偏航角
+ * @param vehicle_center:图形绘制车辆外形曲线
+ * @param vehicle_modle: 图形绘制车辆后轴曲线
+ * @param plot: 图形绘制面板
+ * @return None
+ */
+void MainWindow::VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot)
 {
     FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + static_cast<double>(yaw)));
     FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + static_cast<double>(yaw)));
     RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + static_cast<double>(yaw)));
     RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + static_cast<double>(yaw)));
 
-    mDetectVehicleCenterCurve->addData(static_cast<double>(p.getX()),static_cast<double>(p.getY()));
+    vehicle_center->addData(static_cast<double>(p.getX()),static_cast<double>(p.getY()));
 
     QVector<double> VehiclePointX(5),VehiclePointY(5);
     VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
@@ -728,56 +788,16 @@ void MainWindow::DetectVehicleModule(Vector2d p,float yaw)
     VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
     VehiclePointY[3] = static_cast<double>(FrontRightPoint.getY());
     VehiclePointY[4] = static_cast<double>(RearRightPoint.getY());
-    mDetectVehicleModuleCurve->setData(VehiclePointX,VehiclePointY);
+    vehicle_modle->setData(VehiclePointX,VehiclePointY);
 
-    mDetectPlot->replot();
+    plot->replot();
 }
 
-void MainWindow::PathVehicleModule(Vector2d p,float yaw)
-{
-    FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + static_cast<double>(yaw)));
-    FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + static_cast<double>(yaw)));
-    RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + static_cast<double>(yaw)));
-    RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + static_cast<double>(yaw)));
-
-    mPathVehicleCenterCurve->addData(static_cast<double>(p.getX()),static_cast<double>(p.getY()));
-
-    QVector<double> VehiclePointX(5),VehiclePointY(5);
-    VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
-    VehiclePointX[1] = static_cast<double>(RearLeftPoint.getX());
-    VehiclePointX[2] = static_cast<double>(FrontLeftPoint.getX());
-    VehiclePointX[3] = static_cast<double>(FrontRightPoint.getX());
-    VehiclePointX[4] = static_cast<double>(RearRightPoint.getX());
-
-    VehiclePointY[0] = static_cast<double>(RearRightPoint.getY());
-    VehiclePointY[1] = static_cast<double>(RearLeftPoint.getY());
-    VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
-    VehiclePointY[3] = static_cast<double>(FrontRightPoint.getY());
-    VehiclePointY[4] = static_cast<double>(RearRightPoint.getY());
-    mPathVehicleModuleCurve->setData(VehiclePointX,VehiclePointY);
-//    mPathVehicleGraph->setData(VehiclePointX,VehiclePointY,true);
-
-//    QVector<double> VehiclePointX(3),VehiclePointY(3);
-//    VehiclePointX[0] = static_cast<double>(RearRightPoint.getX());
-//    VehiclePointX[1] = static_cast<double>(RearLeftPoint.getX());
-//    VehiclePointX[2] = static_cast<double>(FrontLeftPoint.getX());
-//    VehiclePointY[0] = static_cast<double>(RearRightPoint.getY());
-//    VehiclePointY[1] = static_cast<double>(RearLeftPoint.getY());
-//    VehiclePointY[2] = static_cast<double>(FrontLeftPoint.getY());
-//    mPathVehicleGraph->setData(VehiclePointX,VehiclePointY,true);
-
-//    QVector<double> VehicleDownPointX(3),VehicleDownPointY(3);
-//    VehicleDownPointX[0] = static_cast<double>(RearRightPoint.getX());
-//    VehicleDownPointX[1] = static_cast<double>(FrontRightPoint.getX());
-//    VehicleDownPointX[2] = static_cast<double>(FrontLeftPoint.getX());
-//    VehicleDownPointY[0] = static_cast<double>(RearRightPoint.getY());
-//    VehicleDownPointY[1] = static_cast<double>(FrontRightPoint.getY());
-//    VehicleDownPointY[2] = static_cast<double>(FrontLeftPoint.getY());
-//    mPathVehicleModuleDownGraph->setData(VehicleDownPointX,VehicleDownPointY,true);
-
-    mPathPlot->replot();
-}
-
+/**
+ * @brief MainWindow::FileDataInit 注入文件数据的缓存区初始化
+ * @param  None
+ * @return None
+ */
 void MainWindow::FileDataInit(void)
 {
     uint8_t i;
@@ -789,18 +809,18 @@ void MainWindow::FileDataInit(void)
        LRU_List[i].clear();
        LRU_PositionList[i].clear();
     }
-   for(i=0;i<4;i++)
-   {
-       ObstacleBody_List[i].clear();
-       _ultrasonic_data_buffer[i].Position.setX(0.0f);
-       _ultrasonic_data_buffer[i].Position.setY(0.0f);
-       _ultrasonic_data_buffer[i].UltrasonicData.Distance1 = 0.0f;
-       _ultrasonic_data_buffer[i].UltrasonicData.Distance2 = 0.0f;
-       _ultrasonic_data_buffer[i].UltrasonicData.Level = 0.0f;
-       _ultrasonic_data_buffer[i].UltrasonicData.Width = 0.0f;
-       _ultrasonic_data_buffer[i].UltrasonicData.status = 0;
-       _ultrasonic_data_buffer[i].UltrasonicData.Time_Tx = 0;
-       _ultrasonic_data_buffer[i].UltrasonicData.Time_Ms = 0.0f;
+    for(i=0;i<4;i++)
+    {
+        ObstacleBody_List[i].clear();
+        _ultrasonic_data_buffer[i].Position.setX(0.0f);
+        _ultrasonic_data_buffer[i].Position.setY(0.0f);
+        _ultrasonic_data_buffer[i].UltrasonicData.Distance1 = 0.0f;
+        _ultrasonic_data_buffer[i].UltrasonicData.Distance2 = 0.0f;
+        _ultrasonic_data_buffer[i].UltrasonicData.Level = 0.0f;
+        _ultrasonic_data_buffer[i].UltrasonicData.Width = 0.0f;
+        _ultrasonic_data_buffer[i].UltrasonicData.status = 0;
+        _ultrasonic_data_buffer[i].UltrasonicData.Time_Tx = 0;
+        _ultrasonic_data_buffer[i].UltrasonicData.Time_Ms = 0.0f;
     }
     time_step_cnt = 0;
 
@@ -816,6 +836,11 @@ void MainWindow::FileDataInit(void)
     mDetectRightEdgeFitLine->data().data()->clear();
 }
 
+/**
+ * @brief MainWindow::AnalyzeOneLine 分析一行数据
+ * @param baLine：待解析的一行数据
+ * @return None
+ */
 void MainWindow::AnalyzeOneLine(const QByteArray &baLine)
 {
     QList<QByteArray> detect_list = baLine.split(' ');
@@ -903,6 +928,9 @@ void MainWindow::AnalyzeOneLine(const QByteArray &baLine)
     LRU_List[7].append(LRU_temp);
 }
 
+/**
+ * @brief MainWindow::DetectTask 超声感知检测任务
+ */
 void MainWindow::DetectTask(void)
 {
     int32_t len;
@@ -945,7 +973,8 @@ void MainWindow::DetectTask(void)
             }
         }
         // 车辆模型绘制
-        DetectVehicleModule(VehicleTrackList[time_step_cnt].getPosition(),VehicleTrackList[time_step_cnt].getYaw());
+//        DetectVehicleModule(VehicleTrackList[time_step_cnt].getPosition(),VehicleTrackList[time_step_cnt].getYaw());
+        VehicleModuleShow(VehicleTrackList[time_step_cnt].getPosition(),VehicleTrackList[time_step_cnt].getYaw(),mDetectVehicleCenterCurve,mDetectVehicleModuleCurve,mDetectPlot);
         time_step_cnt++;
         if(radio_right_enter_location->isChecked()){
             qDebug() << "the front edge list length:" << mUltrasonicObstaclePercption.getFrontEdgeListLength();
@@ -1015,7 +1044,6 @@ void MainWindow::DetectTask(void)
         }
         else if(radio_right_enter_location->isChecked())
         {
-
             // right line fit
             if(0xAA == mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().valid_flag)
             {
@@ -1045,26 +1073,51 @@ void MainWindow::DetectTask(void)
     }
 }
 
-void MainWindow::PathTask(void)
+/**
+ * @brief MainWindow::PlanTask 规划任务
+ */
+void MainWindow::PlanTask(void)
 {
+    // 平行泊车控制
     mParallelPlanning->Work(&mPercaption);
     mParallelPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
+    // 垂直泊车控制
 //    mVerticalPlanning->Work(&mPercaption,&mGeometricTrack);
 //    mVerticalPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
+    // 仿真信号更新
     mSimulation->Update(mBoRuiController,mBoRuiMessage);
 
+    // 车辆位置更新
     mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
 
-//    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',2));
-//    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',2));
-//    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
+    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',2));
+    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',2));
+    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
 
-    PathVehicleModule(mGeometricTrack.getPosition(),mGeometricTrack.getYaw());
+    VehicleModuleShow(mGeometricTrack.getPosition(),mGeometricTrack.getYaw(),mPathVehicleCenterCurve,mPathVehicleModuleCurve,mPathPlot);
+}
+
+/**
+ * @brief MainWindow::TrackTask 跟踪任务
+ */
+void MainWindow::TrackTask(void)
+{
+    mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack);
+
+    // 仿真信号更新
+    mSimulation->Update(mBoRuiController,mBoRuiMessage);
+
+    // 车辆位置更新
+    mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
+
+    VehicleModuleShow(mGeometricTrack.getPosition(),mGeometricTrack.getYaw(),mTrackVehicleCenterCurve,mTrackVehicleModuleCurve,mTrackPlot);
 }
 /****** SLOT ******/
-// 定时任务
+/**
+ * @brief MainWindow::sTimer20msTask 定时任务20ms，调度各个子任务
+ */
 void MainWindow::sTimer20msTask(void)
 {
     if(0 == stack_Widget->currentIndex()){
@@ -1074,10 +1127,13 @@ void MainWindow::sTimer20msTask(void)
         DetectTask();
     }
     else if(2 == stack_Widget->currentIndex()){
-        PathTask();
+        PlanTask();
+    }
+    else if(3 == stack_Widget->currentIndex()){
+        TrackTask();
     }
     else{
-        qDebug() << "索引超出范围";
+        qDebug() << "sTimer20msTask: over the index";
     }
 }
 
@@ -1117,8 +1173,13 @@ void MainWindow::sProcessItemActiveState(QListWidgetItem *current, QListWidgetIt
                 current->setIcon(QIcon(":/Icon/active_path.png"));
                 break;
 
+            case 3:
+                current->setIcon(QIcon(":/Icon/active_track.png"));
+                break;
+
             default:
-            break;
+                current->setIcon(QIcon(":/Icon/active_car.png"));
+                break;
         }
         switch (this->list_function->row(previous)) {
             case 0:
@@ -1133,8 +1194,13 @@ void MainWindow::sProcessItemActiveState(QListWidgetItem *current, QListWidgetIt
                 previous->setIcon(QIcon(":/Icon/unactive_path.png"));
                 break;
 
+            case 3:
+                previous->setIcon(QIcon(":/Icon/unactive_track.png"));
+                break;
+
             default:
-            break;
+                previous->setIcon(QIcon(":/Icon/unactive_car.png"));
+                break;
         }
     }
 }
@@ -1258,13 +1324,13 @@ void MainWindow::sPercaptionDataFileSelect(void)
         }
         else
         {
-            qDebug() << "文件不存在！";
+            qDebug() << "sPercaptionDataFileSelect: File do not exit！";
             return;
         }
     }
     else
     {
-        qDebug("取消");
+        qDebug("sPercaptionDataFileSelect: Cancel");
     }
 }
 // 执行感知检测的相关计算

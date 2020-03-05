@@ -2,21 +2,52 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+/**
+ * @brief 绘图库
+ */
 #include "QCustomPlot/qcustomplot.h"
 #include "QCustomPlot/axistag.h"
+
+/**
+ * @brief Eigen矩阵库
+ */
+#include "Eigen/Dense"
+
+/**
+ * @brief ZLG CAN 驱动
+ */
 #include "WinZlgCan/win_zlg_can.h"
+#include "WinZlgCan/can_rev_work_thread.h"
+
+/**
+ * @brief 交互
+ */
 #include "Interaction/HMI/Terminal.h"
 #include "Interaction/HMI/simulation.h"
 #include "Interaction/Ultrasonic/Ultrasonic.h"
-#include  "WinZlgCan/can_rev_work_thread.h"
+
+/**
+ * @brief 规划
+ */
 #include "Planning/ParallelParking/parallel_planning.h"
 #include "Planning/VerticalParking/vertical_planning.h"
 
+/**
+ * @brief 控制
+ */
+#include "Control/LatControl/lat_control.h"
+
+/**
+ * @brief 车辆配置
+ */
 #ifdef BORUI
 #include "Interaction/CANBUS/BoRui/bo_rui_message.h"
 #include "Interaction/CANBUS/BoRui/bo_rui_controller.h"
 #endif
 
+/**
+ * @brief 车位边界配置
+ */
 #define BOUNDARY_LEFT  (-14.0)
 #define BOUNDARY_RIGHT ( 16.0)
 #define BOUNDARY_TOP   ( 12.0)
@@ -39,19 +70,25 @@ private:
     /********************************************************************************/
     void ControlUI(void);
     void DetectUI(void);
-    void PathUI(void);
+    void PlanUI(void);
+    void TrackUI(void);
+
     // init function
     void Init(void);
 
     void DetectVehicleModule(Vector2d p,float yaw);
     void PathVehicleModule(Vector2d p,float yaw);
 
+    void VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot);
+
+
     //文件解析
     void FileDataInit(void);
     void AnalyzeOneLine(const QByteArray &baLine);
 
     void DetectTask(void);
-    void PathTask(void);
+    void PlanTask(void);
+    void TrackTask(void);
     Ui::MainWindow *ui;
     // plot variable
     /* Control UI*/
@@ -97,7 +134,7 @@ private:
     QFile *detect_file;
     QPushButton *button_start_calculate;
 
-    /* Path UI*/
+    /* Planning UI*/
     QLineEdit *text_VehicleInitPointX;
     QLineEdit *text_VehicleInitPointY;
     QLineEdit *text_VehicleInitPointYaw;
@@ -111,9 +148,10 @@ private:
 
     QPushButton *gParkingInformationConfirm;
 
-    QGridLayout *gPathLayout;
+    QGridLayout *gPlanLayout;
 
     QCustomPlot *mPathPlot;
+
     // 用于车辆模型的绘制
     QCPCurve *mPathVehicleModuleCurve;
     QCPCurve *mPathParkingCurve;
@@ -125,7 +163,17 @@ private:
 
     QPointer<QCPGraph> mPathVehicleGraph;
     QPointer<QCPGraph> mPathVehicleModuleDownGraph;
+    /**
+     * @brief mTrackPlot: 跟踪模块
+     */
+    QCustomPlot *mTrackPlot;
+    QCPCurve *mTrackVehicleModuleCurve;
+    QCPCurve *mTrackVehicleCenterCurve;
+    QCPCurve *mTrackParkingCurve;
 
+    QGridLayout *gTrackLayout;
+
+    // timer 20ms Task
     QTimer mDataTimer20ms;
     QPushButton *button_timer_control;
 
@@ -150,6 +198,12 @@ private:
     // 感知
     Percaption mPercaption;
     UltrasonicObstaclePercption mUltrasonicObstaclePercption;
+    // 规划
+    ParallelPlanning *mParallelPlanning;
+    VerticalPlanning *mVerticalPlanning;
+    // 控制
+    LatControl *mLatControl;
+
     // Detect Module
     Ultrasonic mUltrasonic;
     QList<Ultrasonic_Packet> LRU_List[12];
@@ -164,9 +218,7 @@ private:
     uint8_t NewFileUpdateFlag;
     int32_t time_step_cnt;
     Vector2d FrontLeftPoint,FrontRightPoint,RearLeftPoint,RearRightPoint;
-    // Path
-    ParallelPlanning *mParallelPlanning;
-    VerticalPlanning *mVerticalPlanning;
+
 
 private slots:
     // 功能选择激活函数图片选择的槽函数

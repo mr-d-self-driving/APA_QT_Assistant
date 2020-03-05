@@ -5,40 +5,40 @@
  *      Author: zhuguohua
  */
 
-#include "pid.h"
+#include "Control/Common/pid.h"
 
 PID::PID() {
-    KP.setContainer(this);
-    KP.getter(&PID::getKP);
-    KP.setter(&PID::setKP);
+//    KP.setContainer(this);
+//    KP.getter(&PID::getKP);
+//    KP.setter(&PID::setKP);
 
-    KI.setContainer(this);
-    KI.getter(&PID::getKI);
-    KI.setter(&PID::setKI);
+//    KI.setContainer(this);
+//    KI.getter(&PID::getKI);
+//    KI.setter(&PID::setKI);
 
-    KD.setContainer(this);
-    KD.getter(&PID::getKD);
-    KD.setter(&PID::setKD);
+//    KD.setContainer(this);
+//    KD.getter(&PID::getKD);
+//    KD.setter(&PID::setKD);
 
-    Desired.setContainer(this);
-    Desired.getter(&PID::getDesired);
-    Desired.setter(&PID::setDesired);
+//    Desired.setContainer(this);
+//    Desired.getter(&PID::getDesired);
+//    Desired.setter(&PID::setDesired);
 
-    ILimit.setContainer(this);
-    ILimit.getter(&PID::getILimit);
-    ILimit.setter(&PID::setILimit);
+//    ILimit.setContainer(this);
+//    ILimit.getter(&PID::getILimit);
+//    ILimit.setter(&PID::setILimit);
 
-    OutputLimit.setContainer(this);
-    OutputLimit.getter(&PID::getOutputLimit);
-    OutputLimit.setter(&PID::setOutputLimit);
+//    OutputLimit.setContainer(this);
+//    OutputLimit.getter(&PID::getOutputLimit);
+//    OutputLimit.setter(&PID::setOutputLimit);
 
-    Dt.setContainer(this);
-    Dt.getter(&PID::getDt);
-    Dt.setter(&PID::setDt);
+//    Dt.setContainer(this);
+//    Dt.getter(&PID::getDt);
+//    Dt.setter(&PID::setDt);
 
-    Threshold.setContainer(this);
-    Threshold.getter(&PID::getThreshold);
-    Threshold.setter(&PID::setThreshold);
+//    Threshold.setContainer(this);
+//    Threshold.getter(&PID::getThreshold);
+//    Threshold.setter(&PID::setThreshold);
 
     _desired = 0.0f;      //< set point
     _error = 0.0f;        //< error
@@ -55,37 +55,37 @@ PID::PID() {
 }
 
 PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim) {
-    KP.setContainer(this);
-    KP.getter(&PID::getKP);
-    KP.setter(&PID::setKP);
+//    KP.setContainer(this);
+//    KP.getter(&PID::getKP);
+//    KP.setter(&PID::setKP);
 
-    KI.setContainer(this);
-    KI.getter(&PID::getKI);
-    KI.setter(&PID::setKI);
+//    KI.setContainer(this);
+//    KI.getter(&PID::getKI);
+//    KI.setter(&PID::setKI);
 
-    KD.setContainer(this);
-    KD.getter(&PID::getKD);
-    KD.setter(&PID::setKD);
+//    KD.setContainer(this);
+//    KD.getter(&PID::getKD);
+//    KD.setter(&PID::setKD);
 
-    Desired.setContainer(this);
-    Desired.getter(&PID::getDesired);
-    Desired.setter(&PID::setDesired);
+//    Desired.setContainer(this);
+//    Desired.getter(&PID::getDesired);
+//    Desired.setter(&PID::setDesired);
 
-    ILimit.setContainer(this);
-    ILimit.getter(&PID::getILimit);
-    ILimit.setter(&PID::setILimit);
+//    ILimit.setContainer(this);
+//    ILimit.getter(&PID::getILimit);
+//    ILimit.setter(&PID::setILimit);
 
-    OutputLimit.setContainer(this);
-    OutputLimit.getter(&PID::getOutputLimit);
-    OutputLimit.setter(&PID::setOutputLimit);
+//    OutputLimit.setContainer(this);
+//    OutputLimit.getter(&PID::getOutputLimit);
+//    OutputLimit.setter(&PID::setOutputLimit);
 
-    Dt.setContainer(this);
-    Dt.getter(&PID::getDt);
-    Dt.setter(&PID::setDt);
+//    Dt.setContainer(this);
+//    Dt.getter(&PID::getDt);
+//    Dt.setter(&PID::setDt);
 
-    Threshold.setContainer(this);
-    Threshold.getter(&PID::getThreshold);
-    Threshold.setter(&PID::setThreshold);
+//    Threshold.setContainer(this);
+//    Threshold.getter(&PID::getThreshold);
+//    Threshold.setter(&PID::setThreshold);
 
     _desired = 0.0f;      //< set point
     _error = 0.0f;        //< error
@@ -102,37 +102,37 @@ PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim) {
 }
 
 PID::PID(float dt,float kp,float ki,float kd,float i_lim,float out_lim,float threshold) {
-    KP.setContainer(this);
-    KP.getter(&PID::getKP);
-    KP.setter(&PID::setKP);
+//    KP.setContainer(this);
+//    KP.getter(&PID::getKP);
+//    KP.setter(&PID::setKP);
 
-    KI.setContainer(this);
-    KI.getter(&PID::getKI);
-    KI.setter(&PID::setKI);
+//    KI.setContainer(this);
+//    KI.getter(&PID::getKI);
+//    KI.setter(&PID::setKI);
 
-    KD.setContainer(this);
-    KD.getter(&PID::getKD);
-    KD.setter(&PID::setKD);
+//    KD.setContainer(this);
+//    KD.getter(&PID::getKD);
+//    KD.setter(&PID::setKD);
 
-    Desired.setContainer(this);
-    Desired.getter(&PID::getDesired);
-    Desired.setter(&PID::setDesired);
+//    Desired.setContainer(this);
+//    Desired.getter(&PID::getDesired);
+//    Desired.setter(&PID::setDesired);
 
-    ILimit.setContainer(this);
-    ILimit.getter(&PID::getILimit);
-    ILimit.setter(&PID::setILimit);
+//    ILimit.setContainer(this);
+//    ILimit.getter(&PID::getILimit);
+//    ILimit.setter(&PID::setILimit);
 
-    OutputLimit.setContainer(this);
-    OutputLimit.getter(&PID::getOutputLimit);
-    OutputLimit.setter(&PID::setOutputLimit);
+//    OutputLimit.setContainer(this);
+//    OutputLimit.getter(&PID::getOutputLimit);
+//    OutputLimit.setter(&PID::setOutputLimit);
 
-    Dt.setContainer(this);
-    Dt.getter(&PID::getDt);
-    Dt.setter(&PID::setDt);
+//    Dt.setContainer(this);
+//    Dt.getter(&PID::getDt);
+//    Dt.setter(&PID::setDt);
 
-    Threshold.setContainer(this);
-    Threshold.getter(&PID::getThreshold);
-    Threshold.setter(&PID::setThreshold);
+//    Threshold.setContainer(this);
+//    Threshold.getter(&PID::getThreshold);
+//    Threshold.setter(&PID::setThreshold);
 
     _desired = 0.0f;      //< set point
     _error = 0.0f;        //< error

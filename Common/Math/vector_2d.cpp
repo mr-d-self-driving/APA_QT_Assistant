@@ -49,6 +49,17 @@ float Vector2d::DistanceTo(const Vector2d &other)const
 	return hypotf(this->_x - other._x , this->_y - other._y);
 }
 
+// 向量叉积 axb
+float Vector2d::CrossProduct(const Vector2d&other) const
+{
+    return this->_x * other._y - this->_y * other._x;
+}
+
+// 向量内积 a.b
+float Vector2d::InnerProduct(const Vector2d&other) const
+{
+    return this->_x * other._x + this->_y * other._y;
+}
 
 Vector2d Vector2d::rotate(const float angle) const
 {

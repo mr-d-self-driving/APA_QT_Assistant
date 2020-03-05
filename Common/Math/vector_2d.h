@@ -35,6 +35,12 @@ public:
 	float Angle(void)const;
 	//求连个矢量之间的距离
 	float DistanceTo(const Vector2d &other)const;
+
+    // 向量叉积 axb
+    float CrossProduct(const Vector2d&other) const;
+    // 向量内积 a.b
+    float InnerProduct(const Vector2d&other) const;
+
 	//矢量旋转，旋转角度逆时针为正，顺时针为负
 	Vector2d rotate(const float angle) const;
 	//矢量正交点计算

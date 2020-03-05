@@ -5,7 +5,7 @@
  *      Author: zhuguohua
  */
 
-#include "lat_control.h"‬
+#include "Control/LatControl/lat_control.h"
 
 LatControl::LatControl() {
 	// TODO Auto-generated constructor stub
@@ -248,7 +248,7 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
 	v_x = msg->getVehicleMiddleSpeed();
 
 	psi_omega = v_x * t_track.curvature * cosf(err_yaw)/(1.0f - t_track.curvature * err_cro)
-			  - COEFFICIENT_KE   * v_x * sinf(err_yaw) * err_cro / err_yaw
+              - COEFFICIENT_KE   * v_x  * sinf(err_yaw) * err_cro / err_yaw
 			  - COEFFICIENT_KPSI * fabs(v_x) * err_yaw ;
 
 	if(fabs(psi_omega) < 1.0e-6f || fabs(err_yaw) < 1.0e-6f)
@@ -259,7 +259,7 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
 	else
 	{
 		delta_ctl = atanf(psi_omega * WHEEL_BASE / v_x);
-		delta_ctl = delta_ctl > 0.54 ? 0.54 : delta_ctl < -0.54 ? -0.54:delta_ctl;
+        delta_ctl = delta_ctl > 0.54f ? 0.54f : delta_ctl < -0.54f ? -0.54f:delta_ctl;
 		ctl->SteeringAngle 		= delta_ctl * 16 * 57.3f;
 		ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
 	}
@@ -273,6 +273,11 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 			if(ctl->getAPAEnable() && (msg->getSteeringAngle() < 5.0f) && (msg->getSteeringAngle() > -5.0f))
 			{
 				track->Init(); // 跟踪位置初始化，从坐标零点开始控制
+                ctl->setDistance(10);
+                ctl->setVelocity(0.5);
+                ctl->setAPAEnable(1);
+                ctl->setGear(Drive);
+
 				_lat_control_status = process_status;
 			}
 			else
@@ -286,8 +291,8 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 			if(ctl->getAPAEnable())
 			{
 				_target_track = TrackingCurve(track->getPosition().getX());
-//				ProcV1_0(msg,ctl,track,_target_track);
-				RearWheelFeedback(msg,ctl,track,_target_track);
+//                ProcV1_0(msg,ctl,track,_target_track);
+                RearWheelFeedback(msg,ctl,track,_target_track);
 			}
 			else
 			{

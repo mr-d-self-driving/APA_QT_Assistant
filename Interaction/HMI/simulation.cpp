@@ -21,7 +21,7 @@ void Simulation::Update(VehicleController *c,MessageManager *m)
         m->SteeringAngle     = SteeringAngleControl(c->getSteeringAngle(),c->getSteeringAngleRate(),0.02);
         m->SteeringAngleRate = c->getSteeringAngleRate();
 
-        m->Gear = c->getGear();
+        m->Gear = static_cast<GearStatus>(c->getGear());
 
         if(m->getWheelSpeedRearLeft() < 1.0e-6f)
         {

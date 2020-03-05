@@ -9,7 +9,7 @@
 /* 1.0	 Guohua Zhu     July   30 2019      Add Dongfeng Control Function    */
 /*****************************************************************************/
 
-#include <lon_control.h>
+#include "Control/LonControl/lon_control.h"
 
 LonControl::LonControl() {
 	ControlStateFlag.setContainer(this);
@@ -76,9 +76,9 @@ void LonControl::Proc(MessageManager *msg,VehicleController *ctl,PID *velocity_p
 	{
 		_vehicle_velocity = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
 //		velocity_pid->Desired = ctl->Velocity;
-		velocity_pid->Desired = VelocityControl(ctl->Distance,ctl->Velocity);
+        velocity_pid->setDesired(VelocityControl(ctl->Distance,ctl->Velocity));
 		ctl->Acceleration = velocity_pid->pidUpdateIntegralSeparation(_vehicle_velocity);
-		if((ctl->getAcceleration() < 1.0e-6) && (velocity_pid->Desired < 1.0e-6))
+        if((ctl->getAcceleration() < 1.0e-6) && (velocity_pid->getDesired() < 1.0e-6))
 		{
 			ctl->Acceleration = -0.5;
 		}
@@ -90,7 +90,7 @@ void LonControl::VelocityProc(MessageManager *msg,VehicleController *ctl,PID *ve
 	if(ctl->VelocityEnable)
 	{
 		_vehicle_velocity = (msg->WheelSpeedRearLeft + msg->WheelSpeedRearRight) * 0.5;
-		velocity_pid->Desired = ctl->Velocity;
+        velocity_pid->setDesired(ctl->Velocity);
 		ctl->TargetAcceleration = velocity_pid->pidUpdateIntegralSeparation(_vehicle_velocity);
 	}
 }
@@ -107,7 +107,7 @@ void LonControl::AccProc(MessageManager *msg,VehicleController *ctl,PID *acc_pid
 		}
 		else
 		{
-			acc_pid->Desired = ctl->TargetAcceleration;
+            acc_pid->setDesired(ctl->TargetAcceleration);
 			if(msg->Gear == Drive)
 			{
 				ctl->Torque = acc_pid->pidUpdateIntegralSeparation(msg->LonAcc);
@@ -171,7 +171,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 	{
 //		if(0x55 == _control_state_flag)//启动后速度控制
 //		{
-			velocity_pid->Desired = _target_velocity;
+            velocity_pid->setDesired(_target_velocity);
 			ctl->TargetAcceleration = velocity_pid->pidUpdate(_vehicle_velocity);
 //		}
 //		else if(0xAA == _control_state_flag)//启动前
@@ -188,7 +188,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 																	_lon_VehilceConfig.VelocityTable, _lon_VehilceConfig.VlcNum,
 																	_lon_VehilceConfig.TorqueTable);
 
-			if(velocity_pid->Desired < 1.0e-6)//速度为0时，直接刹住
+            if(velocity_pid->getDesired() < 1.0e-6)//速度为0时，直接刹住
 			{
 				ctl->Torque = 0;
 				ctl->Acceleration = -0.5;
@@ -215,7 +215,7 @@ void LonControl::VelocityLookupProc(MessageManager *msg,VehicleController *ctl,P
 			ctl->TorqueEnable  = 1;
 			_calibration_value = ctl->TargetAcceleration;
 
-			if(velocity_pid->Desired < 1.0e-6)
+            if(velocity_pid->getDesired() < 1.0e-6)
 			{
 				ctl->AccelerationEnable = 1;
 				ctl->Acceleration = -0.6;

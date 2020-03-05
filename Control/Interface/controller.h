@@ -8,9 +8,10 @@
 #ifndef INTERFACE_CONTROLLER_H_
 #define INTERFACE_CONTROLLER_H_
 
-#include "Interface/vehicle_controller.h"
-#include "Interface/message_manager.h"
-#include "pid.h"
+#include <QMainWindow>
+#include "Interaction/CANBUS/Interface/vehicle_controller.h"
+#include "Interaction/CANBUS/Interface/message_manager.h"
+#include "Control/Common/pid.h"
 
 class Controller {
 public:

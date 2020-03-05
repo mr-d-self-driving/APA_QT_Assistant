@@ -17,7 +17,7 @@
 // 高度(m)
 #define HEIGHT                            (1.513)
 // 轴距(m)
-#define WHEEL_BASE                        (2.850)
+#define WHEEL_BASE                        (2.850f)
 // 车辆边沿到车辆中心点的距离(m)
 #define FRONT_EDGE_TO_CENTER              (3.886)
 #define REAR_EDGE_TO_CENTER               (1.10)
@@ -44,6 +44,8 @@
 #define SPEED_REVISE_RATIO               (1.01)
 // 轮脉冲比例系数
 #define WHEEL_PUSLE_RATIO                (0.021654)
+
+#define V_M_S 0.015625
 /****/
 // 1530 -> 33.2    :0.02169935
 // 2060 -> 44.55   :0.02162621

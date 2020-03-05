@@ -8,12 +8,12 @@
 #include "./Interaction/CANBUS/BoRui/bo_rui_controller.h"
 
 BoRuiController::BoRuiController() {
-	// TODO Auto-generated constructor stub
+    // TODO Auto-generated constructor stub
 
 }
 
 BoRuiController::~BoRuiController() {
-	// TODO Auto-generated destructor stub
+    // TODO Auto-generated destructor stub
 }
 
 void BoRuiController::Init()
@@ -41,22 +41,22 @@ void BoRuiController::Stop()
    * @param command the control command
    * @return error_code
    */
-//void BoRuiController::Update(ControlCommand cmd)
-//{
+void BoRuiController::Update(ControlCommand cmd)
+{
 
-//}
+}
 
 void BoRuiController::Update(APAControlCommand cmd)
 {
-	APAEnable         = cmd.ControlEnable.B.APAEnable;
+    APAEnable         = cmd.ControlEnable.B.APAEnable;
 
-	Gear              = cmd.Gear;
+    Gear              = cmd.Gear;
 
-	SteeringAngle 	  = cmd.SteeringAngle;
-	SteeringAngleRate = cmd.SteeringAngleRate;
+    SteeringAngle 	  = cmd.SteeringAngle;
+    SteeringAngleRate = cmd.SteeringAngleRate;
 
-	Velocity          = cmd.Velocity;
-	Distance          = cmd.Distance;
+    Velocity          = cmd.Velocity;
+    Distance          = cmd.Distance;
 }
 
 
@@ -72,25 +72,37 @@ void BoRuiController::VehicleContorlPri()
 
 void BoRuiController::SteeringAngleControl(float dt)
 {
-    float da = SteeringAngleRate * dt;
-    float left_target_angle = SteeringAngle - da;
-    float right_target_angle = SteeringAngle + da;
-
-    if(_steering_angle_set < left_target_angle)
-    {
-    	_steering_angle_set += da;
-    }
-    else if(_steering_angle_set > right_target_angle)
-    {
-    	_steering_angle_set -= da;
-    }
-    else
-    {
-    	_steering_angle_set = SteeringAngle;
-    }
+//    float da = SteeringAngleRate * dt;
+//    float left_target_angle = SteeringAngle - da;
+//    float right_target_angle = SteeringAngle + da;
+//
+//    if(SteeringAngleSet < left_target_angle)
+//    {
+//    	SteeringAngleSet = SteeringAngleSet + da;
+//    }
+//    else if(SteeringAngleSet > right_target_angle)
+//    {
+//    	SteeringAngleSet = SteeringAngleSet - da;
+//    }
+//    else
+//    {
+//    	SteeringAngleSet = SteeringAngle;
+//    }
 }
 
-void BoRuiController::Push(void)
+void BoRuiController::SteeringAngleControl(float dt,float actual_steering)
 {
 
+}
+
+void BoRuiController::Push(float dt)
+{
+//	SteeringAngleControl(dt);
+//	VehicleContorl();
+}
+
+void BoRuiController::Push(float dt,float actual_steering)
+{
+    SteeringAngleControl(dt,actual_steering);
+    VehicleContorl();
 }
