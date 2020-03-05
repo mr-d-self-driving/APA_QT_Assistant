@@ -37,6 +37,10 @@ SOURCES += \
         Common/Utils/Src/node.cpp \
         Common/VehicleState/GeometricTrack/geometric_track.cpp \
         Common/VehicleState/Interface/vehicle_state.cpp \
+        Control/Common/pid.cpp \
+        Control/Interface/controller.cpp \
+        Control/LatControl/lat_control.cpp \
+        Control/LonControl/lon_control.cpp \
         Interaction/CANBUS/BoRui/bo_rui_controller.cpp \
         Interaction/CANBUS/BoRui/bo_rui_message.cpp \
         Interaction/CANBUS/ChangAn/chang_an_controller.cpp \
@@ -77,6 +81,11 @@ HEADERS += \
         Common/Utils/Inc/property.h \
         Common/VehicleState/GeometricTrack/geometric_track.h \
         Common/VehicleState/Interface/vehicle_state.h \
+        Control/Common/pid.h \
+        Control/Interface/controller.h \
+        Control/LatControl/lat_control.h \
+        Control/LonControl/lon_control.h \
+        Eigen/Eigen \
         Interaction/CANBUS/BoRui/bo_rui_controller.h \
         Interaction/CANBUS/BoRui/bo_rui_message.h \
         Interaction/CANBUS/ChangAn/chang_an_controller.h \
