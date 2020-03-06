@@ -7,6 +7,11 @@
 
 #ifndef CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_
 #define CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_
+
+#include <QMainWindow>
+
+#define APA_DEBUG(t) (qDebug(t))
+
 /****************Task Shedule Priority Level******************/
 #define TIME_5MS_TASK (1)
 #define CAN0_TASK     (2)
@@ -22,9 +27,9 @@
 /********************是否使用超声波避障使能按钮***********************/
 #define ULTRASONIC_COLLISION_ENABLE  ( 1 ) // 超声避障使能按钮
 
-#define M_PI    ( 3.1415926535897932384626433832795 )
-#define M_3PI4  ( 2.3561944901923449288469825374596 )
-#define M_PI2   ( 1.5707963267948966192313216916398 )
-#define M_PI4   ( 0.7853981633974483096156608458198 )
+#define M_PI    ( 3.1415926535897932384626433832795f )
+#define M_3PI4  ( 2.3561944901923449288469825374596f )
+#define M_PI2   ( 1.5707963267948966192313216916398f )
+#define M_PI4   ( 0.7853981633974483096156608458198f )
 
 #endif /* CONFIGURE_CONFIGS_SYSTEM_CONFIG_H_ */
