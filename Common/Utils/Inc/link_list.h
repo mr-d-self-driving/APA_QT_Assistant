@@ -18,6 +18,7 @@ public:
 	LinkList();
 	virtual ~LinkList();
 
+    void Init();
     void Add(TYPE dat);
     void Delete(void);
 
@@ -53,6 +54,16 @@ LinkList<TYPE>::~LinkList() {
 //	_head_node = new Node();
 //	_end_node  = new Node();
 //	_node      = new Node();
+}
+
+template <typename TYPE>
+void LinkList<TYPE>::Init()
+{
+    _list_length = 0;
+
+    _node = NULL;//头节点
+    _end_node  = NULL;//尾节点
+    _head_node = NULL;//
 }
 
 template <typename TYPE>
