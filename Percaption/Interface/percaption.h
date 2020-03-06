@@ -9,17 +9,17 @@
 #define INTERFACE_PERCAPTION_INFORMATION_H_
 
 #include <QMainWindow>
-#include "./Common/Utils/Inc/property.h"
-#include "./Common/Configure/Configs/vehilce_config.h"
-#include "./Common/VehicleState/Interface/vehicle_state.h"
+#include "Common/Utils/Inc/property.h"
+#include "Common/Configure/Configs/vehilce_config.h"
+#include "Common/VehicleState/Interface/vehicle_state.h"
 
-#include "./Interaction/Ultrasonic/Ultrasonic.h"
+#include "Interaction/Ultrasonic/Ultrasonic.h"
 
 // math
 #include "math.h"
-#include "./Common/Math/vector_2d.h"
-#include "./Common/Utils/Inc/link_list.h"
-#include "./Common/Math/curve_fitting.h"
+#include "Common/Math/vector_2d.h"
+#include "Common/Utils/Inc/link_list.h"
+#include "Common/Math/curve_fitting.h"
 #include "Common/Math/huogh.h"
 
 typedef enum _ObstacleRegion

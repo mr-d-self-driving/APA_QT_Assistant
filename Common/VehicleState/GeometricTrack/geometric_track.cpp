@@ -103,16 +103,16 @@ void GeometricTrack::VelocityUpdate(MessageManager *msg,float dt)
     if( ((int16_t)fabs(msg->SteeringAngle) != 0) && ((int16_t)fabs(msg->SteeringAngle) < 520))
     {
         radius = m_GeometricVehicleConfig.TurnRadiusCalculate(msg->SteeringAngle);
-        Yaw  = _last_yaw + LinearVelocity * dt / radius;
-        _position.setX(_position.getX() + radius * (sinf(Yaw) - sinf(_last_yaw)));
-        _position.setY(_position.getY() + radius * (cosf(_last_yaw) - cosf(Yaw)));
+        _yaw  = pi2pi(_last_yaw + LinearVelocity * dt / radius);
+        _position.setX(_position.getX() + radius * (sinf(_yaw) - sinf(_last_yaw)));
+        _position.setY(_position.getY() + radius * (cosf(_last_yaw) - cosf(_yaw)));
     }
     else
     {
-        _position.setX(_position.getX() + LinearVelocity * cosf(Yaw) * dt);
-        _position.setY(_position.getY() + LinearVelocity * sinf(Yaw) * dt);
+        _position.setX(_position.getX() + LinearVelocity * cosf(_yaw) * dt);
+        _position.setY(_position.getY() + LinearVelocity * sinf(_yaw) * dt);
     }
-    _last_yaw = Yaw;
+    _last_yaw = _yaw;
 }
 
 void GeometricTrack::PulseUpdate(MessageManager *msg)
