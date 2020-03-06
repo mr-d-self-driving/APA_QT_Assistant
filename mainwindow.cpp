@@ -108,6 +108,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mParallelPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
     connect(mVerticalPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
 
+    // 跟踪
+    connect(button_patn_generate,SIGNAL(clicked()),this,SLOT(sPathGenarate()));
+    connect(button_track_start,SIGNAL(clicked()),this,SLOT(sTrackStart()));
+
     // 定时器20ms
     mDataTimer20ms.start(10);
 }
@@ -694,12 +698,34 @@ void MainWindow::PlanUI(void)
     gPlanLayout->setColumnStretch(1,9);
 }
 
-/*
- 跟踪UI配置函数
+/**
+ * @brief MainWindow::TrackUI 跟踪UI配置函数
  */
 void MainWindow::TrackUI(void)
 {
+    button_patn_generate = new QPushButton();
+    button_patn_generate->setText("路径生成");
+
+    button_track_start = new QPushButton();
+    button_track_start->setText("开始跟踪");
+
+    QGridLayout *gPathGenerate_Layout = new QGridLayout();
+    gPathGenerate_Layout->addWidget(button_patn_generate,0,0);
+    gPathGenerate_Layout->addWidget(button_track_start,1,0);
+    gPathGenerate_Layout->setRowStretch(0,1);
+    gPathGenerate_Layout->setRowStretch(1,1);
+    gPathGenerate_Layout->setRowStretch(2,1);
+
+    QGroupBox *gPathGenerate_Group = new QGroupBox();
+    gPathGenerate_Group->setTitle("路径生成");
+    gPathGenerate_Group->setFixedHeight(120);
+    gPathGenerate_Group->setLayout(gPathGenerate_Layout);
+
     QGridLayout *gTrack_IO_Layout = new QGridLayout();
+    gTrack_IO_Layout->addWidget(gPathGenerate_Group,0,0);
+    gTrack_IO_Layout->setRowStretch(0,1);
+    gTrack_IO_Layout->setRowStretch(1,1);
+
     // 绘图界面配置
     mTrackPlot = new QCustomPlot();
     mTrackPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
@@ -721,10 +747,14 @@ void MainWindow::TrackUI(void)
     mTrackParkingCurve->setPen(QPen(Qt::green,4));
     mTrackParkingCurve->setBrush(QBrush(QColor(90,255,240,80)));
 
+    mTrackTargetCurve = new QCPCurve(mTrackPlot->xAxis,mTrackPlot->yAxis);
+    mTrackTargetCurve->setName("目标路径");
+    mTrackTargetCurve->setPen(QPen(Qt::blue,3));
+
     mTrackVehicleCenterCurve = new QCPCurve(mTrackPlot->xAxis,mTrackPlot->yAxis);
     mTrackVehicleCenterCurve->setName("后轴中心");
+    mTrackVehicleCenterCurve->setPen(QPen(Qt::darkRed,3));
 
-    gTrackLayout = new QGridLayout();
     gTrackLayout = new QGridLayout();
     gTrackLayout->addLayout(gTrack_IO_Layout, 0, 0);
     gTrackLayout->addWidget(mTrackPlot, 0, 1);
@@ -737,6 +767,7 @@ void MainWindow::Init()
 {
      mTerminal = new Terminal();
      mSimulation = new Simulation();
+
 
 //    Percaption mPercaption;
 //    GeometricTrack mGeometricTrack;
@@ -755,6 +786,11 @@ void MainWindow::Init()
 
     mParallelPlanning->Init();
     mVerticalPlanning->Init();
+
+    // Track
+    mLatControl = new LatControl();
+    mLatControl->Init();
+    _target_curvature_data_sets = new TrackLinkList();
 }
 
 /****** Function ******/
@@ -793,6 +829,24 @@ void MainWindow::VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center
     plot->replot();
 }
 
+void MainWindow::TargetPathShow(TrackLinkList *list)
+{
+    uint16_t i;
+    Node<TargetTrack>* _track_node;
+    _track_node = list->getHeadNode();
+    QVector<double> VehiclePointX(list->Length()),VehiclePointY(list->Length());
+    i = 0;
+    while(_track_node->next != NULL)
+    {
+        VehiclePointX[i] = static_cast<double>(_track_node->data.point.getX());
+        VehiclePointY[i] = static_cast<double>(_track_node->data.point.getY());
+        _track_node = _track_node->next;
+        i++;
+    }
+    VehiclePointX[i] = static_cast<double>(_track_node->data.point.getX());
+    VehiclePointY[i] = static_cast<double>(_track_node->data.point.getY());
+    mTrackTargetCurve->setData(VehiclePointX,VehiclePointY);
+}
 /**
  * @brief MainWindow::FileDataInit 注入文件数据的缓存区初始化
  * @param  None
@@ -1104,7 +1158,9 @@ void MainWindow::PlanTask(void)
  */
 void MainWindow::TrackTask(void)
 {
-    mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack);
+    TargetTrack temp_node;
+    temp_node = mLatControl->CalculateNearestPoint(_target_curvature_data_sets,&mGeometricTrack);
+    mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack,temp_node);
 
     // 仿真信号更新
     mSimulation->Update(mBoRuiController,mBoRuiMessage);
@@ -1394,6 +1450,23 @@ void MainWindow::sPathCirclePoint(uint8_t id,Circle *c)
         default:
             break;
     }
+}
+
+/**
+ * @brief MainWindow::sPathGenarate 路径生成按钮事件
+ */
+void MainWindow::sPathGenarate(void)
+{
+    mLatControl->GenerateCurvatureSets(_target_curvature_data_sets);
+    TargetPathShow(_target_curvature_data_sets);
+}
+
+void MainWindow::sTrackStart(void)
+{
+    mBoRuiController->setDistance(10);
+    mBoRuiController->setVelocity(0.5);
+    mBoRuiController->setAPAEnable(1);
+    mBoRuiController->setGear(Drive);
 }
 
 void MainWindow::SortSmallToBig(float *array,uint8_t *index_array,uint8_t cnt)

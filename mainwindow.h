@@ -80,7 +80,7 @@ private:
     void PathVehicleModule(Vector2d p,float yaw);
 
     void VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot);
-
+    void TargetPathShow(TrackLinkList *list);
 
     //文件解析
     void FileDataInit(void);
@@ -170,9 +170,11 @@ private:
     QCPCurve *mTrackVehicleModuleCurve;
     QCPCurve *mTrackVehicleCenterCurve;
     QCPCurve *mTrackParkingCurve;
-
+    QCPCurve *mTrackTargetCurve;
     QGridLayout *gTrackLayout;
 
+    QPushButton *button_patn_generate;
+    QPushButton *button_track_start;
     // timer 20ms Task
     QTimer mDataTimer20ms;
     QPushButton *button_timer_control;
@@ -203,7 +205,7 @@ private:
     VerticalPlanning *mVerticalPlanning;
     // 控制
     LatControl *mLatControl;
-
+    TrackLinkList *_target_curvature_data_sets;
     // Detect Module
     Ultrasonic mUltrasonic;
     QList<Ultrasonic_Packet> LRU_List[12];
@@ -247,6 +249,8 @@ private slots:
 
     void sPathCirclePoint(uint8_t id,Circle *c);
 
+    void sPathGenarate(void);
+    void sTrackStart(void);
     void SortSmallToBig(float *array,uint8_t *index_array,uint8_t cnt);
 };
 
