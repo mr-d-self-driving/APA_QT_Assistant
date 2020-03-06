@@ -13,6 +13,7 @@
 
 #include "math.h"
 #include "Common/Math/vector_2d.h"
+#include "Common/Utils/Inc/link_list.h"
 #include "Common/VehicleState/GeometricTrack/geometric_track.h"
 #include "Common/Configure/Configs/vehilce_config.h"
 
@@ -39,6 +40,11 @@ typedef struct _TargetTrack
 	float    curvature;
 }TargetTrack;
 
+/**
+ * @brief The TrackLinkList class：曲线跟踪目标曲线链表
+ */
+class TrackLinkList : public LinkList<TargetTrack>{};
+
 class LatControl :public Controller
 {
 public:
@@ -53,14 +59,19 @@ public:
 
 	TargetTrack TrackingCurve(float x);
 
+    void GenerateCurvatureSets(TrackLinkList *list);
+
+    TargetTrack CalculateNearestPoint(TrackLinkList *list,GeometricTrack *a_track);
+
+    float pi2pi(float angle);
+
 	float SatFunction(float x);
 
 	void Proc(MessageManager *msg,VehicleController *ctl,PID *pid) override;
-	void Proc(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
 	void ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
 
 	void RearWheelFeedback(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
-	void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *track);
+    void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track);
 
 	TargetTrack getTargetTrack();
 	void setTargetTrack(TargetTrack value);
@@ -81,6 +92,9 @@ private:
 	float _sliding_variable;
 
 	LatControlStatus _lat_control_status;
+
+//    TrackLinkList *_target_curvature_data_sets;
+
 };
 
 #endif /* LATCONTROL_LAT_CONTROL_H_ */
