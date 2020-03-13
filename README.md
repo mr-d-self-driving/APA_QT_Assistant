@@ -40,3 +40,14 @@
 ![](https://raw.githubusercontent.com/zgh551/FigureBed/master/img/%E5%9E%82%E7%9B%B4%E4%B8%80%E6%AC%A1%E5%85%A5%E5%BA%93.gif)
 #### 多次尝试入库情况
 ![](https://raw.githubusercontent.com/zgh551/FigureBed/master/img/%E5%9E%82%E7%9B%B4%E5%A4%9A%E6%AC%A1%E5%B0%9D%E8%AF%95%E5%85%A5%E5%BA%93.gif)
+
+## 路径跟踪
+### 概述
+路径跟踪算法主要分为基于几何、基于后轴、基于前轴和基于模型的优化控制算法。
+### 后轴反馈控制
+后轴反馈控制原理如下：
+![](https://raw.githubusercontent.com/zgh551/FigureBed/master/img/20200227170936.png)
+#### 圆弧前进跟踪
+![](https://raw.githubusercontent.com/zgh551/FigureBed/master/img/20200313132324.gif)
+#### 圆弧倒车跟踪
+![](https://raw.githubusercontent.com/zgh551/FigureBed/master/img/20200313132026.gif)
