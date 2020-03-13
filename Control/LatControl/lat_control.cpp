@@ -18,6 +18,8 @@ LatControl::~LatControl() {
 
 void LatControl::Init()
 {
+    last_cross_err = 0.0f;
+    track_list = new TrackLinkList();
 	_lat_control_status = init_status;
 }
 
@@ -43,11 +45,32 @@ float LatControl::TargetLineSecondDerivative(float x)
 {
 	return -COEFFICIENT_TLS*COEFFICIENT_TLS*cosf(COEFFICIENT_TLS*x);
 }
+/**
+ * @brief LatControl::TrackingCurve 生成目标曲线
+ * @param x：输入x轴数据
+ * @return 返回目标跟踪路径数据集
+ */
+TargetTrack LatControl::TrackingCurve(float x)
+{
+    TargetTrack _temp_track;
+    float _temp_cos_psi_r;
 
-void LatControl::GenerateCurvatureSets(TrackLinkList *list)
+    _temp_track.point.setX(x);
+    _temp_track.point.setY(TargetLine(x));
+    _temp_track.yaw = atanf(TargetLineFirstDerivative(x)); // (-90,90)°
+    _temp_cos_psi_r = cosf(_temp_track.yaw);
+    _temp_track.curvature = _temp_cos_psi_r*_temp_cos_psi_r*_temp_cos_psi_r*TargetLineSecondDerivative(x);
+    return _temp_track;
+}
+
+/**
+ * @brief LatControl::GenerateCurvatureSets 产生曲线数据集
+ * @param list：存储数据的链表
+ */
+void LatControl::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
 {
     TargetTrack temp_track;
-    float index_x;
+    float index_x,rho,gain;
     Node<TargetTrack>* last_track_node;
     Node<TargetTrack>* current_track_node;
     Node<TargetTrack>* next_track_node;
@@ -61,12 +84,78 @@ void LatControl::GenerateCurvatureSets(TrackLinkList *list)
     temp_track.curvature = 0.0f;
     index_x = 0.0f;
 
-    while(index_x < (2*M_PI/COEFFICIENT_TLS))
+    switch(type)
     {
-        temp_track.point.setX(index_x);
-        temp_track.point.setY(TargetLine(index_x));
-        list->Add(temp_track);
-        index_x = index_x + 0.1f;
+    case 1:
+        // 三角函数曲线
+        while(index_x < (M_PI/COEFFICIENT_TLS))
+        {
+            temp_track.point.setX(index_x);
+            temp_track.point.setY(0.05f*TargetLine(index_x));
+            list->Add(temp_track);
+            index_x = index_x + 0.1f;
+        }
+        break;
+
+    case 2:
+        // 8形曲线
+        index_x = -M_PI;
+        while(index_x < M_PI)
+        {
+            rho = sqrtf(cosf(2*index_x));
+            gain = rho*10;
+            temp_track.point.setX(gain*cosf(index_x));
+            temp_track.point.setY(gain*sinf(index_x));
+            list->Add(temp_track);
+            index_x = index_x + 0.01f;
+        }
+        break;
+
+    case 3:
+        // 8字圆
+        // 后退
+//        index_x = M_PI2;
+//        while(index_x < M_PI)
+//        {
+//            gain = 5;
+//            temp_track.point.setX(gain*cosf(index_x));
+//            temp_track.point.setY(gain*sinf(index_x)-gain);
+//            list->Add(temp_track);
+//            index_x = index_x + 0.01f;
+//        }
+//        index_x = 0;
+//        while(index_x > -(M_PI+M_PI2))
+//        {
+//            gain = 5;
+//            temp_track.point.setX(gain*cosf(index_x)-2*gain);
+//            temp_track.point.setY(gain*sinf(index_x)-gain);
+//            list->Add(temp_track);
+//            index_x = index_x - 0.01f;
+//        }
+
+        // 前进
+        index_x = M_PI2;
+        while(index_x > -M_PI)
+        {
+            gain = 5;
+            temp_track.point.setX(gain*cosf(index_x));
+            temp_track.point.setY(gain*sinf(index_x)-gain);
+            list->Add(temp_track);
+            index_x = index_x - 0.01f;
+        }
+        index_x = 0;
+        while(index_x < (M_PI + M_PI2))
+        {
+            gain = 5;
+            temp_track.point.setX(gain*cosf(index_x)-2*gain);
+            temp_track.point.setY(gain*sinf(index_x)-gain);
+            list->Add(temp_track);
+            index_x = index_x + 0.01f;
+        }
+        break;
+
+    default:
+        break;
     }
 
     last_track_node = list->getHeadNode();
@@ -86,14 +175,18 @@ void LatControl::GenerateCurvatureSets(TrackLinkList *list)
         last_track_node = last_track_node->next;
         current_track_node = last_track_node->next;
         next_track_node = current_track_node->next;
-
     }while(next_track_node->next != NULL);
-
 }
 
+/**
+ * @brief CalculateNearestPoint：计算最近的目标点
+ * @param list：目标曲线数据集
+ * @param a_track：当前车辆跟踪位置
+ * @return 返回离车辆后轴最近的目标曲线点
+ */
 TargetTrack LatControl::CalculateNearestPoint(TrackLinkList *list,GeometricTrack *a_track)
 {
-    Node<TargetTrack>* track_node;
+    Node<TargetTrack>* track_index_node;
     TargetTrack index_node;
     float min_value;
     index_node.point.setX(0.0);
@@ -105,17 +198,26 @@ TargetTrack LatControl::CalculateNearestPoint(TrackLinkList *list,GeometricTrack
     {
         return index_node;
     }
-    track_node = list->getHeadNode();
-    min_value = (track_node->data.point - a_track->getPosition()).Length();
-    index_node = track_node->data;
-    while(track_node->next != NULL)
+    if(track_list->Length() == 0)
     {
-        if((track_node->data.point - a_track->getPosition()).Length() < min_value)
+        track_list->setHeadNode(list->getHeadNode());
+    }
+    else
+    {
+        track_list->setHeadNode(track_node);
+    }
+    track_index_node = track_list->getHeadNode();
+    min_value = (track_index_node->data.point - a_track->getPosition()).Length();
+    index_node = track_index_node->data;
+    while(track_index_node->next != NULL)
+    {
+        if((track_index_node->data.point - a_track->getPosition()).Length() < min_value)
         {
-            min_value = (track_node->data.point - a_track->getPosition()).Length();
-            index_node = track_node->data;
+            min_value = (track_index_node->data.point - a_track->getPosition()).Length();
+            track_node = track_index_node;
+            index_node = track_index_node->data;
         }
-        track_node = track_node->next;
+        track_index_node = track_index_node->next;
     }
     return index_node;
 }
@@ -131,24 +233,6 @@ float LatControl::pi2pi(float angle)
         angle = angle + 2*M_PI;
     }
     return angle;
-}
-
-/**
- * @brief LatControl::TrackingCurve 生成目标曲线
- * @param x：输入x轴数据
- * @return 返回目标跟踪路径数据集
- */
-TargetTrack LatControl::TrackingCurve(float x)
-{
-    TargetTrack _temp_track;
-    float _temp_cos_psi_r;
-
-    _temp_track.point.setX(x);
-    _temp_track.point.setY(TargetLine(x));
-    _temp_track.yaw = atanf(TargetLineFirstDerivative(x)); // (-90,90)°
-    _temp_cos_psi_r = cosf(_temp_track.yaw);
-    _temp_track.curvature = _temp_cos_psi_r*_temp_cos_psi_r*_temp_cos_psi_r*TargetLineSecondDerivative(x);
-    return _temp_track;
 }
 
 /**
@@ -171,9 +255,6 @@ float LatControl::SatFunction(float x)
 		return x/COEFFICIENT_DELTA;
 	}
 }
-
-
-
 
 /**
  * @brief LatControl::ProcV1_0 基于非时间参考的滑模控制算法
@@ -294,20 +375,37 @@ void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTr
  */
 void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
 {
-	float err_yaw,err_cro;
+    float err_yaw=0.0f,err_cro=0.0f;
 	Vector2d vec_d,vec_t;
 	float psi_omega;
-	float v_x;
+    float v_x = 0.0f,k = 0.0f;
 	float delta_ctl;
 
     vec_d = a_track->getPosition() - t_track.point;
-	vec_t = Vector2d(cosf(t_track.yaw),sinf(t_track.yaw));
-    err_cro = -vec_d.CrossProduct(vec_t);
-    err_yaw = pi2pi(a_track->getYaw() - t_track.yaw);
 
-	v_x = msg->getVehicleMiddleSpeed();
+    if(Drive == msg->getGear())
+    {
+        vec_t = Vector2d(cosf(t_track.yaw),sinf(t_track.yaw));
+        err_yaw = pi2pi(a_track->getYaw() - t_track.yaw);
+        v_x = msg->getVehicleMiddleSpeed();
+        k =  t_track.curvature;
+    }
+    else if(Reverse == msg->getGear())
+    {
+        vec_t = Vector2d(cosf(t_track.yaw + M_PI),sinf(t_track.yaw + M_PI));
+        err_yaw = pi2pi(a_track->getYaw() - t_track.yaw - M_PI);
+        v_x = msg->getVehicleMiddleSpeed();
+        k = -t_track.curvature;
+    }
+    else
+    {
+        vec_t = Vector2d(0.0f,0.0f);
+        err_yaw = 0.0f;
+        v_x = 0.0f;
+    }
+    err_cro = vec_t.CrossProduct(vec_d);
 
-    psi_omega = v_x * t_track.curvature * cosf(err_yaw)/(1.0f + t_track.curvature * err_cro)
+    psi_omega = v_x * k * cosf(err_yaw)/(1.0f - k * err_cro)
               - COEFFICIENT_KE   * v_x  * sinf(err_yaw) * err_cro / err_yaw
 			  - COEFFICIENT_KPSI * fabs(v_x) * err_yaw ;
 
@@ -327,13 +425,17 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
 
 
 /**
- * @brief LatControl::Work
- * @param msg
- * @param ctl
- * @param track
+ * @brief LatControl::Work 横向控制状态切换控制
+ * @param msg：车辆信息->挡位、车速
+ * @param ctl：车辆控制->转向角、转向角速度、车速、挡位
+ * @param a_track：当前跟踪位置信息
+ * @param t_track：目标曲线信息
+ * @param last_track：车辆终点信息
  */
-void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
+void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track,TargetTrack last_track)
 {
+    float nerest_distance;
+    float cross_err;
 	switch(_lat_control_status)
 	{
 		case init_status:
@@ -354,6 +456,21 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 			{
 //                ProcV1_0(msg,ctl,a_track,t_track);
                 RearWheelFeedback(msg,ctl,a_track,t_track);
+                nerest_distance = (a_track->getPosition() - last_track.point).Length();
+                cross_err = last_track.point.CrossProduct(a_track->getPosition());
+                if( nerest_distance < 0.1f)
+                {
+                    ctl->setDistance(0);
+                    ctl->setVelocity(0.0);
+                    ctl->setAPAEnable(0);
+                    ctl->setGear(Parking);
+                    _lat_control_status = init_status;
+                }
+                else
+                {
+
+                }
+                last_cross_err = cross_err;
 			}
 			else
 			{
@@ -362,6 +479,10 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 			break;
 
 		default:
+            a_track->Init(); // 跟踪位置初始化，从坐标零点开始控制
+            ctl->SteeringAngle 		= 0;
+            ctl->SteeringAngleRate 	= MAX_STEERING_ANGLE_RATE;
+            _lat_control_status = init_status;
 			break;
 	}
 }
