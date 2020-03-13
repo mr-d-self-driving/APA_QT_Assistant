@@ -24,6 +24,8 @@ public:
 
     uint32_t Length();//返回链表个数
     Node<TYPE>* getHeadNode();
+    void setHeadNode(Node<TYPE>* node);
+
     Node<TYPE>* getEndNode();
 
 private:
@@ -113,6 +115,9 @@ uint32_t LinkList<TYPE>::Length() { return _list_length;}
 
 template <typename TYPE>
 Node<TYPE>* LinkList<TYPE>::getHeadNode() { return  _head_node;}
+
+template <typename TYPE>
+void LinkList<TYPE>::setHeadNode(Node<TYPE>* node){_head_node = node;}
 
 template <typename TYPE>
 Node<TYPE>* LinkList<TYPE>::getEndNode()  { return  _end_node; }
