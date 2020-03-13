@@ -39,6 +39,15 @@ void Simulation::Update(VehicleController *c,MessageManager *m)
             }
         }
     }
+    else
+    {
+        m->WheelSpeedRearLeft  = 0.0f;
+        m->WheelSpeedRearRight = 0.0f;
+
+        m->SteeringAngle     = 0;
+        m->SteeringAngleRate = c->getSteeringAngleRate();
+        m->WheelSpeedDirection = StandStill;
+    }
 }
 
 //根据距离规划速度
