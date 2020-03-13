@@ -81,6 +81,7 @@ private:
 
     void VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot);
     void TargetPathShow(TrackLinkList *list);
+    void SteeringAngleShow(float angle);
 
     //文件解析
     void FileDataInit(void);
@@ -167,11 +168,29 @@ private:
      * @brief mTrackPlot: 跟踪模块
      */
     QCustomPlot *mTrackPlot;
+    QCustomPlot *mTrackSinglePlot;
+
     QCPCurve *mTrackVehicleModuleCurve;
     QCPCurve *mTrackVehicleCenterCurve;
     QCPCurve *mTrackParkingCurve;
     QCPCurve *mTrackTargetCurve;
+
+    QPointer<QCPGraph> mGraph_SteeringAngle;
+    QPointer<QCPGraph> mGraph_Track;
+    AxisTag *mTag_SteeringAngle;
+    AxisTag *mTag_Track;
+
+    QGridLayout *gPlotLayout;
     QGridLayout *gTrackLayout;
+
+
+    QRadioButton *radio_sin_curvature;
+    QRadioButton *radio_double_line;
+    QRadioButton *radio_circle_curvature;
+
+    QLabel *label_TrackUI_VehiceTrackX_Value;
+    QLabel *label_TrackUI_VehiceTrackY_Value;
+    QLabel *label_TrackUI_VehiceTrackYaw_Value;
 
     QPushButton *button_patn_generate;
     QPushButton *button_track_start;
