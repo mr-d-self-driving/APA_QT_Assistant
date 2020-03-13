@@ -38,7 +38,7 @@
 // 最大转向角(°)
 #define MAX_STEERING_ANGLE                (500)
 // 最大转向加速度(°/s)
-#define MAX_STEERING_ANGLE_RATE           (500)
+#define MAX_STEERING_ANGLE_RATE           (400)
 
 // 速度修正比例系数
 #define SPEED_REVISE_RATIO               (1.01)
