@@ -8,6 +8,8 @@
 #ifndef LATCONTROL_LAT_CONTROL_H_
 #define LATCONTROL_LAT_CONTROL_H_
 
+#pragma once
+
 //#include "property.h"
 #include "Control/Interface/controller.h"
 
@@ -17,33 +19,27 @@
 #include "Common/VehicleState/GeometricTrack/geometric_track.h"
 #include "Common/Configure/Configs/vehilce_config.h"
 
-#define COEFFICIENT_TLS 	( 1.2f  )	// 目标曲线曲率因子
+#include "Planning/Curvature/curvature.h"
+
+#include "Common/Filter/digital_filter_coefficients.h"
+#include "Common/Filter/digital_filter.h"
+
+
 #define COEFFICIENT_SMV 	( 2.0f )	// 滑模变量系数
 #define COEFFICIENT_RHO 	( 0.02f )	// 补偿噪声系数
 #define COEFFICIENT_K   	( 1.1f  )	// 指数趋近率系数
 #define COEFFICIENT_DELTA	( 0.2f  )   // Sat函数系数
 
-#define COEFFICIENT_KPSI	( 1.0f  )   // K_psi
-#define COEFFICIENT_KE		( 1.5f  )   // K_e
+#define COEFFICIENT_KPSI	( 1.5f  )   // K_psi
+#define COEFFICIENT_KE		( 1.0f  )   // K_e
+
+using namespace common;
 
 typedef enum _LatControlStatus
 {
 	init_status = 0,
 	process_status
 }LatControlStatus;
-
-
-typedef struct _TargetTrack
-{
-	Vector2d point;
-	float    yaw;
-	float    curvature;
-}TargetTrack;
-
-/**
- * @brief The TrackLinkList class：曲线跟踪目标曲线链表
- */
-class TrackLinkList : public LinkList<TargetTrack>{};
 
 class LatControl :public Controller
 {
@@ -52,27 +48,6 @@ public:
 	virtual ~LatControl();
 
 	void Init() override;
-
-	float TargetLine(float x);
-	float TargetLineFirstDerivative(float x);
-	float TargetLineSecondDerivative(float x);
-
-	TargetTrack TrackingCurve(float x);
-
-    /**
-     * @brief GenerateCurvatureSets：生成目标曲线数据集
-     * @param list：目标曲线数据集
-     */
-    void GenerateCurvatureSets(TrackLinkList *list,uint16_t type);
-
-    /**
-     * @brief CalculateNearestPoint：计算最近的目标点
-     * @param list：目标曲线数据集
-     * @param a_track：当前车辆跟踪位置
-     * @return 返回离车辆后轴最近的目标曲线点
-     */
-    TargetTrack CalculateNearestPoint(TrackLinkList *list,GeometricTrack *a_track);
-
 
     float pi2pi(float angle);
 
@@ -118,10 +93,6 @@ public:
      */
     void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track,TargetTrack last_track);
 
-    /***************** 接口 ********************/
-	TargetTrack getTargetTrack();
-	void setTargetTrack(TargetTrack value);
-
 	float getX1();
 	void  setX1(float value);
 
@@ -132,15 +103,16 @@ public:
 	void  setSlidingVariable(float value);
 
 private:
-	TargetTrack _target_track;
+
 	float _x1;
 	float _x2;
 	float _sliding_variable;
 
 	LatControlStatus _lat_control_status;
     float last_cross_err;
-    Node<TargetTrack>* track_node;
-    TrackLinkList    * track_list;
+
+    common::DigitalFilter _digital_filter;
+
 };
 
 #endif /* LATCONTROL_LAT_CONTROL_H_ */
