@@ -17,7 +17,7 @@
 // 高度(m)
 #define HEIGHT                            (1.513)
 // 轴距(m)
-#define WHEEL_BASE                        (2.850f)
+#define WHEEL_BASE                        (2.850)
 // 车辆边沿到车辆中心点的距离(m)
 #define FRONT_EDGE_TO_CENTER              (3.886)
 #define REAR_EDGE_TO_CENTER               (1.10)
@@ -45,6 +45,9 @@
 // 轮脉冲比例系数
 #define WHEEL_PUSLE_RATIO                (0.021654)
 
+// 最小速度保护
+#define MIN_SPEED_PROTECTION             (0.05)
+
 #define V_M_S 0.015625
 /****/
 // 1530 -> 33.2    :0.02169935
@@ -56,6 +59,24 @@
 // 2146 -> 46.46   :0.02164958
 /****/
 #define WHEEL_PUSLE_MAX                  (4095)
+
+// lat controller configure
+#define TS                  (0.02)
+#define CF                  (80000.0)
+#define CR                  (80000.0)
+#define MASS_FL             (520)
+#define MASS_FR             (520)
+#define MASS_RL             (520)
+#define MASS_RR             (520)
+#define EPS                 (0.1)
+#define MAX_ITERATION       (150)
+
+#define MATRIX_Q1           (5.0 )
+#define MATRIX_Q2           (1.5 )
+#define MATRIX_Q3           (2.0 )
+#define MATRIX_Q4           (0.5 )
+
+
 /*** turn radius and the steering angle relationship ***/
 // (400,470]
 #define FIT_RADIUS_A1 		( 0.07466)

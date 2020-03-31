@@ -121,6 +121,30 @@ public:
 
 	uint16_t getVlcNum();
 	Property<VehilceConfig,uint16_t,READ_ONLY> VlcNum;
+
+    double getTs();
+    double getCf();
+    double getCr();
+    double getMassFl();
+    double getMassFr();
+    double getMassRl();
+    double getMassRr();
+    double getEps();
+    uint16_t getMaxIteration();
+    double getMatrixQ1();
+    double getMatrixQ2();
+    double getMatrixQ3();
+    double getMatrixQ4();
+
+    double *getMatrixQ();
+
+    double getWheelBase();
+    double getSteeringRatio();
+    double getMaxSteeringAngle();
+    double getMaxSteeringAngleRate();
+
+    double getMinSpeedProtection();
+
 private:
 	// the diagonal axis of the four edge to the center point and the angle
     double _front_diagonal_axis;
@@ -144,6 +168,31 @@ private:
 	float _accelerate_table[ACC_ARRAY_NUM];
 	float _velocity_table[VELOCITY_ARRAY_NUM];
 	float _torque_table[ACC_ARRAY_NUM * VELOCITY_ARRAY_NUM];
+
+    double _wheel_base;
+    double _steering_ratio;
+    double _max_steering_angle;
+    double _max_steering_angle_rate;
+    double _min_speed_protection;
+
+
+    double _ts;
+    double _cf;
+    double _cr;
+    double _mass_fl;
+    double _mass_fr;
+    double _mass_rl;
+    double _mass_rr;
+    double _eps;
+    uint16_t _max_iteration;
+
+    double _matrix_q1;
+    double _matrix_q2;
+    double _matrix_q3;
+    double _matrix_q4;
+
+    double _matrix_q[4];
+
 };
 
 #endif /* CONFIGURE_CONFIGS_VEHILCE_CONFIG_H_ */

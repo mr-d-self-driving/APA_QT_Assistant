@@ -174,6 +174,32 @@ void VehilceConfig::Init()
 	{
 		_torque_table[i] = torque_table[i/VELOCITY_ARRAY_NUM][i%VELOCITY_ARRAY_NUM];
 	}
+
+    _ts = TS;
+    _cf = CF;
+    _cr = CR;
+    _mass_fl = MASS_FL;
+    _mass_fr = MASS_FR;
+    _mass_rl = MASS_RL;
+    _mass_rr = MASS_RR;
+    _eps = EPS;
+    _max_iteration = MAX_ITERATION;
+
+    _matrix_q1 = MATRIX_Q1;
+    _matrix_q2 = MATRIX_Q2;
+    _matrix_q3 = MATRIX_Q3;
+    _matrix_q4 = MATRIX_Q4;
+
+    _matrix_q[0] = MATRIX_Q1;
+    _matrix_q[1] = MATRIX_Q2;
+    _matrix_q[2] = MATRIX_Q3;
+    _matrix_q[3] = MATRIX_Q4;
+
+    _wheel_base = WHEEL_BASE;
+    _steering_ratio = STEERING_RATIO;
+    _max_steering_angle = MAX_STEERING_ANGLE;
+    _max_steering_angle_rate = MAX_STEERING_ANGLE_RATE;
+    _min_speed_protection = MIN_SPEED_PROTECTION;
 }
 
 // r is + and -
@@ -390,3 +416,24 @@ float* VehilceConfig::getTorqueTable() { return  _torque_table;}
 uint16_t VehilceConfig::getAccNum() { return  _acc_num;}
 uint16_t VehilceConfig::getVlcNum() { return  _vlc_num;}
 
+double VehilceConfig::getTs() { return  _ts;}
+double VehilceConfig::getCf() { return  _cf;}
+double VehilceConfig::getCr() { return  _cr;}
+double VehilceConfig::getMassFl() { return  _mass_fl;}
+double VehilceConfig::getMassFr() { return  _mass_fr;}
+double VehilceConfig::getMassRl() { return  _mass_rl;}
+double VehilceConfig::getMassRr() { return  _mass_rr;}
+double VehilceConfig::getEps() { return  _eps;}
+uint16_t VehilceConfig::getMaxIteration() { return  _max_iteration;}
+double VehilceConfig::getMatrixQ1() { return  _matrix_q1;}
+double VehilceConfig::getMatrixQ2() { return  _matrix_q2;}
+double VehilceConfig::getMatrixQ3() { return  _matrix_q3;}
+double VehilceConfig::getMatrixQ4() { return  _matrix_q4;}
+double *VehilceConfig::getMatrixQ() { return  _matrix_q;}
+
+double VehilceConfig::getWheelBase() { return  _wheel_base;}
+double VehilceConfig::getSteeringRatio(){ return  _steering_ratio;}
+double VehilceConfig::getMaxSteeringAngle(){ return  _max_steering_angle;}
+double VehilceConfig::getMaxSteeringAngleRate(){ return  _max_steering_angle_rate;}
+
+double VehilceConfig::getMinSpeedProtection(){ return _min_speed_protection; }
