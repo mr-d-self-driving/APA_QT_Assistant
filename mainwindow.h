@@ -36,6 +36,8 @@
  * @brief 控制
  */
 #include "Control/LatControl/lat_control.h"
+#include "Control/LatControl/lat_control_lqr.h"
+#include "Control/Common/trajectory_analyzer.h"
 
 /**
  * @brief 车辆配置
@@ -222,9 +224,15 @@ private:
     // 规划
     ParallelPlanning *mParallelPlanning;
     VerticalPlanning *mVerticalPlanning;
+    Curvature        *mCurvature;
+
     // 控制
     LatControl *mLatControl;
+    LatControl_LQR *m_LatControl_LQR;
+
     TrackLinkList *_target_curvature_data_sets;
+    TrajectoryAnalyzer *m_TrajectoryAnalyzer;
+
     // Detect Module
     Ultrasonic mUltrasonic;
     QList<Ultrasonic_Packet> LRU_List[12];

@@ -898,7 +898,16 @@ void MainWindow::Init()
     // Track
     mLatControl = new LatControl();
     mLatControl->Init();
+
+    mCurvature = new Curvature();
+    mCurvature->Init();
+
+    m_LatControl_LQR = new LatControl_LQR();
+    m_LatControl_LQR->Init(&mVehilceConfig);
+
     _target_curvature_data_sets = new TrackLinkList();
+
+    m_TrajectoryAnalyzer = new TrajectoryAnalyzer();
 }
 
 /****** Function ******/
@@ -1291,9 +1300,12 @@ void MainWindow::TrackTask(void)
     TargetTrack end_node;
     if(_target_curvature_data_sets->Length() > 0)
     {
-        end_node = _target_curvature_data_sets->getEndNode()->data;
-        temp_node = mLatControl->CalculateNearestPoint(_target_curvature_data_sets,&mGeometricTrack);
-        mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack,temp_node,end_node);
+//        end_node = _target_curvature_data_sets->getEndNode()->data;
+//        temp_node = m_TrajectoryAnalyzer->CalculateNearestPointByPosition(mGeometricTrack.getPosition().getX(),
+//                                                                          mGeometricTrack.getPosition().getY());
+//        mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack,temp_node,end_node);
+
+        m_LatControl_LQR->Work(mBoRuiMessage,&mGeometricTrack,*m_TrajectoryAnalyzer,mBoRuiController);
     }
     // 仿真信号更新
     mSimulation->Update(mBoRuiController,mBoRuiMessage);
@@ -1613,7 +1625,8 @@ void MainWindow::sPathGenarate(void)
         curvature_type = 0;
     }
     _target_curvature_data_sets->Delete();
-    mLatControl->GenerateCurvatureSets(_target_curvature_data_sets,curvature_type);
+    mCurvature->GenerateCurvatureSets(_target_curvature_data_sets,curvature_type);
+    m_TrajectoryAnalyzer->Init(_target_curvature_data_sets);
     TargetPathShow(_target_curvature_data_sets);
 }
 
