@@ -270,8 +270,8 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 		case process_status:
 			if(ctl->getAPAEnable())
 			{
-//                ProcV1_0(msg,ctl,a_track,t_track);
-                RearWheelFeedback(msg,ctl,a_track,t_track);
+                ProcV1_0(msg,ctl,a_track,t_track);
+//                RearWheelFeedback(msg,ctl,a_track,t_track);
                 nerest_distance = (a_track->getPosition() - last_track.point).Length();
                 cross_err = last_track.point.CrossProduct(a_track->getPosition());
                 if( nerest_distance < 0.1f)
