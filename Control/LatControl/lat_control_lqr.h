@@ -77,11 +77,22 @@ public:
     void Init(VehilceConfig *vehicle_conf);
     bool LoadControlConf(VehilceConfig *vehicle_conf);
 
+    void KinematicsModuleInit();
+
+    void DynamicsModuleInit();
+
+    void KinematicsModuleUpdate();
+
+    void DynamicsModuleUpdate();
     /**
      * @brief UpdateState:更新状态矩阵
      * @param err：更新误差状态
      */
     void UpdateState(LateralErr *err);
+
+    void KinematicsUpdateMatrix(double v, double k);
+
+    void DynamicsUpdateMatrix(double v);
 
     /**
      * @brief UpdateMatrix:更新矩阵
@@ -108,12 +119,15 @@ public:
      */
     void ComputeLateralErrors(const double x, const double y, const double yaw,
                               const double linear_v, const double angular_v,
-                              const TrajectoryAnalyzer &trajectory_analyzer,LateralErr *error);
+                              TrajectoryAnalyzer &trajectory_analyzer,LateralErr *error);
 
 
     void ComputeControlCommand(GeometricTrack *act_track, MessageManager *msg, TrajectoryAnalyzer track, VehicleController *ctl);
 
     void Work(MessageManager *msg, GeometricTrack *a_track, TrajectoryAnalyzer track, VehicleController *ctl);
+
+    //
+    double getLr();
 private:
     MessageManager *_message_manager;
     GeometricTrack *_vehicle_track;

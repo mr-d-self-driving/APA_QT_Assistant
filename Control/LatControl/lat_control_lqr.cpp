@@ -15,24 +15,10 @@ void LatControl_LQR::Init(VehilceConfig *vehicle_conf)
         qDebug() << "failed to load control conf";
         return;
     }
-    _matrix_a  = Matrix::Zero(_basic_state_size,_basic_state_size);
-    _matrix_ad = Matrix::Zero(_basic_state_size,_basic_state_size);
 
-    // 运动学方程
-    _matrix_ad(0,0) = 1.0;
-    _matrix_ad(0,1) = _ts;
-    _matrix_ad(2,2) = 1.0;
-    _matrix_ad(2,3) = _ts;
+    KinematicsModuleInit();
 
-    _matrix_a_coeff = Matrix::Zero(_basic_state_size,_basic_state_size);
-    _matrix_a_coeff(1,2) =  1.0;
-    _matrix_a_coeff(3,0) = -1.0;
-
-    _matrix_b  = Matrix::Zero(_basic_state_size,1);
-    _matrix_bd = Matrix::Zero(_basic_state_size,1);
-
-    _matrix_b_coeff = Matrix::Zero(_basic_state_size,1);
-    _matrix_b_coeff(3,0) = 1.0/_wheelbase;
+//    DynamicsModuleInit();
 
     _matrix_state = Matrix::Zero(_basic_state_size, 1);
 
@@ -93,13 +79,93 @@ bool LatControl_LQR::LoadControlConf(VehilceConfig *vehicle_conf)
     return true;
 }
 
+void LatControl_LQR::KinematicsModuleInit()
+{
+    _matrix_a  = Matrix::Zero(_basic_state_size,_basic_state_size);
+    _matrix_ad = Matrix::Zero(_basic_state_size,_basic_state_size);
 
+    // 运动学方程
+    _matrix_ad(0,0) = 1.0;
+    _matrix_ad(0,1) = _ts;
+    _matrix_ad(2,2) = 1.0;
+    _matrix_ad(2,3) = _ts;
+
+    _matrix_a_coeff = Matrix::Zero(_basic_state_size,_basic_state_size);
+    _matrix_a_coeff(1,2) =  1.0;
+    _matrix_a_coeff(3,0) = -1.0;
+
+    _matrix_b  = Matrix::Zero(_basic_state_size,1);
+    _matrix_bd = Matrix::Zero(_basic_state_size,1);
+
+    _matrix_b_coeff = Matrix::Zero(_basic_state_size,1);
+    _matrix_b_coeff(3,0) = 1.0/_wheelbase;
+}
+
+void LatControl_LQR::DynamicsModuleInit()
+{
+    _matrix_a  = Matrix::Zero(_basic_state_size,_basic_state_size);
+    _matrix_ad = Matrix::Zero(_basic_state_size,_basic_state_size);
+
+    _matrix_a(0, 1) = 1.0;
+    _matrix_a(1, 2) = (_cf + _cr) / _mass;
+    _matrix_a(2, 3) = 1.0;
+    _matrix_a(3, 2) = (_lf * _cf - _lr * _cr) / _iz;
+
+    _matrix_a_coeff = Matrix::Zero(_basic_state_size, _basic_state_size);
+    _matrix_a_coeff(1, 1) = -(_cf + _cr) / _mass;
+    _matrix_a_coeff(1, 3) = (_lr * _cr - _lf * _cf) / _mass;
+    _matrix_a_coeff(3, 1) = (_lr * _cr - _lf * _cf) / _iz;
+    _matrix_a_coeff(3, 3) = -1.0 * (_lf * _lf * _cf + _lr * _lr * _cr) / _iz;
+
+    _matrix_b  = Matrix::Zero(_basic_state_size,1);
+    _matrix_bd = Matrix::Zero(_basic_state_size,1);
+
+    _matrix_b(1, 0) = _cf / _mass;
+    _matrix_b(3, 0) = _lf * _cf / _iz;
+
+    _matrix_bd = _matrix_b * _ts;
+}
+
+void LatControl_LQR::KinematicsModuleUpdate()
+{
+    // 运动学方程
+    _matrix_ad(0,0) = 1.0;
+    _matrix_ad(0,1) = _ts;
+    _matrix_ad(2,2) = 1.0;
+    _matrix_ad(2,3) = _ts;
+
+    _matrix_a_coeff(1,2) =  1.0;
+    _matrix_a_coeff(3,0) = -1.0;
+
+    _matrix_b_coeff(3,0) = 1.0/_wheelbase;
+}
+
+void LatControl_LQR::DynamicsModuleUpdate()
+{
+    // A Matrix
+    _matrix_a(0, 1) = 1.0;
+    _matrix_a(1, 2) = (_cf + _cr) / _mass;
+    _matrix_a(3, 2) = (_lf * _cf - _lr * _cr) / _iz;
+
+    _matrix_a_coeff(0, 2) = 0.0;
+    _matrix_a_coeff(1, 1) = -(_cf + _cr) / _mass;
+    _matrix_a_coeff(1, 3) = (_lr * _cr - _lf * _cf) / _mass;
+    _matrix_a_coeff(3, 1) = (_lr * _cr - _lf * _cf) / _iz;
+    _matrix_a_coeff(3, 3) = -1.0 * (_lf * _lf * _cf + _lr * _lr * _cr) / _iz;
+
+    // B Matrix
+    _matrix_b(1, 0) = _cf / _mass;
+    _matrix_b(3, 0) = _lf * _cf / _iz;
+
+    _matrix_bd = _matrix_b * _ts;
+}
 
 void LatControl_LQR::UpdateState(LateralErr *err)
 {
-
-    ComputeLateralErrors(static_cast<double>(_vehicle_track->getPosition().getX()),
-                         static_cast<double>(_vehicle_track->getPosition().getY()),
+//    Vector2d com = _vehicle_track->ComputeCOMPosition(_lr);
+    Vector2d com = _vehicle_track->getPosition();
+    ComputeLateralErrors(static_cast<double>(com.getX()),
+                         static_cast<double>(com.getY()),
                          static_cast<double>(_vehicle_track->getYaw()),
                          static_cast<double>(_message_manager->getVehicleMiddleSpeed()),
                          static_cast<double>(_message_manager->getYawRate()),
@@ -110,6 +176,29 @@ void LatControl_LQR::UpdateState(LateralErr *err)
     _matrix_state(2,0) = err->getHeadingError();
     _matrix_state(3,0) = err->getHeadingErrorRate();
 }
+
+
+void LatControl_LQR::KinematicsUpdateMatrix(double v, double k)
+{
+    _matrix_ad(1,2) = _matrix_a_coeff(1,2) * v;
+    _matrix_ad(3,0) = _matrix_a_coeff(3,0) * v * k * k;
+
+    _matrix_bd(3,0) = _matrix_b_coeff(3,0) * v;
+}
+
+void LatControl_LQR::DynamicsUpdateMatrix(double v)
+{
+    _matrix_a(1, 1) = _matrix_a_coeff(1, 1) / v;
+    _matrix_a(1, 3) = _matrix_a_coeff(1, 3) / v;
+    _matrix_a(3, 1) = _matrix_a_coeff(3, 1) / v;
+    _matrix_a(3, 3) = _matrix_a_coeff(3, 3) / v;
+
+    Matrix matrix_i = Matrix::Identity(_matrix_a.cols(), _matrix_a.cols());
+
+    _matrix_ad = (matrix_i - _ts * 0.5 * _matrix_a).inverse() *
+                 (matrix_i + _ts * 0.5 * _matrix_a);
+}
+
 
 void LatControl_LQR::UpdateMatrix(const double k)
 {
@@ -122,14 +211,17 @@ void LatControl_LQR::UpdateMatrix(const double k)
     {
         v = fmax(_message_manager->getVehicleMiddleSpeed(),_min_speed_protection);
     }
-    _matrix_ad(1,2) = _matrix_a_coeff(1,2) * v;
-    _matrix_ad(3,0) = _matrix_a_coeff(3,0) * v * k * k;
-
-    _matrix_bd(3,0) = _matrix_b_coeff(3,0) * v;
+    KinematicsUpdateMatrix(v,k);
+//    DynamicsUpdateMatrix(v);
 }
 
 double LatControl_LQR::ComputeFeedForward(const double ref_curvature)const
 {
+    const double kv =
+        _lr * _mass / 2 / _cf / _wheelbase - _lf * _mass / 2 / _cr / _wheelbase;
+
+    const double v = static_cast<double>(_message_manager->getVehicleMiddleSpeed());
+
     double steer_angle_feedforward_term;
     if(_message_manager->getGear() == Reverse)
     {
@@ -138,13 +230,19 @@ double LatControl_LQR::ComputeFeedForward(const double ref_curvature)const
     else
     {
         steer_angle_feedforward_term = _wheelbase * ref_curvature * 180.0 / static_cast<double>(M_PI) *_steer_ratio;
+//        steer_angle_feedforward_term = (_wheelbase * ref_curvature +
+//                                        kv * v * v * ref_curvature -
+//                                        _matrix_k(0,2) *
+//                                        (_lr * ref_curvature -
+//                                         _lf * _mass * v * v * ref_curvature / 2 / _cr / _wheelbase)) *
+//                                        180.0 / static_cast<double>(M_PI) *_steer_ratio;
     }
     return steer_angle_feedforward_term;
 }
 
 void LatControl_LQR::ComputeLateralErrors(const double x, const double y, const double yaw,
                                           const double linear_v, const double angular_v,
-                                          const TrajectoryAnalyzer &trajectory_analyzer,LateralErr *error)
+                                          TrajectoryAnalyzer &trajectory_analyzer,LateralErr *error)
 {
     TargetTrack target_point;
     Vector2d vec_a,vec_d,vec_t;
@@ -172,9 +270,9 @@ void LatControl_LQR::ComputeLateralErrors(const double x, const double y, const 
 
     //error first dot
     // base on the actual velocity
-    error->setLateralErrorRate(linear_v * sin(error->getHeadingError()));
+//    error->setLateralErrorRate(linear_v * sin(error->getHeadingError()));
     // base on last error value calculate the dot
-//    error->setLateralErrorRate((error->getLateralError() - _previous_lateral_error) / _ts);
+    error->setLateralErrorRate((error->getLateralError() - _previous_lateral_error) / _ts);
     error->setHeadingErrorRate((error->getHeadingError() - _previous_heading_error) / _ts);
 
     _previous_lateral_error = error->getLateralError();
@@ -194,16 +292,8 @@ void LatControl_LQR::ComputeControlCommand(GeometricTrack *act_track,MessageMana
     _message_manager        = msg;
     _trajectory_analyzer    = track;
 
-    // 运动学方程
-    _matrix_ad(0,0) = 1.0;
-    _matrix_ad(0,1) = _ts;
-    _matrix_ad(2,2) = 1.0;
-    _matrix_ad(2,3) = _ts;
-
-    _matrix_a_coeff(1,2) =  1.0;
-    _matrix_a_coeff(3,0) = -1.0;
-
-    _matrix_b_coeff(3,0) = 1.0/_wheelbase;
+    KinematicsModuleUpdate();
+//    DynamicsModuleUpdate();
 
     UpdateState(error);
     UpdateMatrix(error->getCurvature());
@@ -250,7 +340,7 @@ void LatControl_LQR::Work(MessageManager *msg, GeometricTrack *a_track, Trajecto
                 ComputeControlCommand(a_track,msg,track,ctl);
                 nerest_distance = track.DistanceToEnd(static_cast<double>(a_track->getPosition().getX()),
                                                       static_cast<double>(a_track->getPosition().getY()));
-                if( nerest_distance < 0.1)
+                if( nerest_distance < 0.1 )
                 {
                     ctl->setDistance(0);
                     ctl->setVelocity(0.0);
@@ -277,6 +367,8 @@ void LatControl_LQR::Work(MessageManager *msg, GeometricTrack *a_track, Trajecto
             break;
     }
 }
+
+double LatControl_LQR::getLr() {return _lr;}
 
 void   LateralErr::setRefHeading(double value)  {_ref_heading = value;}
 double LateralErr::getRefHeading()              {return  _ref_heading;}
