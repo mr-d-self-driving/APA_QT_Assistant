@@ -908,6 +908,8 @@ void MainWindow::Init()
     _target_curvature_data_sets = new TrackLinkList();
 
     m_TrajectoryAnalyzer = new TrajectoryAnalyzer();
+
+    _target_curvature_vectors = new std::vector<TargetTrack>;
 }
 
 /****** Function ******/
@@ -969,6 +971,19 @@ void MainWindow::TargetPathShow(TrackLinkList *list)
     mTrackTargetCurve->setData(VehiclePointX,VehiclePointY);
 }
 
+void MainWindow::TargetPathShow(std::vector<TargetTrack> *vec)
+{
+    uint16_t i;
+    QVector<double> VehiclePointX(vec->size()),VehiclePointY(vec->size());
+    i = 0;
+    for(std::vector<TargetTrack>::iterator it = vec->begin();it != vec->end();it++)
+    {
+        VehiclePointX[i] = static_cast<double>(it->point.getX());
+        VehiclePointY[i] = static_cast<double>(it->point.getY());
+        i++;
+    }
+    mTrackTargetCurve->setData(VehiclePointX,VehiclePointY);
+}
 /**
  * @brief MainWindow::SteeringAngleShow 显示方向盘转角信息
  * @param angle：需显示角度值
@@ -1298,7 +1313,7 @@ void MainWindow::TrackTask(void)
 {
     TargetTrack temp_node;
     TargetTrack end_node;
-    if(_target_curvature_data_sets->Length() > 0)
+    if(_target_curvature_vectors->size() > 0)
     {
 //        end_node = _target_curvature_data_sets->getEndNode()->data;
 //        temp_node = m_TrajectoryAnalyzer->CalculateNearestPointByPosition(mGeometricTrack.getPosition().getX(),
@@ -1624,23 +1639,29 @@ void MainWindow::sPathGenarate(void)
     {
         curvature_type = 0;
     }
-    _target_curvature_data_sets->Delete();
-    mCurvature->GenerateCurvatureSets(_target_curvature_data_sets,curvature_type);
-    m_TrajectoryAnalyzer->Init(_target_curvature_data_sets);
-    TargetPathShow(_target_curvature_data_sets);
+//    _target_curvature_data_sets->Delete();
+//    mCurvature->GenerateCurvatureSets(_target_curvature_data_sets,curvature_type);
+//    m_TrajectoryAnalyzer->Init(_target_curvature_data_sets);
+//    TargetPathShow(_target_curvature_data_sets);
+
+    mCurvature->GenerateCurvaturePointSets(_target_curvature_vectors,curvature_type);
+    m_TrajectoryAnalyzer->Init(_target_curvature_vectors);
+//    m_TrajectoryAnalyzer->TrajectoryTransformToCOM(m_LatControl_LQR->getLr());
+    TargetPathShow(_target_curvature_vectors);
 }
 
 void MainWindow::sTrackStart(void)
 {
     mBoRuiController->setDistance(10);
-    mBoRuiController->setVelocity(0.5f);
+    mBoRuiController->setVelocity(2.0f);
     mBoRuiController->setAPAEnable(1);
     mBoRuiController->setGear(Drive);
 
     QVector<double> PointX(1),PointY(1);
     PointX[0] = 0;
     PointY[0] = 0;
-    mPathVehicleCenterCurve->setData(PointX,PointY);
+    mTrackVehicleCenterCurve->setData(PointX,PointY);
+
     mGeometricTrack.Init();
     mTrackPlot->replot();
 }

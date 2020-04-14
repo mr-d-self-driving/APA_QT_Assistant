@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <vector>
 /**
  * @brief 绘图库
  */
@@ -83,6 +84,7 @@ private:
 
     void VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot);
     void TargetPathShow(TrackLinkList *list);
+    void TargetPathShow(std::vector<TargetTrack> *vec);
     void SteeringAngleShow(float angle);
 
     //文件解析
@@ -231,6 +233,7 @@ private:
     LatControl_LQR *m_LatControl_LQR;
 
     TrackLinkList *_target_curvature_data_sets;
+    std::vector<TargetTrack> *_target_curvature_vectors;
     TrajectoryAnalyzer *m_TrajectoryAnalyzer;
 
     // Detect Module
