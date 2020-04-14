@@ -352,6 +352,19 @@ void GeometricTrack::VelocityPulseUpdate(MessageManager *msg)
     _last_rear_left_pulse  = msg->WheelPulseRearLeft;
     _last_rear_right_pulse = msg->WheelPulseRearRight;
 }
+
+
+void GeometricTrack::DynamicsUpdate(MessageManager *msg)
+{
+
+}
+
+Vector2d GeometricTrack::ComputeCOMPosition(double rear_to_com_distance)
+{
+    Vector2d d;
+    d = Vector2d(rear_to_com_distance,0);
+    return this->getPosition() + d.rotate(this->getYaw());
+}
 /**************************************************************************************/
 int32_t GeometricTrack::getSumRearLeftPulse()             { return _sum_rear_left_pulse;}
 void    GeometricTrack::setSumRearLeftPulse(int32_t value){_sum_rear_left_pulse = value;}

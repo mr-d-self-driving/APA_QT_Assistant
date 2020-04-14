@@ -41,6 +41,10 @@ public:
 
     void VelocityPulseUpdate(MessageManager *msg);
 
+    void DynamicsUpdate(MessageManager *msg);
+
+    Vector2d ComputeCOMPosition(double rear_to_com_distance);
+
     float pi2pi(float angle);
 
     int32_t getSumRearLeftPulse();
