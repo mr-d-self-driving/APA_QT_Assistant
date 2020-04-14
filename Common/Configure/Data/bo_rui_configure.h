@@ -62,18 +62,18 @@
 
 // lat controller configure
 #define TS                  (0.02)
-#define CF                  (80000.0)
-#define CR                  (80000.0)
+#define CF                  (20000.0)
+#define CR                  (20000.0)
 #define MASS_FL             (520)
 #define MASS_FR             (520)
 #define MASS_RL             (520)
 #define MASS_RR             (520)
-#define EPS                 (0.1)
+#define EPS                 (0.01)
 #define MAX_ITERATION       (150)
 
-#define MATRIX_Q1           (5.0 )
-#define MATRIX_Q2           (1.5 )
-#define MATRIX_Q3           (2.0 )
+#define MATRIX_Q1           (1.0 )
+#define MATRIX_Q2           (0.5 )
+#define MATRIX_Q3           (1.0 )
 #define MATRIX_Q4           (0.5 )
 
 
