@@ -29,6 +29,14 @@ namespace math{
     double sgn(double x);
 
     /**
+     * @brief Computation of the distance between two points
+     * @param x1,y1 : one point
+     * @param x2,y2 : another point
+     * @return the distance of two point
+     */
+    double PointDistance(double x1, double y1, double x2, double y2);
+
+    /**
      * @brief Transformation of (local_x, local_y) from local coordinate system to global one
      * @param (x, y, psi): the local body point in global coordinate system
      * @param (local_x,local_y): the local coordinate system

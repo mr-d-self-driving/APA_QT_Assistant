@@ -62,6 +62,7 @@ SOURCES += \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.cpp \
         Planning/Common/configuration.cpp \
         Planning/Curvature/curvature.cpp \
+        Planning/Interface/hc_cc_state_space.cpp \
         Planning/Interface/planning.cpp \
         Planning/ParallelParking/parallel_planning.cpp \
         Planning/Path/hc_cc_circle.cpp \
@@ -118,7 +119,9 @@ HEADERS += \
         Percaption/Interface/percaption.h \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.h \
         Planning/Common/configuration.h \
+        Planning/Common/steering_common.h \
         Planning/Curvature/curvature.h \
+        Planning/Interface/hc_cc_state_space.h \
         Planning/Interface/planning.h \
         Planning/ParallelParking/parallel_planning.h \
         Planning/Path/hc_cc_circle.h \

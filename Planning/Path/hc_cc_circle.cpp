@@ -175,6 +175,51 @@ HC_CC_Circle::HC_CC_Circle(double x_c, double y_c, bool left, bool forward, bool
 }
 
 /**
+ * @brief Computation of the distance between the canters of two circles
+ * @param c :the other circle
+ * @return the distance between current circle and another circle
+ */
+double HC_CC_Circle::CenterDistance(const HC_CC_Circle &c) const
+{
+    return math::PointDistance(c._x_c, c._y_c, this->_x_c, this->_y_c);
+}
+
+/**
+ * @brief judgment configuration point whether on the hc or cc circle
+ * @param q :the configuration point
+ * @return true: on the circle ; false : not on the circle
+ */
+bool HC_CC_Circle::isConfigurationOn_HC_CC_Circle(const Configuration &q) const
+{
+    double distance = math::PointDistance(this->_x_c, this->_y_c, q.getX(), q.getY());
+
+    if(fabs(distance - this->_radius) > math::getEpsilon())
+    {
+        return false;
+    }
+
+    double angle = atan2(q.getY() - this->_y_c, q.getX() - this->_x_c);
+    if(this->_left && this->_forward)
+    {
+        angle = angle + MV_PI2 - this->_mu;
+    }
+    else if(this->_left && !this->_forward)
+    {
+        angle = angle + MV_PI2 + this->_mu;
+    }
+    else if(!this->_left && this->_forward)
+    {
+        angle = angle - MV_PI2 + this->_mu;
+    }
+    else if(!this->_left && !this->_forward)
+    {
+        angle = angle - MV_PI2 - this->_mu;
+    }
+    angle = math::TwoPiNormallizeAngle(angle);
+    return fabs(q.getPsi() - angle) < math::getEpsilon();
+}
+
+/**
  * @brief Computation of deflection(angle between start configuration of circle and configuration q)
  * @param q: Configuration point
  * @return the deflection angle
@@ -210,7 +255,7 @@ double HC_CC_Circle::deflection(const Configuration &q) const
  * @param delta: the deflection of rs-turn
  * @return the deflection angle(rad)
  */
-double HC_CC_Circle::rs_circular_deflection(const double delta) const
+double HC_CC_Circle::rs_circular_deflection(double delta) const
 {
     if( this->_regular )
     {
@@ -240,7 +285,7 @@ double HC_CC_Circle::rs_turn_lenght(const Configuration &q) const
  * @param delta: the deflection of hs-turn
  * @return the deflection angle(rad)
  */
-double HC_CC_Circle::hc_circular_deflection(const double delta) const
+double HC_CC_Circle::hc_circular_deflection(double delta) const
 {
     double delta_min_twopified = math::TwoPiNormallizeAngle(this->_delta_min);
 
@@ -315,7 +360,7 @@ bool HC_CC_Circle::cc_elementary_path_sharpness(const Configuration &q, double d
  * @param delta: the deflection of cc-turn
  * @return the deflection angle(rad)
  */
-double HC_CC_Circle::cc_circular_deflection(const double delta) const
+double HC_CC_Circle::cc_circular_deflection(double delta) const
 {
     double two_delta_min_twopified = math::TwoPiNormallizeAngle(2 * this->_delta_min);
     if(this->_regular)

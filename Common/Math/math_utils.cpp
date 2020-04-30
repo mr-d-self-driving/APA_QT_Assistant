@@ -43,6 +43,17 @@ double sgn(double x)
 }
 
 /**
+ * @brief Computation of the distance between two points
+ * @param x1,y1 : one point
+ * @param x2,y2 : another point
+ * @return the distance of two point
+ */
+double PointDistance(double x1, double y1, double x2, double y2)
+{
+    return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+/**
  * @brief Transformation of (local_x, local_y) from local coordinate system to global one
  * @param (x, y, psi): the local body point in global coordinate system
  * @param (local_x,local_y): the local coordinate system
@@ -80,7 +91,7 @@ void change_to_local_frame(double x, double y, double psi,
  * @brief get the epsilon value
  * @return  the epsilon value
  */
-double getEpsilon(void){return _epsilon;}
+double getEpsilon(void){return _epsilon; }
 
 }
 

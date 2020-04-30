@@ -109,7 +109,19 @@ public:
      */
     HC_CC_Circle(double x_c, double y_c, bool left, bool forward, bool regular,HC_CC_Circle_Param &param);
 
-    double center_distance(const HC_CC_Circle &c) const;
+    /**
+     * @brief Computation of the distance between the canters of two circles
+     * @param c :the other circle
+     * @return the distance between current circle and another circle
+     */
+    double CenterDistance(const HC_CC_Circle &c) const;
+
+    /**
+     * @brief judgment configuration point whether on the hc or cc circle
+     * @param q :the configuration point
+     * @return true: on the circle ; false : not on the circle
+     */
+    bool isConfigurationOn_HC_CC_Circle(const Configuration &q) const;
 
     /**
      * @brief Computation of deflection(angle between start configuration of circle and configuration q)
@@ -123,7 +135,7 @@ public:
      * @param delta :the deflection of rs-turn
      * @return the deflection angle(rad)
      */
-    double rs_circular_deflection(const double delta) const;
+    double rs_circular_deflection(double delta) const;
 
     /**
      * @brief Computation of the Length of a rs-turn betwen current circle and configuration point
@@ -137,7 +149,7 @@ public:
      * @param delta :the deflection of hc-turn
      * @return the deflection angle(rad)
      */
-    double hc_circular_deflection(const double delta) const;
+    double hc_circular_deflection(double delta) const;
 
     /**
      * @brief Computation of the Length of a hc-turn betwen current circle and configuration point
@@ -160,7 +172,7 @@ public:
      * @param delta: the deflection of cc-turn
      * @return the deflection angle(rad)
      */
-    double cc_circular_deflection(const double delta) const;
+    double cc_circular_deflection(double delta) const;
 
     /**
      * @brief Computation of the Length of a cc-turn betwen current circle and configuration point
