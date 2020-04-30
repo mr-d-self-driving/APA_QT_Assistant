@@ -203,9 +203,9 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case WaitVehicleStop:
-			if(s->getPosition().X < (_line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN))
+            if(s->getPosition().getX() < (_line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN))
 			{
-				_apa_control_command.Distance = _line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+                _apa_control_command.Distance = _line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().getX();
 			}
 			else
 			{
@@ -604,20 +604,20 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	MinParkingWidth  = LEFT_EDGE_TO_CENTER + _plan_vehilce_config.RadiusRearRight - MIN_LEFT_TURN_RADIUS + InsideMarginBoundary;
 	if(inf->ParkingWidth >= MinParkingWidth)//库位宽度足够
 	{
-		enter_point.Y = -LEFT_EDGE_TO_CENTER + OuterMarginMove;
+        enter_point.setY( -LEFT_EDGE_TO_CENTER + OuterMarginMove );
 	}
 	else //库位宽度太小，调整y轴方向位置
 	{
-		enter_point.Y = -LEFT_EDGE_TO_CENTER + MinParkingWidth - inf->ParkingWidth + InsideMarginBoundary + OuterMarginMove;
+        enter_point.setY( -LEFT_EDGE_TO_CENTER + MinParkingWidth - inf->ParkingWidth + InsideMarginBoundary + OuterMarginMove );
 	}
-	_parking_center_point = Vector2d( RearVirtualBoundary + (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.Y);
+    _parking_center_point = Vector2d( RearVirtualBoundary + (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.getY());
 
 //	m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	// 根据车位长度，确定车辆最终的纵向位置
-	MinParkingLength = REAR_EDGE_TO_CENTER + sqrtf(powf(_plan_vehilce_config.RadiusFrontRight,2) - powf(MIN_LEFT_TURN_RADIUS + enter_point.Y,2));
+    MinParkingLength = REAR_EDGE_TO_CENTER + sqrtf(powf(_plan_vehilce_config.RadiusFrontRight,2) - powf(MIN_LEFT_TURN_RADIUS + enter_point.getY(),2));
 	if( inf->ParkingLength > (MinParkingLength + FrontMarginBoundary + RearMarginBoundary))//满足一次入库条件
 	{
-		enter_point.X = RearMarginBoundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - FrontMarginBoundary - RearMarginBoundary - MinParkingLength)*0.5;
+        enter_point.setX( RearMarginBoundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - FrontMarginBoundary - RearMarginBoundary - MinParkingLength)*0.5 );
 		_enter_parking.setCenter(enter_point);
 		_enter_parking.setAttitudeYaw(0.0f);
 		_enter_parking.RotationCenter(MIN_LEFT_TURN_RADIUS);
@@ -629,12 +629,12 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	}
 	else//不满足一次入库，需多次尝试
 	{
-		enter_point.X = inf->ParkingLength - FrontMarginBoundary - FRONT_EDGE_TO_CENTER;
+        enter_point.setX( inf->ParkingLength - FrontMarginBoundary - FRONT_EDGE_TO_CENTER );
 		front_trial_body.Center = enter_point;
 		front_trial_body.AttitudeYaw = 0.0f;
 		front_trial_arrary[_reverse_cnt] = enter_point;
 
-		enter_point.X = RearMarginBoundary  + REAR_EDGE_TO_CENTER ;
+        enter_point.setX( RearMarginBoundary  + REAR_EDGE_TO_CENTER );
 		rear_trial_body.Center = enter_point;
 		rear_trial_body.AttitudeYaw = 0.0f;
 		rear_trial_arrary[_reverse_cnt]  = enter_point;
@@ -694,8 +694,8 @@ void ParallelPlanning::TransitionArc(Percaption *inf)
 	Line cr_line;
 
 	//圆心和直线变量初始化
-	_line_init.Point.X = inf->PositionX;
-	_line_init.Point.Y = inf->PositionY;
+    _line_init.Point.setX( inf->PositionX );
+    _line_init.Point.setY( inf->PositionY );
 	_line_init.Angle   = inf->AttitudeYaw;
 
 	_circle_left.Center = _enter_parking.getRotation();
@@ -711,8 +711,8 @@ void ParallelPlanning::TransitionArc(Percaption *inf)
 		// 沿右下方向移动圆心坐标
 		cr_line.Point = _circle_right.Center;
 		cr_line.Angle = _line_init.Angle - PI_4;
-		_circle_right.Center.X = _circle_right.Center.getX() + 0.1;
-		_circle_right.Center.Y = _plan_algebraic_geometry.LinearAlgebra(cr_line, _circle_right.Center.getX());
+        _circle_right.Center.setX( _circle_right.Center.getX() + 0.1 );
+        _circle_right.Center.setY( _plan_algebraic_geometry.LinearAlgebra(cr_line, _circle_right.Center.getX()) );
 		// 重新根据右圆心坐标计算右圆半径和切点坐标
 		_plan_algebraic_geometry.Tangent_CL(_line_init,&_circle_right,&_line_init_circle_right_tangent);
 		// 计算左右圆之间切线的切点坐标

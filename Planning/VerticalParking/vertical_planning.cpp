@@ -73,8 +73,8 @@ void VerticalPlanning::Work(Percaption *p)
 			break;
 
 		case ArcPlanning:
-			temp_line.Point.X = p->getPositionX();
-			temp_line.Point.Y = p->getPositionY();
+            temp_line.Point.setX( p->getPositionX() );
+            temp_line.Point.setY( p->getPositionY() );
 			temp_line.Angle   = p->getAttitudeYaw();
 			PlanningArc(temp_line);
 			Command = 0x70;
@@ -88,8 +88,8 @@ void VerticalPlanning::Work(Percaption *p)
 			break;
 
 		case TrialPlanning:
-			temp_line.Point.X = p->getPositionX();
-			temp_line.Point.Y = p->getPositionY();
+            temp_line.Point.setX( p->getPositionX() );
+            temp_line.Point.setY( p->getPositionY());
 			temp_line.Angle   = p->getAttitudeYaw();
 			EnterTrialWithMargin(temp_line);
 			Command = 0x70;
@@ -104,8 +104,8 @@ void VerticalPlanning::Work(Percaption *p)
 			break;
 
 		case EnterOuterTrialPlanning:
-			temp_line.Point.X = p->getPositionX();
-			temp_line.Point.Y = p->getPositionY();
+            temp_line.Point.setX( p->getPositionX() );
+            temp_line.Point.setY( p->getPositionY() );
 			temp_line.Angle   = p->getAttitudeYaw();
 			OuterAndEnterTrial(temp_line);
 			if(1 == _analysis_state)
@@ -160,8 +160,8 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			break;
 
 		case ArcPlanning:
-			temp_line.Point.X = s->getPosition().getX();
-			temp_line.Point.Y = s->getPosition().getY();
+            temp_line.Point.setX( s->getPosition().getX() );
+            temp_line.Point.setY( s->getPosition().getY() );
 			temp_line.Angle   = s->getYaw();
 			PlanningArc(temp_line);
 			Command = 0x70;
@@ -175,8 +175,8 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			break;
 
 		case TrialPlanning:
-			temp_line.Point.X = s->getPosition().getX();
-			temp_line.Point.Y = s->getPosition().getY();
+            temp_line.Point.setX( s->getPosition().getX() );
+            temp_line.Point.setY( s->getPosition().getY() );
 			temp_line.Angle   = s->getYaw();
 			EnterTrialWithMargin(temp_line);
 			Command = 0x70;
@@ -194,10 +194,10 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			//TODO 实现库位的矫正
             if((p->getValidParkingEdgePosition().FrontOutSide.position - p->getValidParkingEdgePosition().RearOutSide.position).Length() > 3)
 			{
-                _line_center.Point.X = (p->getValidParkingEdgePosition().FrontOutSide.position.getX() + p->getValidParkingEdgePosition().RearOutSide.position.getX()) * 0.5;
+                _line_center.Point.setX( (p->getValidParkingEdgePosition().FrontOutSide.position.getX() + p->getValidParkingEdgePosition().RearOutSide.position.getX()) * 0.5 );
 			}
-			temp_line.Point.X = s->getPosition().getX();
-			temp_line.Point.Y = s->getPosition().getY();
+            temp_line.Point.setX( s->getPosition().getX() );
+            temp_line.Point.setY( s->getPosition().getY() );
 			temp_line.Angle   = s->getYaw();
 			OuterAndEnterTrial(temp_line);
 			Command = 0x71;
@@ -377,9 +377,9 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 		case VerticalWaitVehicleStop:
 			if(1 == _analysis_state)
 			{
-				if(s->getPosition().X < (_line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN))
+                if(s->getPosition().getX() < (_line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN))
 				{
-					_apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+                    _apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().getX();
 				}
 				else
 				{
@@ -388,9 +388,9 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			}
 			else if(2 == _analysis_state)
 			{
-				if(s->getPosition().X < (_line_to_circle_enter_turn.Point.getX() + INIT_POINT_MARGIN))
+                if(s->getPosition().getX() < (_line_to_circle_enter_turn.Point.getX() + INIT_POINT_MARGIN))
 				{
-					_apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+                    _apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().getX();
 				}
 				else
 				{
@@ -793,8 +793,8 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 // 泊车库位初始位置分析，确定泊车模式
 int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 {
-	_line_init.Point.X = inf->PositionX;
-	_line_init.Point.Y = inf->PositionY;
+    _line_init.Point.setX( inf->PositionX );
+    _line_init.Point.setY( inf->PositionY );
 	_line_init.Angle   = inf->AttitudeYaw;
 
 	// 车位信息发送
@@ -806,22 +806,22 @@ int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 	_parking_outer_rear_point  = Vector2d(RearVirtualBoundary,0);
 
 	// TODO _parking_center_point 可以放到 Planning 类中
-	_parking_center_point.X = (FrontVirtualBoundary + RearVirtualBoundary) * 0.5;
-	_parking_center_point.Y = -FRONT_EDGE_TO_CENTER;
+    _parking_center_point.setX( (FrontVirtualBoundary + RearVirtualBoundary) * 0.5 );
+    _parking_center_point.setY( -FRONT_EDGE_TO_CENTER );
 //	m_VerticalPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	_line_center.Point = _parking_center_point;
 	_line_center.Angle = PI_2;
 
-	_circle_parking_enter.Center.X = _parking_center_point.X + MIN_RIGHT_TURN_RADIUS;
+    _circle_parking_enter.Center.setX( _parking_center_point.getX() + MIN_RIGHT_TURN_RADIUS );
 	_circle_parking_enter.Radius   = MIN_RIGHT_TURN_RADIUS;
 	_plan_vehilce_config.EdgeRadius(-_circle_parking_enter.Radius);
 
-	_min_circle_parking_enter_y = -sqrtf( powf(_circle_parking_enter.Radius - RIGHT_EDGE_TO_CENTER,2) - powf(_circle_parking_enter.Center.X - FrontVirtualBoundary,2));
+    _min_circle_parking_enter_y = -sqrtf( powf(_circle_parking_enter.Radius - RIGHT_EDGE_TO_CENTER,2) - powf(_circle_parking_enter.Center.getX() - FrontVirtualBoundary,2));
 	_max_circle_parking_enter_y = _outer_parking_boundary - _plan_vehilce_config.RadiusFrontLeft;
 
-	_circle_parking_enter.Center.Y = _min_circle_parking_enter_y;
-	_critical_boundary = _circle_parking_enter.Center.Y + _circle_parking_enter.Radius;
-	if((RearVirtualBoundary + _plan_vehilce_config.RadiusRearLeft) > _circle_parking_enter.Center.X) // 库位长度太小不满足一次入库条件
+    _circle_parking_enter.Center.setY( _min_circle_parking_enter_y );
+    _critical_boundary = _circle_parking_enter.Center.getY() + _circle_parking_enter.Radius;
+    if((RearVirtualBoundary + _plan_vehilce_config.RadiusRearLeft) > _circle_parking_enter.Center.getX()) // 库位长度太小不满足一次入库条件
 	{
 		return FAIL;
 	}
@@ -1075,21 +1075,21 @@ void VerticalPlanning::TransitionCurve(Percaption *inf)
 //	_line_init.Point.Y = inf->PositionY;
 //	_line_init.Angle   = inf->AttitudeYaw;
 
-	_circle_parking_enter.Center.Y = (_min_circle_parking_enter_y + _max_circle_parking_enter_y) * 0.5;
+    _circle_parking_enter.Center.setY( (_min_circle_parking_enter_y + _max_circle_parking_enter_y) * 0.5 );
 	_circle_transition.Radius = MIN_LEFT_TURN_RADIUS;
 
 	_plan_algebraic_geometry.Tangent_CCL_Up(_line_init,_circle_parking_enter,&_circle_transition);
 
-	_line_center_circle_parking_enter_tangent.X = _parking_center_point.getX();
-	_line_center_circle_parking_enter_tangent.Y = _circle_parking_enter.Center.getY();
+    _line_center_circle_parking_enter_tangent.setX( _parking_center_point.getX() );
+    _line_center_circle_parking_enter_tangent.setY( _circle_parking_enter.Center.getY() );
 	do
 	{
 		// 确定圆心移动方向
 		circle_move_line.Point = _circle_transition.Center;
 		circle_move_line.Angle = _line_init.Angle + PI_4;
 		// x方向按照0.1步长移动
-		_circle_transition.Center.X = _circle_transition.Center.getX() + 0.1;
-		_circle_transition.Center.Y = _plan_algebraic_geometry.LinearAlgebra(circle_move_line,_circle_transition.Center.getX());
+        _circle_transition.Center.setX( _circle_transition.Center.getX() + 0.1 );
+        _circle_transition.Center.setY( _plan_algebraic_geometry.LinearAlgebra(circle_move_line,_circle_transition.Center.getX()) );
 		// 根据新的圆心坐标计算与初始直线的切点和相切圆的半径
 		_plan_algebraic_geometry.Tangent_CL(_line_init,&_circle_transition,&_line_init_circle_transition_tangent);
 		// 计算左右圆之间切线的切点坐标

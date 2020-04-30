@@ -19,49 +19,46 @@
 
 #include <QMainWindow>
 #include "math.h"
-#include "./Common/Utils/Inc/property.h"
 
 class Vector2d {
 public:
 	Vector2d();
-	Vector2d(const float x,const float y) noexcept:_x(x),_y(y){}
+    Vector2d(const double x,const double y) noexcept:_x(x),_y(y){}
 	virtual ~Vector2d();
 
 	//矢量模长
-	float Length(void)const;
+    double Length(void)const;
 	//矢量模长的平方
-	float LengthSquare(void)const;
+    double LengthSquare(void)const;
 	// 矢量角度
-	float Angle(void)const;
+    double Angle(void)const;
 	//求连个矢量之间的距离
-	float DistanceTo(const Vector2d &other)const;
+    double DistanceTo(const Vector2d &other)const;
 
     // 向量叉积 axb
-    float CrossProduct(const Vector2d&other) const;
+    double CrossProduct(const Vector2d&other) const;
     // 向量内积 a.b
-    float InnerProduct(const Vector2d&other) const;
+    double InnerProduct(const Vector2d&other) const;
 
 	//矢量旋转，旋转角度逆时针为正，顺时针为负
-	Vector2d rotate(const float angle) const;
+    Vector2d rotate(const double angle) const;
 	//矢量正交点计算
-	Vector2d Orthogonal(const float angle) const;
+    Vector2d Orthogonal(const double angle) const;
 
 	//运算符重载
 	Vector2d operator+(const Vector2d &other) const;
 	Vector2d operator-(const Vector2d &other) const;
 	Vector2d operator*(const double ratio) const;
 
-	float getX();
-	void  setX(float value);
-	Property<Vector2d,float,READ_WRITE> X;
+    double getX();
+    void   setX(double value);
 
-	float getY();
-	void  setY(float value);
-	Property<Vector2d,float,READ_WRITE> Y;
+    double getY();
+    void   setY(double value);
 
 protected:
-	float _x;
-	float _y;
+    double _x;
+    double _y;
 };
 
 #endif /* MATH_VECTOR_2D_H_ */
