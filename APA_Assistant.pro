@@ -30,6 +30,7 @@ SOURCES += \
         Common/Math/algebraic_geometry.cpp \
         Common/Math/crc_compute.cpp \
         Common/Math/curve_fitting.cpp \
+        Common/Math/fresnel.cpp \
         Common/Math/huogh.cpp \
         Common/Math/interpolation.cpp \
         Common/Math/linear_quadratic_regulator.cpp \
@@ -59,9 +60,12 @@ SOURCES += \
         Interaction/Ultrasonic/Ultrasonic.cpp \
         Percaption/Interface/percaption.cpp \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.cpp \
+        Planning/Common/configuration.cpp \
         Planning/Curvature/curvature.cpp \
         Planning/Interface/planning.cpp \
         Planning/ParallelParking/parallel_planning.cpp \
+        Planning/Path/hc_cc_circle.cpp \
+        Planning/Path/path_line.cpp \
         Planning/VerticalParking/vertical_planning.cpp \
         QCustomPlot/axistag.cpp \
         main.cpp \
@@ -80,6 +84,7 @@ HEADERS += \
         Common/Math/algebraic_geometry.h \
         Common/Math/crc_compute.h \
         Common/Math/curve_fitting.h \
+        Common/Math/fresnel.h \
         Common/Math/huogh.h \
         Common/Math/interpolation.h \
         Common/Math/linear_quadratic_regulator.h \
@@ -112,9 +117,12 @@ HEADERS += \
         Interaction/Ultrasonic/Ultrasonic.h \
         Percaption/Interface/percaption.h \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.h \
+        Planning/Common/configuration.h \
         Planning/Curvature/curvature.h \
         Planning/Interface/planning.h \
         Planning/ParallelParking/parallel_planning.h \
+        Planning/Path/hc_cc_circle.h \
+        Planning/Path/path_line.h \
         Planning/VerticalParking/vertical_planning.h \
         QCustomPlot/axistag.h \
         mainwindow.h \
