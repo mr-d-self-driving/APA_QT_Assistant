@@ -108,52 +108,52 @@ void VehilceConfig::Init()
     _rear_right_diagonal.Length =  RearDiagonalAxis;
     _rear_right_diagonal.Angle  =  RearDiagonalAngle;
 
-	_ultrasonic_location_array[0].Point.X = SENSOR1_X;
-	_ultrasonic_location_array[0].Point.Y = SENSOR1_Y;
+    _ultrasonic_location_array[0].Point.setX( SENSOR1_X );
+    _ultrasonic_location_array[0].Point.setY( SENSOR1_Y );
 	_ultrasonic_location_array[0].Angle   = SENSOR1_ANGLE;
 
-	_ultrasonic_location_array[1].Point.X = SENSOR2_X;
-	_ultrasonic_location_array[1].Point.Y = SENSOR2_Y;
+    _ultrasonic_location_array[1].Point.setX( SENSOR2_X );
+    _ultrasonic_location_array[1].Point.setY( SENSOR2_Y );
 	_ultrasonic_location_array[1].Angle   = SENSOR2_ANGLE;
 
-	_ultrasonic_location_array[2].Point.X = SENSOR3_X;
-	_ultrasonic_location_array[2].Point.Y = SENSOR3_Y;
+    _ultrasonic_location_array[2].Point.setX( SENSOR3_X );
+    _ultrasonic_location_array[2].Point.setY( SENSOR3_Y );
 	_ultrasonic_location_array[2].Angle   = SENSOR3_ANGLE;
 
-	_ultrasonic_location_array[3].Point.X = SENSOR4_X;
-	_ultrasonic_location_array[3].Point.Y = SENSOR4_Y;
+    _ultrasonic_location_array[3].Point.setX( SENSOR4_X );
+    _ultrasonic_location_array[3].Point.setY( SENSOR4_Y );
 	_ultrasonic_location_array[3].Angle   = SENSOR4_ANGLE;
 
-	_ultrasonic_location_array[4].Point.X = SENSOR5_X;
-	_ultrasonic_location_array[4].Point.Y = SENSOR5_Y;
+    _ultrasonic_location_array[4].Point.setX( SENSOR5_X );
+    _ultrasonic_location_array[4].Point.setY( SENSOR5_Y );
 	_ultrasonic_location_array[4].Angle   = SENSOR5_ANGLE;
 
-	_ultrasonic_location_array[5].Point.X = SENSOR6_X;
-	_ultrasonic_location_array[5].Point.Y = SENSOR6_Y;
+    _ultrasonic_location_array[5].Point.setX( SENSOR6_X );
+    _ultrasonic_location_array[5].Point.setY( SENSOR6_Y );
 	_ultrasonic_location_array[5].Angle   = SENSOR6_ANGLE;
 
-	_ultrasonic_location_array[6].Point.X = SENSOR7_X;
-	_ultrasonic_location_array[6].Point.Y = SENSOR7_Y;
+    _ultrasonic_location_array[6].Point.setX( SENSOR7_X );
+    _ultrasonic_location_array[6].Point.setY( SENSOR7_Y );
 	_ultrasonic_location_array[6].Angle   = SENSOR7_ANGLE;
 
-	_ultrasonic_location_array[7].Point.X = SENSOR8_X;
-	_ultrasonic_location_array[7].Point.Y = SENSOR8_Y;
+    _ultrasonic_location_array[7].Point.setX( SENSOR8_X );
+    _ultrasonic_location_array[7].Point.setY( SENSOR8_Y );
 	_ultrasonic_location_array[7].Angle   = SENSOR8_ANGLE;
 
-	_ultrasonic_location_array[8].Point.X = SENSOR9_X;
-	_ultrasonic_location_array[8].Point.Y = SENSOR9_Y;
+    _ultrasonic_location_array[8].Point.setX( SENSOR9_X );
+    _ultrasonic_location_array[8].Point.setY( SENSOR9_Y );
 	_ultrasonic_location_array[8].Angle   = SENSOR9_ANGLE;
 
-	_ultrasonic_location_array[9].Point.X = SENSOR10_X;
-	_ultrasonic_location_array[9].Point.Y = SENSOR10_Y;
-	_ultrasonic_location_array[9].Angle   = SENSOR10_ANGLE;
+    _ultrasonic_location_array[9].Point.setX( SENSOR10_X );
+    _ultrasonic_location_array[9].Point.setX( SENSOR10_Y );
+    _ultrasonic_location_array[9].Angle     = SENSOR10_ANGLE;
 
-	_ultrasonic_location_array[10].Point.X = SENSOR11_X;
-	_ultrasonic_location_array[10].Point.Y = SENSOR11_Y;
+    _ultrasonic_location_array[10].Point.setX( SENSOR11_X );
+    _ultrasonic_location_array[10].Point.setY( SENSOR11_Y );
 	_ultrasonic_location_array[10].Angle   = SENSOR11_ANGLE;
 
-	_ultrasonic_location_array[11].Point.X = SENSOR12_X;
-	_ultrasonic_location_array[11].Point.Y = SENSOR12_Y;
+    _ultrasonic_location_array[11].Point.setX( SENSOR12_X );
+    _ultrasonic_location_array[11].Point.setY( SENSOR12_Y );
 	_ultrasonic_location_array[11].Angle   = SENSOR12_ANGLE;
 
 	/*
