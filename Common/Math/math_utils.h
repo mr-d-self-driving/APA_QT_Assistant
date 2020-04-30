@@ -6,12 +6,53 @@
 #include "Common/Configure/Configs/system_config.h"
 
 namespace math{
+    const double _epsilon = 1.0e-6;
     /**
      * @brief Normallize Angle to [-PI,PI)
-     * @param angle the original value of the angle
+     * @param angle:the original value of the angle
      * @return The normalized value of the angle
      */
     double NormallizeAngle(const double angle);
+
+    /**
+     * @brief Normallize Angle to [0 , 2PI)
+     * @param angle: the original value of the angle
+     * @return The normalized value of the angle
+     */
+    double TwoPiNormallizeAngle(const double angle);
+
+    /**
+     * @brief 获取变量的符号
+     * @param x: 求取符号的变量
+     * @return 符号值: (-1.0, 1.0)
+     */
+    double sgn(double x);
+
+    /**
+     * @brief Transformation of (local_x, local_y) from local coordinate system to global one
+     * @param (x, y, psi): the local body point in global coordinate system
+     * @param (local_x,local_y): the local coordinate system
+     * @param (global_x,global_y): the global coordinate system
+     */
+    void change_to_global_frame(double x, double y, double psi,
+                                double   local_x, double   local_y,
+                                double *global_x, double *global_y);
+
+    /**
+     * @brief Transformation of (global_x, global_y) from global coordinate system to local one
+     * @param (x, y, psi): the local body point in global coordinate system
+     * @param (global_x,global_y): the global coordinate system
+     * @param (local_x,local_y): the local coordinate system
+     */
+    void change_to_local_frame(double x, double y, double psi,
+                               double global_x, double global_y,
+                               double *local_x, double *local_y);
+
+    /**
+     * @brief get the epsilon value
+     * @return  the epsilon value
+     */
+    double getEpsilon(void);
 
     /**
      * @brief Clamp a value between two bounds.
