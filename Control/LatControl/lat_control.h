@@ -93,6 +93,8 @@ public:
      */
     void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track,TargetTrack last_track);
 
+    void Work(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TrajectoryAnalyzer *track_aly);
+
 	float getX1();
 	void  setX1(float value);
 

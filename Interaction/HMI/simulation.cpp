@@ -15,8 +15,8 @@ void Simulation::Update(VehicleController *c,MessageManager *m)
 {
     if(c->APAEnable)
     {
-        m->WheelSpeedRearLeft  = c->Velocity;//VelocityControl(c->Distance,c->Velocity);
-        m->WheelSpeedRearRight = c->Velocity;//VelocityControl(c->Distance,c->Velocity);
+        m->WheelSpeedRearLeft  = c->Velocity+0.5f;//VelocityControl(c->Distance,c->Velocity);
+        m->WheelSpeedRearRight = c->Velocity+0.5f;//VelocityControl(c->Distance,c->Velocity);
 
         m->SteeringAngle     = SteeringAngleControl(c->getSteeringAngle(),c->getSteeringAngleRate(),0.02);
         m->SteeringAngleRate = c->getSteeringAngleRate();

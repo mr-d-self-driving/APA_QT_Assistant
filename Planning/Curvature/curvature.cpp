@@ -67,7 +67,7 @@ void Curvature::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
     {
     case 1:
         // 三角函数曲线
-        while(index_x < (M_PI/COEFFICIENT_TLS))
+        while(index_x < (MV_PI/COEFFICIENT_TLS))
         {
             temp_track.point.setX(index_x);
             temp_track.point.setY(1.0f*TargetLine(index_x));
@@ -78,8 +78,8 @@ void Curvature::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
 
     case 2:
         // 8形曲线
-        index_x = -M_PI;
-        while(index_x < M_PI)
+        index_x = -MV_PI;
+        while(index_x < MV_PI)
         {
             rho = sqrtf(cosf(2*index_x));
             gain = rho*10;
@@ -93,8 +93,8 @@ void Curvature::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
     case 3:
         // 8字圆
         // 后退
-//        index_x = M_PI2;
-//        while(index_x < M_PI)
+//        index_x = MV_PI2;
+//        while(index_x < MV_PI)
 //        {
 //            gain = 5;
 //            temp_track.point.setX(gain*cosf(index_x));
@@ -103,7 +103,7 @@ void Curvature::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
 //            index_x = index_x + 0.01f;
 //        }
 //        index_x = 0;
-//        while(index_x > -(M_PI+M_PI2))
+//        while(index_x > -(MV_PI+MV_PI2))
 //        {
 //            gain = 5;
 //            temp_track.point.setX(gain*cosf(index_x)-2*gain);
@@ -113,8 +113,8 @@ void Curvature::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
 //        }
 
         // 前进
-        index_x = M_PI2;
-        while(index_x > -M_PI)
+        index_x = MV_PI2;
+        while(index_x > -MV_PI)
         {
             gain = 5;
             temp_track.point.setX(gain*cosf(index_x));
@@ -123,7 +123,7 @@ void Curvature::GenerateCurvatureSets(TrackLinkList *list,uint16_t type)
             index_x = index_x - 0.01f;
         }
         index_x = 0;
-        while(index_x < (M_PI + M_PI2))
+        while(index_x < (MV_PI + MV_PI2))
         {
             gain = 5;
             temp_track.point.setX(gain*cosf(index_x)-2*gain);
@@ -180,7 +180,7 @@ void Curvature::GenerateCurvaturePointSets(std::vector<TargetTrack> *vec,uint16_
             vec->push_back(temp_track);
             index_x = index_x + SAMPLE_STEP;
         }
-        while(index_x < (M_PI/COEFFICIENT_TLS))
+        while(index_x < (MV_PI/COEFFICIENT_TLS))
         {
 
             temp_track.point.setX(index_x);
@@ -200,16 +200,16 @@ void Curvature::GenerateCurvaturePointSets(std::vector<TargetTrack> *vec,uint16_
     case 3:// 圆
 //        index_x = 0.0;
 //        gain = 5;
-//        while(index_x < M_PI)
+//        while(index_x < MV_PI)
 //        {
 //            temp_track.point.setX(gain*cosf(index_x));
 //            temp_track.point.setY(gain*sinf(index_x)-gain);
 //            vec->push_back(temp_track);
 //            index_x = index_x + SAMPLE_STEP;
 //        }
-        gain = 10;
-        index_x = M_PI2;
-        while(index_x > -M_PI)
+        gain = 5;
+        index_x = MV_PI2;
+        while(index_x > -MV_PI)
         {
             temp_track.point.setX(gain*cosf(index_x));
             temp_track.point.setY(gain*sinf(index_x)-gain);
@@ -217,7 +217,7 @@ void Curvature::GenerateCurvaturePointSets(std::vector<TargetTrack> *vec,uint16_
             index_x = index_x - SAMPLE_STEP;
         }
         index_x = 0;
-        while(index_x < (M_PI + M_PI2))
+        while(index_x < (MV_PI + MV_PI2))
         {
             temp_track.point.setX(gain*cosf(index_x)-2*gain);
             temp_track.point.setY(gain*sinf(index_x)-gain);

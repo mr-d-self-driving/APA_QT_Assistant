@@ -924,10 +924,10 @@ void MainWindow::Init()
  */
 void MainWindow::VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot)
 {
-    FrontLeftPoint  = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontLeftDiagonal().Angle + static_cast<double>(yaw)));
-    FrontRightPoint = p + Vector2d(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getFrontRightDiagonal().Angle + static_cast<double>(yaw)));
-    RearLeftPoint   = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearLeftDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearLeftDiagonal().Angle + static_cast<double>(yaw)));
-    RearRightPoint  = p + Vector2d(static_cast<float>(-mVehilceConfig.getRearRightDiagonal().Length),0.0f).rotate(static_cast<float>(mVehilceConfig.getRearRightDiagonal().Angle + static_cast<double>(yaw)));
+    FrontLeftPoint  = p + Vector2d(mVehilceConfig.getFrontLeftDiagonal().Length,0.0).rotate(mVehilceConfig.getFrontLeftDiagonal().Angle + yaw);
+    FrontRightPoint = p + Vector2d(mVehilceConfig.getFrontRightDiagonal().Length,0.0).rotate(mVehilceConfig.getFrontRightDiagonal().Angle + yaw);
+    RearLeftPoint   = p + Vector2d(-mVehilceConfig.getRearLeftDiagonal().Length,0.0).rotate(mVehilceConfig.getRearLeftDiagonal().Angle + yaw);
+    RearRightPoint  = p + Vector2d(-mVehilceConfig.getRearRightDiagonal().Length,0.0).rotate(mVehilceConfig.getRearRightDiagonal().Angle + yaw);
 
     vehicle_center->addData(static_cast<double>(p.getX()),static_cast<double>(p.getY()));
 
@@ -957,29 +957,29 @@ void MainWindow::TargetPathShow(TrackLinkList *list)
     uint16_t i;
     Node<TargetTrack>* _track_node;
     _track_node = list->getHeadNode();
-    QVector<double> VehiclePointX(list->Length()),VehiclePointY(list->Length());
+    QVector<double> VehiclePointX,VehiclePointY;
     i = 0;
     while(_track_node->next != NULL)
     {
-        VehiclePointX[i] = static_cast<double>(_track_node->data.point.getX());
-        VehiclePointY[i] = static_cast<double>(_track_node->data.point.getY());
+        VehiclePointX.append(_track_node->data.point.getX());
+        VehiclePointY.append(_track_node->data.point.getY());
         _track_node = _track_node->next;
         i++;
     }
-    VehiclePointX[i] = static_cast<double>(_track_node->data.point.getX());
-    VehiclePointY[i] = static_cast<double>(_track_node->data.point.getY());
+    VehiclePointX.append(_track_node->data.point.getX());
+    VehiclePointY.append(_track_node->data.point.getY());
     mTrackTargetCurve->setData(VehiclePointX,VehiclePointY);
 }
 
 void MainWindow::TargetPathShow(std::vector<TargetTrack> *vec)
 {
     uint16_t i;
-    QVector<double> VehiclePointX(vec->size()),VehiclePointY(vec->size());
+    QVector<double> VehiclePointX,VehiclePointY;
     i = 0;
     for(std::vector<TargetTrack>::iterator it = vec->begin();it != vec->end();it++)
     {
-        VehiclePointX[i] = static_cast<double>(it->point.getX());
-        VehiclePointY[i] = static_cast<double>(it->point.getY());
+        VehiclePointX.append(it->point.getX());
+        VehiclePointY.append(it->point.getY());
         i++;
     }
     mTrackTargetCurve->setData(VehiclePointX,VehiclePointY);
@@ -1019,8 +1019,8 @@ void MainWindow::FileDataInit(void)
     for(i=0;i<4;i++)
     {
         ObstacleBody_List[i].clear();
-        _ultrasonic_data_buffer[i].Position.setX(0.0f);
-        _ultrasonic_data_buffer[i].Position.setY(0.0f);
+        _ultrasonic_data_buffer[i].Position.setX(0.0);
+        _ultrasonic_data_buffer[i].Position.setY(0.0);
         _ultrasonic_data_buffer[i].UltrasonicData.Distance1 = 0.0f;
         _ultrasonic_data_buffer[i].UltrasonicData.Distance2 = 0.0f;
         _ultrasonic_data_buffer[i].UltrasonicData.Level = 0.0f;
@@ -1054,49 +1054,49 @@ void MainWindow::AnalyzeOneLine(const QByteArray &baLine)
 
     ObstacleLocationPacket temp_position;
 
-    temp_position.Position.X = detect_list[13].toFloat();
-    temp_position.Position.Y = detect_list[14].toFloat();
+    temp_position.Position.setX( detect_list[13].toDouble() );
+    temp_position.Position.setY( detect_list[14].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[15].toUShort());
     LRU_PositionList[4].append(temp_position);
 
-    temp_position.Position.X = detect_list[16].toFloat();
-    temp_position.Position.Y = detect_list[17].toFloat();
+    temp_position.Position.setX( detect_list[16].toDouble() );
+    temp_position.Position.setY( detect_list[17].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[18].toUShort());
     LRU_PositionList[5].append(temp_position);
 
-    temp_position.Position.X = detect_list[19].toFloat();
-    temp_position.Position.Y = detect_list[20].toFloat();
+    temp_position.Position.setX( detect_list[19].toDouble() );
+    temp_position.Position.setY( detect_list[20].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[21].toUShort());
     LRU_PositionList[6].append(temp_position);
 
-    temp_position.Position.X = detect_list[22].toFloat();
-    temp_position.Position.Y = detect_list[23].toFloat();
+    temp_position.Position.setX( detect_list[22].toDouble() );
+    temp_position.Position.setY( detect_list[23].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[24].toUShort());
     LRU_PositionList[7].append(temp_position);
 
-    temp_position.Position.X = detect_list[25].toFloat();
-    temp_position.Position.Y = detect_list[26].toFloat();
+    temp_position.Position.setX( detect_list[25].toDouble() );
+    temp_position.Position.setY( detect_list[26].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[27].toUShort());
     LRU_PositionList[8].append(temp_position);
 
-    temp_position.Position.X = detect_list[28].toFloat();
-    temp_position.Position.Y = detect_list[29].toFloat();
+    temp_position.Position.setX( detect_list[28].toDouble() );
+    temp_position.Position.setY( detect_list[29].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[30].toUShort());
     LRU_PositionList[9].append(temp_position);
 
-    temp_position.Position.X = detect_list[31].toFloat();
-    temp_position.Position.Y = detect_list[32].toFloat();
+    temp_position.Position.setX( detect_list[31].toDouble() );
+    temp_position.Position.setY( detect_list[32].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[33].toUShort());
     LRU_PositionList[10].append(temp_position);
 
-    temp_position.Position.X = detect_list[34].toFloat();
-    temp_position.Position.Y = detect_list[35].toFloat();
+    temp_position.Position.setX( detect_list[34].toDouble() );
+    temp_position.Position.setY( detect_list[35].toDouble() );
     temp_position.Status     = static_cast<UltrasonicStatus>(detect_list[36].toUShort());
     LRU_PositionList[11].append(temp_position);
 
     GeometricTrack *temp_track = new GeometricTrack();
-    temp_track->getPosition().X = detect_list[37].toFloat();
-    temp_track->getPosition().Y = detect_list[38].toFloat();
+    temp_track->getPosition().setX( detect_list[37].toDouble() );
+    temp_track->getPosition().setY( detect_list[38].toDouble() );
     temp_track->Yaw = detect_list[39].toFloat();
     VehicleTrackList.append(*temp_track);
 
@@ -1226,12 +1226,12 @@ void MainWindow::DetectTask(void)
             if(0xAA == mUltrasonicObstaclePercption.getLeftFitLinePacket().valid_flag)
             {
                 line_point.setX(VehicleTrackList[0].getPosition().getX());
-                line_point.setY(tanf(mUltrasonicObstaclePercption.getLeftFitLinePacket().angle) * line_point.getX() +
+                line_point.setY(tan(mUltrasonicObstaclePercption.getLeftFitLinePacket().angle) * line_point.getX() +
                                      mUltrasonicObstaclePercption.getLeftFitLinePacket().offset);
                 mDetectLeftEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
 
                 line_point.setX(VehicleTrackList[time_step_cnt-1].getPosition().getX());
-                line_point.setY(tanf(mUltrasonicObstaclePercption.getLeftFitLinePacket().angle) * line_point.getX() +
+                line_point.setY(tan(mUltrasonicObstaclePercption.getLeftFitLinePacket().angle) * line_point.getX() +
                                      mUltrasonicObstaclePercption.getLeftFitLinePacket().offset);
                 mDetectLeftEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
             }
@@ -1239,12 +1239,12 @@ void MainWindow::DetectTask(void)
             if(0xAA == mUltrasonicObstaclePercption.getRightFitLinePacket().valid_flag)
             {
                 line_point.setX(VehicleTrackList[0].getPosition().getX());
-                line_point.setY(tanf(mUltrasonicObstaclePercption.getRightFitLinePacket().angle) * line_point.getX() +
+                line_point.setY(tan(mUltrasonicObstaclePercption.getRightFitLinePacket().angle) * line_point.getX() +
                                      mUltrasonicObstaclePercption.getRightFitLinePacket().offset);
                 mDetectRightEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
 
                 line_point.setX(VehicleTrackList[time_step_cnt-1].getPosition().getX());
-                line_point.setY(tanf(mUltrasonicObstaclePercption.getRightFitLinePacket().angle) * line_point.getX() +
+                line_point.setY(tan(mUltrasonicObstaclePercption.getRightFitLinePacket().angle) * line_point.getX() +
                                      mUltrasonicObstaclePercption.getRightFitLinePacket().offset);
                 mDetectRightEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
             }
@@ -1256,12 +1256,12 @@ void MainWindow::DetectTask(void)
             {
                 qDebug() << "Front Edge fit line variance:" << mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().variance;
                 line_point.setX(VehicleTrackList[0].getPosition().getX());
-                line_point.setY(tanf(mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().angle) * line_point.getX() +
+                line_point.setY(tan(mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().angle) * line_point.getX() +
                                      mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().offset);
                 mDetectRightEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
 
                 line_point.setX(VehicleTrackList[time_step_cnt-1].getPosition().getX());
-                line_point.setY(tanf(mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().angle) * line_point.getX() +
+                line_point.setY(tan(mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().angle) * line_point.getX() +
                                      mUltrasonicObstaclePercption.getFrontEdgeFitLinePacket().offset);
                 mDetectRightEdgeFitLine->addData(static_cast<double>(line_point.getX()) ,static_cast<double>(line_point.getY()));
             }
@@ -1299,8 +1299,8 @@ void MainWindow::PlanTask(void)
     // 车辆位置更新
     mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
 
-    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',2));
-    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',2));
+    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getX()),'f',2));
+    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getY()),'f',2));
     label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
 
     VehicleModuleShow(mGeometricTrack.getPosition(),mGeometricTrack.getYaw(),mPathVehicleCenterCurve,mPathVehicleModuleCurve,mPathPlot);
@@ -1315,12 +1315,10 @@ void MainWindow::TrackTask(void)
     TargetTrack end_node;
     if(_target_curvature_vectors->size() > 0)
     {
-//        end_node = _target_curvature_data_sets->getEndNode()->data;
-//        temp_node = m_TrajectoryAnalyzer->CalculateNearestPointByPosition(mGeometricTrack.getPosition().getX(),
-//                                                                          mGeometricTrack.getPosition().getY());
-//        mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack,temp_node,end_node);
 
-        m_LatControl_LQR->Work(mBoRuiMessage,&mGeometricTrack,*m_TrajectoryAnalyzer,mBoRuiController);
+        mLatControl->Work(mBoRuiMessage,mBoRuiController,&mGeometricTrack,m_TrajectoryAnalyzer);
+
+//        m_LatControl_LQR->Work(mBoRuiMessage,&mGeometricTrack,*m_TrajectoryAnalyzer,mBoRuiController);
     }
     // 仿真信号更新
     mSimulation->Update(mBoRuiController,mBoRuiMessage);
@@ -1328,8 +1326,8 @@ void MainWindow::TrackTask(void)
     // 车辆位置更新
     mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
 
-    label_TrackUI_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().X),'f',2));
-    label_TrackUI_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().Y),'f',2));
+    label_TrackUI_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getX()),'f',2));
+    label_TrackUI_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getY()),'f',2));
     label_TrackUI_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
     SteeringAngleShow(mBoRuiMessage->getSteeringAngle());
     VehicleModuleShow(mGeometricTrack.getPosition(),mGeometricTrack.getYaw(),mTrackVehicleCenterCurve,mTrackVehicleModuleCurve,mTrackPlot);
@@ -1476,8 +1474,8 @@ void MainWindow::sCAN_Close(void)
 //    this->button_CanClose->setEnabled(false);
 }
 
-void MainWindow::sDisplayPercaption(Percaption *p)
-{
+//void MainWindow::sDisplayPercaption(Percaption *p)
+//{
 //    label_FrontObstacleDistance_Value->setText(QString::number(static_cast<double>(p->getFrontObstacleDistance().distance)));
 //    label_FrontObstacleRegion_Value->setText(obstacle_region[p->getFrontObstacleDistance().region]);
 //    label_FrontObstacleStatus_Value->setText(obstacle_status[p->getRearObstacleDistance().status]);
@@ -1507,7 +1505,7 @@ void MainWindow::sDisplayPercaption(Percaption *p)
 //    mDetectTag2->setText(QString::number(graph2Value, 'f', 2));
 
 //    mDetectPlot->replot();
-}
+//}
 
 // 注入文件选择
 void MainWindow::sPercaptionDataFileSelect(void)
@@ -1653,7 +1651,7 @@ void MainWindow::sPathGenarate(void)
 void MainWindow::sTrackStart(void)
 {
     mBoRuiController->setDistance(10);
-    mBoRuiController->setVelocity(2.0f);
+    mBoRuiController->setVelocity(0.2f);
     mBoRuiController->setAPAEnable(1);
     mBoRuiController->setGear(Drive);
 

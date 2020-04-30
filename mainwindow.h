@@ -266,7 +266,7 @@ private slots:
     void sCAN_Close(void);
 
     // 障碍物感知信息
-    void sDisplayPercaption(Percaption *p);
+//    void sDisplayPercaption(Percaption *p);
 
     // 感知区域的文件数据载入
     void sPercaptionDataFileSelect(void);
