@@ -52,6 +52,18 @@ VehilceConfig::VehilceConfig() {
 	UltrasonicLocationArray.setContainer(this);
 	UltrasonicLocationArray.getter(&VehilceConfig::getUltrasonicLocationArray);
 
+    FrontLeftDiagonal.setContainer(this);
+    FrontLeftDiagonal.getter(&VehilceConfig::getFrontLeftDiagonal);
+
+    FrontRightDiagonal.setContainer(this);
+    FrontRightDiagonal.getter(&VehilceConfig::getFrontRightDiagonal);
+
+    RearLeftDiagonal.setContainer(this);
+    RearLeftDiagonal.getter(&VehilceConfig::getRearLeftDiagonal);
+
+    RearRightDiagonal.setContainer(this);
+    RearRightDiagonal.getter(&VehilceConfig::getRearRightDiagonal);
+
 	AccelerateTable.setContainer(this);
 	AccelerateTable.getter(&VehilceConfig::getAccelerateTable);
 
@@ -84,52 +96,64 @@ void VehilceConfig::Init()
 	FrontDiagonalAngle = atanf(LEFT_EDGE_TO_CENTER/FRONT_EDGE_TO_CENTER);
 	RearDiagonalAngle  = atanf(LEFT_EDGE_TO_CENTER/REAR_EDGE_TO_CENTER);
 
-	_ultrasonic_location_array[0].Point.X = SENSOR1_X;
-	_ultrasonic_location_array[0].Point.Y = SENSOR1_Y;
+    _front_left_diagonal.Length = FrontDiagonalAxis;
+    _front_left_diagonal.Angle  = FrontDiagonalAngle;
+
+    _front_right_diagonal.Length =  FrontDiagonalAxis;
+    _front_right_diagonal.Angle  = -FrontDiagonalAngle;
+
+    _rear_left_diagonal.Length = RearDiagonalAxis;
+    _rear_left_diagonal.Angle  = -RearDiagonalAngle;
+
+    _rear_right_diagonal.Length =  RearDiagonalAxis;
+    _rear_right_diagonal.Angle  =  RearDiagonalAngle;
+
+    _ultrasonic_location_array[0].Point.setX( SENSOR1_X );
+    _ultrasonic_location_array[0].Point.setY( SENSOR1_Y );
 	_ultrasonic_location_array[0].Angle   = SENSOR1_ANGLE;
 
-	_ultrasonic_location_array[1].Point.X = SENSOR2_X;
-	_ultrasonic_location_array[1].Point.Y = SENSOR2_Y;
+    _ultrasonic_location_array[1].Point.setX( SENSOR2_X );
+    _ultrasonic_location_array[1].Point.setY( SENSOR2_Y );
 	_ultrasonic_location_array[1].Angle   = SENSOR2_ANGLE;
 
-	_ultrasonic_location_array[2].Point.X = SENSOR3_X;
-	_ultrasonic_location_array[2].Point.Y = SENSOR3_Y;
+    _ultrasonic_location_array[2].Point.setX( SENSOR3_X );
+    _ultrasonic_location_array[2].Point.setY( SENSOR3_Y );
 	_ultrasonic_location_array[2].Angle   = SENSOR3_ANGLE;
 
-	_ultrasonic_location_array[3].Point.X = SENSOR4_X;
-	_ultrasonic_location_array[3].Point.Y = SENSOR4_Y;
+    _ultrasonic_location_array[3].Point.setX( SENSOR4_X );
+    _ultrasonic_location_array[3].Point.setY( SENSOR4_Y );
 	_ultrasonic_location_array[3].Angle   = SENSOR4_ANGLE;
 
-	_ultrasonic_location_array[4].Point.X = SENSOR5_X;
-	_ultrasonic_location_array[4].Point.Y = SENSOR5_Y;
+    _ultrasonic_location_array[4].Point.setX( SENSOR5_X );
+    _ultrasonic_location_array[4].Point.setY( SENSOR5_Y );
 	_ultrasonic_location_array[4].Angle   = SENSOR5_ANGLE;
 
-	_ultrasonic_location_array[5].Point.X = SENSOR6_X;
-	_ultrasonic_location_array[5].Point.Y = SENSOR6_Y;
+    _ultrasonic_location_array[5].Point.setX( SENSOR6_X );
+    _ultrasonic_location_array[5].Point.setY( SENSOR6_Y );
 	_ultrasonic_location_array[5].Angle   = SENSOR6_ANGLE;
 
-	_ultrasonic_location_array[6].Point.X = SENSOR7_X;
-	_ultrasonic_location_array[6].Point.Y = SENSOR7_Y;
+    _ultrasonic_location_array[6].Point.setX( SENSOR7_X );
+    _ultrasonic_location_array[6].Point.setY( SENSOR7_Y );
 	_ultrasonic_location_array[6].Angle   = SENSOR7_ANGLE;
 
-	_ultrasonic_location_array[7].Point.X = SENSOR8_X;
-	_ultrasonic_location_array[7].Point.Y = SENSOR8_Y;
+    _ultrasonic_location_array[7].Point.setX( SENSOR8_X );
+    _ultrasonic_location_array[7].Point.setY( SENSOR8_Y );
 	_ultrasonic_location_array[7].Angle   = SENSOR8_ANGLE;
 
-	_ultrasonic_location_array[8].Point.X = SENSOR9_X;
-	_ultrasonic_location_array[8].Point.Y = SENSOR9_Y;
+    _ultrasonic_location_array[8].Point.setX( SENSOR9_X );
+    _ultrasonic_location_array[8].Point.setY( SENSOR9_Y );
 	_ultrasonic_location_array[8].Angle   = SENSOR9_ANGLE;
 
-	_ultrasonic_location_array[9].Point.X = SENSOR10_X;
-	_ultrasonic_location_array[9].Point.Y = SENSOR10_Y;
-	_ultrasonic_location_array[9].Angle   = SENSOR10_ANGLE;
+    _ultrasonic_location_array[9].Point.setX( SENSOR10_X );
+    _ultrasonic_location_array[9].Point.setX( SENSOR10_Y );
+    _ultrasonic_location_array[9].Angle     = SENSOR10_ANGLE;
 
-	_ultrasonic_location_array[10].Point.X = SENSOR11_X;
-	_ultrasonic_location_array[10].Point.Y = SENSOR11_Y;
+    _ultrasonic_location_array[10].Point.setX( SENSOR11_X );
+    _ultrasonic_location_array[10].Point.setY( SENSOR11_Y );
 	_ultrasonic_location_array[10].Angle   = SENSOR11_ANGLE;
 
-	_ultrasonic_location_array[11].Point.X = SENSOR12_X;
-	_ultrasonic_location_array[11].Point.Y = SENSOR12_Y;
+    _ultrasonic_location_array[11].Point.setX( SENSOR12_X );
+    _ultrasonic_location_array[11].Point.setY( SENSOR12_Y );
 	_ultrasonic_location_array[11].Angle   = SENSOR12_ANGLE;
 
 	/*
@@ -150,6 +174,32 @@ void VehilceConfig::Init()
 	{
 		_torque_table[i] = torque_table[i/VELOCITY_ARRAY_NUM][i%VELOCITY_ARRAY_NUM];
 	}
+
+    _ts = TS;
+    _cf = CF;
+    _cr = CR;
+    _mass_fl = MASS_FL;
+    _mass_fr = MASS_FR;
+    _mass_rl = MASS_RL;
+    _mass_rr = MASS_RR;
+    _eps = EPS;
+    _max_iteration = MAX_ITERATION;
+
+    _matrix_q1 = MATRIX_Q1;
+    _matrix_q2 = MATRIX_Q2;
+    _matrix_q3 = MATRIX_Q3;
+    _matrix_q4 = MATRIX_Q4;
+
+    _matrix_q[0] = MATRIX_Q1;
+    _matrix_q[1] = MATRIX_Q2;
+    _matrix_q[2] = MATRIX_Q3;
+    _matrix_q[3] = MATRIX_Q4;
+
+    _wheel_base = WHEEL_BASE;
+    _steering_ratio = STEERING_RATIO;
+    _max_steering_angle = MAX_STEERING_ANGLE;
+    _max_steering_angle_rate = MAX_STEERING_ANGLE_RATE;
+    _min_speed_protection = MIN_SPEED_PROTECTION;
 }
 
 // r is + and -
@@ -170,8 +220,8 @@ void VehilceConfig::EdgeRadius(float r)
 
 float VehilceConfig::SteeringAngle2TurnningRadius(float steer,float a,float b)
 {
-	return steer < 0 ? -WHEEL_BASE / tanf((a * -steer + b) * PI / 180) :
-			            WHEEL_BASE / tanf((a *  steer + b) * PI / 180) ;
+    return steer < 0 ? -WHEEL_BASE / tanf((a * -steer + b) * PI / 180.0f) :
+                        WHEEL_BASE / tanf((a *  steer + b) * PI / 180.0f) ;
 }
 
 float VehilceConfig::SteeringAngle2TurnningRadiusExp(float steer,float a,float b)
@@ -251,7 +301,7 @@ float VehilceConfig::SteeringAngleFindingCallback(uint16_t left_id,uint16_t righ
 		}
 		else
 		{
-			return (left_id + right_id) * 0.5;
+            return (left_id + right_id) * 0.5f;
 		}
 	}
 	else
@@ -273,7 +323,7 @@ float VehilceConfig::SteeringAngleFindingCallback(uint16_t left_id,uint16_t righ
 		}
 		else
 		{
-			return -(left_id + right_id) * 0.5;
+            return -(left_id + right_id) * 0.5f;
 		}
 	}
 }
@@ -299,13 +349,13 @@ float VehilceConfig::SteeringAngleFindingLoop(uint16_t left_id,uint16_t right_id
 				return middle_id;
 			}
 		}
-		return (left_id + right_id) * 0.5;
+        return (left_id + right_id) * 0.5f;
 	}
 	else
 	{
 		while( (right_id - left_id) > 1)
 		{
-			middle_id = (uint16_t)((left_id + right_id) * 0.5);
+            middle_id = (uint16_t)((left_id + right_id) * 0.5f);
 			if(-radius < SteerAngle2Radius[middle_id][1])
 			{
 				left_id = middle_id;
@@ -319,7 +369,7 @@ float VehilceConfig::SteeringAngleFindingLoop(uint16_t left_id,uint16_t right_id
 				return -middle_id;
 			}
 		}
-		return -(left_id + right_id) * 0.5;
+        return -(left_id + right_id) * 0.5f;
 	}
 }
 
@@ -343,16 +393,21 @@ void  VehilceConfig::setRadiusRearLeft(float value){ _radius_rear_left = value;}
 float VehilceConfig::getRadiusRearRight()           { return  _radius_rear_right;}
 void  VehilceConfig::setRadiusRearRight(float value){ _radius_rear_right = value;}
 
-float VehilceConfig::getFrontDiagonalAxis()           { return  _front_diagonal_axis;}
-void  VehilceConfig::setFrontDiagonalAxis(float value){ _front_diagonal_axis = value;}
-float VehilceConfig::getFrontDiagonalAngle()           { return  _front_diagonal_angle;}
-void  VehilceConfig::setFrontDiagonalAngle(float value){ _front_diagonal_angle = value;}
-float VehilceConfig::getRearDiagonalAxis()           { return  _rear_diagonal_axis;}
-void  VehilceConfig::setRearDiagonalAxis(float value){ _rear_diagonal_axis = value;}
-float VehilceConfig::getRearDiagonalAngle()           { return  _rear_diagonal_angle;}
-void  VehilceConfig::setRearDiagonalAngle(float value){ _rear_diagonal_angle = value;}
+double VehilceConfig::getFrontDiagonalAxis()           { return  _front_diagonal_axis;}
+void  VehilceConfig::setFrontDiagonalAxis(double value){ _front_diagonal_axis = value;}
+double VehilceConfig::getFrontDiagonalAngle()           { return  _front_diagonal_angle;}
+void  VehilceConfig::setFrontDiagonalAngle(double value){ _front_diagonal_angle = value;}
+double VehilceConfig::getRearDiagonalAxis()           { return  _rear_diagonal_axis;}
+void  VehilceConfig::setRearDiagonalAxis(double value){ _rear_diagonal_axis = value;}
+double VehilceConfig::getRearDiagonalAngle()           { return  _rear_diagonal_angle;}
+void  VehilceConfig::setRearDiagonalAngle(double value){ _rear_diagonal_angle = value;}
 
 Location* VehilceConfig::getUltrasonicLocationArray() { return  _ultrasonic_location_array;}
+
+Polar VehilceConfig::getFrontLeftDiagonal()  { return  _front_left_diagonal;}
+Polar VehilceConfig::getFrontRightDiagonal() { return  _front_right_diagonal;}
+Polar VehilceConfig::getRearLeftDiagonal()   { return  _rear_left_diagonal;}
+Polar VehilceConfig::getRearRightDiagonal()  { return  _rear_right_diagonal;}
 
 float* VehilceConfig::getAccelerateTable() { return  _accelerate_table;}
 float* VehilceConfig::getVelocityTable() { return  _velocity_table;}
@@ -361,3 +416,24 @@ float* VehilceConfig::getTorqueTable() { return  _torque_table;}
 uint16_t VehilceConfig::getAccNum() { return  _acc_num;}
 uint16_t VehilceConfig::getVlcNum() { return  _vlc_num;}
 
+double VehilceConfig::getTs() { return  _ts;}
+double VehilceConfig::getCf() { return  _cf;}
+double VehilceConfig::getCr() { return  _cr;}
+double VehilceConfig::getMassFl() { return  _mass_fl;}
+double VehilceConfig::getMassFr() { return  _mass_fr;}
+double VehilceConfig::getMassRl() { return  _mass_rl;}
+double VehilceConfig::getMassRr() { return  _mass_rr;}
+double VehilceConfig::getEps() { return  _eps;}
+uint16_t VehilceConfig::getMaxIteration() { return  _max_iteration;}
+double VehilceConfig::getMatrixQ1() { return  _matrix_q1;}
+double VehilceConfig::getMatrixQ2() { return  _matrix_q2;}
+double VehilceConfig::getMatrixQ3() { return  _matrix_q3;}
+double VehilceConfig::getMatrixQ4() { return  _matrix_q4;}
+double *VehilceConfig::getMatrixQ() { return  _matrix_q;}
+
+double VehilceConfig::getWheelBase() { return  _wheel_base;}
+double VehilceConfig::getSteeringRatio(){ return  _steering_ratio;}
+double VehilceConfig::getMaxSteeringAngle(){ return  _max_steering_angle;}
+double VehilceConfig::getMaxSteeringAngleRate(){ return  _max_steering_angle_rate;}
+
+double VehilceConfig::getMinSpeedProtection(){ return _min_speed_protection; }

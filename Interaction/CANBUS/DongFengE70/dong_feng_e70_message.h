@@ -11,8 +11,8 @@
 #include <QMainWindow>
 #include "./Common/Utils/Inc/property.h"
 #include "./Interaction/CANBUS/Interface/message_manager.h"
+#include "Common/Configure/Configs/vehilce_config.h"
 
-#define V_M_S 0.00277777777777777777777777777778
 
 class DongFengE70Message  : public MessageManager
 {

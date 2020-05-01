@@ -17,82 +17,90 @@
 #include "./Interaction/CANBUS/Interface/message_manager.h"
 
 MessageManager::MessageManager() {
-	// wheel speed
-	WheelSpeedFrontLeft.setContainer(this);
-	WheelSpeedFrontLeft.getter(&MessageManager::getWheelSpeedFrontLeft);
-	WheelSpeedFrontLeft.setter(&MessageManager::setWheelSpeedFrontLeft);
+    // wheel speed
+    WheelSpeedFrontLeft.setContainer(this);
+    WheelSpeedFrontLeft.getter(&MessageManager::getWheelSpeedFrontLeft);
+    WheelSpeedFrontLeft.setter(&MessageManager::setWheelSpeedFrontLeft);
 
-	WheelSpeedFrontRight.setContainer(this);
-	WheelSpeedFrontRight.getter(&MessageManager::getWheelSpeedFrontRight);
-	WheelSpeedFrontRight.setter(&MessageManager::setWheelSpeedFrontRight);
+    WheelSpeedFrontRight.setContainer(this);
+    WheelSpeedFrontRight.getter(&MessageManager::getWheelSpeedFrontRight);
+    WheelSpeedFrontRight.setter(&MessageManager::setWheelSpeedFrontRight);
 
-	WheelSpeedRearRight.setContainer(this);
-	WheelSpeedRearRight.getter(&MessageManager::getWheelSpeedRearRight);
-	WheelSpeedRearRight.setter(&MessageManager::setWheelSpeedRearRight);
+    WheelSpeedRearRight.setContainer(this);
+    WheelSpeedRearRight.getter(&MessageManager::getWheelSpeedRearRight);
+    WheelSpeedRearRight.setter(&MessageManager::setWheelSpeedRearRight);
 
-	WheelSpeedRearLeft.setContainer(this);
-	WheelSpeedRearLeft.getter(&MessageManager::getWheelSpeedRearLeft);
-	WheelSpeedRearLeft.setter(&MessageManager::setWheelSpeedRearLeft);
+    WheelSpeedRearLeft.setContainer(this);
+    WheelSpeedRearLeft.getter(&MessageManager::getWheelSpeedRearLeft);
+    WheelSpeedRearLeft.setter(&MessageManager::setWheelSpeedRearLeft);
 
-	VehicleMiddleSpeed.setContainer(this);
-	VehicleMiddleSpeed.getter(&MessageManager::getVehicleMiddleSpeed);
-	VehicleMiddleSpeed.setter(&MessageManager::setVehicleMiddleSpeed);
+    VehicleMiddleSpeed.setContainer(this);
+    VehicleMiddleSpeed.getter(&MessageManager::getVehicleMiddleSpeed);
+    VehicleMiddleSpeed.setter(&MessageManager::setVehicleMiddleSpeed);
 
-	VehicleMiddleSpeedValid.setContainer(this);
-	VehicleMiddleSpeedValid.getter(&MessageManager::getVehicleMiddleSpeedValid);
-	VehicleMiddleSpeedValid.setter(&MessageManager::setVehicleMiddleSpeedValid);
+    VehicleMiddleSpeedValid.setContainer(this);
+    VehicleMiddleSpeedValid.getter(&MessageManager::getVehicleMiddleSpeedValid);
+    VehicleMiddleSpeedValid.setter(&MessageManager::setVehicleMiddleSpeedValid);
 
-	// wheel speed direction
-	WheelSpeedDirection.setContainer(this);
-	WheelSpeedDirection.getter(&MessageManager::getWheelSpeedDirection);
-	WheelSpeedDirection.setter(&MessageManager::setWheelSpeedDirection);
-	// wheel pulse
-	WheelPulseFrontLeft.setContainer(this);
-	WheelPulseFrontLeft.getter(&MessageManager::getWheelPulseFrontLeft);
-	WheelPulseFrontLeft.setter(&MessageManager::setWheelPulseFrontLeft);
+    // wheel speed direction
+    WheelSpeedDirection.setContainer(this);
+    WheelSpeedDirection.getter(&MessageManager::getWheelSpeedDirection);
+    WheelSpeedDirection.setter(&MessageManager::setWheelSpeedDirection);
+    // wheel pulse
+    WheelPulseFrontLeft.setContainer(this);
+    WheelPulseFrontLeft.getter(&MessageManager::getWheelPulseFrontLeft);
+    WheelPulseFrontLeft.setter(&MessageManager::setWheelPulseFrontLeft);
 
-	WheelPulseFrontRight.setContainer(this);
-	WheelPulseFrontRight.getter(&MessageManager::getWheelPulseFrontRight);
-	WheelPulseFrontRight.setter(&MessageManager::setWheelPulseFrontRight);
+    WheelPulseFrontRight.setContainer(this);
+    WheelPulseFrontRight.getter(&MessageManager::getWheelPulseFrontRight);
+    WheelPulseFrontRight.setter(&MessageManager::setWheelPulseFrontRight);
 
-	WheelPulseRearRight.setContainer(this);
-	WheelPulseRearRight.getter(&MessageManager::getWheelPulseRearRight);
-	WheelPulseRearRight.setter(&MessageManager::setWheelPulseRearRight);
+    WheelPulseRearRight.setContainer(this);
+    WheelPulseRearRight.getter(&MessageManager::getWheelPulseRearRight);
+    WheelPulseRearRight.setter(&MessageManager::setWheelPulseRearRight);
 
-	WheelPulseRearLeft.setContainer(this);
-	WheelPulseRearLeft.getter(&MessageManager::getWheelPulseRearLeft);
-	WheelPulseRearLeft.setter(&MessageManager::setWheelPulseRearLeft);
-	// wheel pulse dirction
-	WheelPulseDirection.setContainer(this);
-	WheelPulseDirection.getter(&MessageManager::getWheelPulseDirection);
-	WheelPulseDirection.setter(&MessageManager::setWheelPulseDirection);
+    WheelPulseRearLeft.setContainer(this);
+    WheelPulseRearLeft.getter(&MessageManager::getWheelPulseRearLeft);
+    WheelPulseRearLeft.setter(&MessageManager::setWheelPulseRearLeft);
 
-	// SAS Steering angle
-	SteeringAngle.setContainer(this);
-	SteeringAngle.getter(&MessageManager::getSteeringAngle);
-	SteeringAngle.setter(&MessageManager::setSteeringAngle);
+    WheelSumPulse.setContainer(this);
+    WheelSumPulse.getter(&MessageManager::getWheelSumPulse);
+    WheelSumPulse.setter(&MessageManager::setWheelSumPulse);
+    // wheel pulse dirction
+    WheelPulseDirection.setContainer(this);
+    WheelPulseDirection.getter(&MessageManager::getWheelPulseDirection);
+    WheelPulseDirection.setter(&MessageManager::setWheelPulseDirection);
 
-	SteeringAngleRate.setContainer(this);
-	SteeringAngleRate.getter(&MessageManager::getSteeringAngleRate);
-	SteeringAngleRate.setter(&MessageManager::setSteeringAngleRate);
+    // SAS Steering angle
+    SteeringAngle.setContainer(this);
+    SteeringAngle.getter(&MessageManager::getSteeringAngle);
+    SteeringAngle.setter(&MessageManager::setSteeringAngle);
 
-	// TCU
-	Gear.setContainer(this);
-	Gear.getter(&MessageManager::getGear);
-	Gear.setter(&MessageManager::setGear);
+    SteeringAngleRate.setContainer(this);
+    SteeringAngleRate.getter(&MessageManager::getSteeringAngleRate);
+    SteeringAngleRate.setter(&MessageManager::setSteeringAngleRate);
 
-	// ESP Sensor
-	YawRate.setContainer(this);
-	YawRate.getter(&MessageManager::getYawRate);
-	YawRate.setter(&MessageManager::setYawRate);
+    // TCU
+    Gear.setContainer(this);
+    Gear.getter(&MessageManager::getGear);
+    Gear.setter(&MessageManager::setGear);
 
-	LonAcc.setContainer(this);
-	LonAcc.getter(&MessageManager::getLonAcc);
-	LonAcc.setter(&MessageManager::setLonAcc);
+    // ESP Sensor
+    YawRate.setContainer(this);
+    YawRate.getter(&MessageManager::getYawRate);
+    YawRate.setter(&MessageManager::setYawRate);
 
-	LatAcc.setContainer(this);
-	LatAcc.getter(&MessageManager::getLatAcc);
-	LatAcc.setter(&MessageManager::setLatAcc);
+    LonAcc.setContainer(this);
+    LonAcc.getter(&MessageManager::getLonAcc);
+    LonAcc.setter(&MessageManager::setLonAcc);
+
+    LatAcc.setContainer(this);
+    LatAcc.getter(&MessageManager::getLatAcc);
+    LatAcc.setter(&MessageManager::setLatAcc);
+
+    BrakePressure.setContainer(this);
+    BrakePressure.getter(&MessageManager::getBrakePressure);
+    BrakePressure.setter(&MessageManager::setBrakePressure);
 }
 
 MessageManager::~MessageManager() {
@@ -118,6 +126,9 @@ void  MessageManager::setVehicleMiddleSpeed(float value){_vehicle_middle_speed =
 
 uint8_t MessageManager::getVehicleMiddleSpeedValid()             { return _vehicle_middle_speed_valid;}
 void    MessageManager::setVehicleMiddleSpeedValid(uint8_t value){_vehicle_middle_speed_valid = value;}
+
+SpeedStatus MessageManager::getVehicleMiddleSpeedAbnormal()             { return _vehicle_middle_speed_abnormal;}
+void    MessageManager::setVehicleMiddleSpeedAbnormal(SpeedStatus value){_vehicle_middle_speed_abnormal = value;}
 // wheel speed direction
 DirectStatus MessageManager::getWheelSpeedDirection()                  { return _wheel_speed_direction;}
 void         MessageManager::setWheelSpeedDirection(DirectStatus value){_wheel_speed_direction = value;}
@@ -134,6 +145,9 @@ void     MessageManager::setWheelPulseRearRight(uint16_t value){_wheel_pulse_rea
 
 uint16_t MessageManager::getWheelPulseRearLeft()              { return _wheel_pulse_rear_left;}
 void     MessageManager::setWheelPulseRearLeft(uint16_t value){_wheel_pulse_rear_left = value;}
+
+int32_t MessageManager::getWheelSumPulse()              { return _wheel_sum_pulse;}
+void    MessageManager::setWheelSumPulse(int32_t value){_wheel_sum_pulse = value;}
 // wheel pulse dirction
 DirectStatus MessageManager::getWheelPulseDirection()                  { return _wheel_pulse_direction;}
 void         MessageManager::setWheelPulseDirection(DirectStatus value){_wheel_pulse_direction = value;}
@@ -158,3 +172,12 @@ void  MessageManager::setLonAcc(float value){_lon_acc = value;}
 
 float MessageManager::getLatAcc()           { return _lat_acc;}
 void  MessageManager::setLatAcc(float value){_lat_acc = value;}
+
+uint8_t MessageManager::getBrakePressure()             { return _brake_pressure;}
+void    MessageManager::setBrakePressure(uint8_t value){_brake_pressure = value;}
+
+ActuatorStatus MessageManager::getESC_Status()                    { return _esc_status;}
+void           MessageManager::setESC_Status(ActuatorStatus value){_esc_status = value;}
+
+ActuatorStatus MessageManager::getEPS_Status()                    { return _eps_status;}
+void           MessageManager::setEPS_Status(ActuatorStatus value){_eps_status = value;}

@@ -25,10 +25,16 @@ CONFIG += resources_big
 
 SOURCES += \
         Common/Configure/Configs/vehilce_config.cpp \
+        Common/Filter/digital_filter.cpp \
+        Common/Filter/digital_filter_coefficients.cpp \
         Common/Math/algebraic_geometry.cpp \
         Common/Math/crc_compute.cpp \
         Common/Math/curve_fitting.cpp \
+        Common/Math/fresnel.cpp \
+        Common/Math/huogh.cpp \
         Common/Math/interpolation.cpp \
+        Common/Math/linear_quadratic_regulator.cpp \
+        Common/Math/math_utils.cpp \
         Common/Math/solve_equation.cpp \
         Common/Math/vector_2d.cpp \
         Common/Math/vehicle_body.cpp \
@@ -36,6 +42,12 @@ SOURCES += \
         Common/Utils/Src/node.cpp \
         Common/VehicleState/GeometricTrack/geometric_track.cpp \
         Common/VehicleState/Interface/vehicle_state.cpp \
+        Control/Common/pid.cpp \
+        Control/Common/trajectory_analyzer.cpp \
+        Control/Interface/controller.cpp \
+        Control/LatControl/lat_control.cpp \
+        Control/LatControl/lat_control_lqr.cpp \
+        Control/LonControl/lon_control.cpp \
         Interaction/CANBUS/BoRui/bo_rui_controller.cpp \
         Interaction/CANBUS/BoRui/bo_rui_message.cpp \
         Interaction/CANBUS/ChangAn/chang_an_controller.cpp \
@@ -48,12 +60,15 @@ SOURCES += \
         Interaction/Ultrasonic/Ultrasonic.cpp \
         Percaption/Interface/percaption.cpp \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.cpp \
+        Planning/Common/configuration.cpp \
+        Planning/Curvature/curvature.cpp \
+        Planning/Interface/hc_cc_state_space.cpp \
         Planning/Interface/planning.cpp \
         Planning/ParallelParking/parallel_planning.cpp \
+        Planning/Path/hc_cc_circle.cpp \
+        Planning/Path/path_line.cpp \
         Planning/VerticalParking/vertical_planning.cpp \
         QCustomPlot/axistag.cpp \
-        WinZlgCan/can_rev_work_thread.cpp \
-        WinZlgCan/win_zlg_can.cpp \
         main.cpp \
         mainwindow.cpp \
         QCustomPlot/qcustomplot.cpp
@@ -65,10 +80,16 @@ HEADERS += \
         Common/Configure/Data/chang_an_configure.h \
         Common/Configure/Data/common_configure.h \
         Common/Configure/Data/dong_feng_configure.h \
+        Common/Filter/digital_filter.h \
+        Common/Filter/digital_filter_coefficients.h \
         Common/Math/algebraic_geometry.h \
         Common/Math/crc_compute.h \
         Common/Math/curve_fitting.h \
+        Common/Math/fresnel.h \
+        Common/Math/huogh.h \
         Common/Math/interpolation.h \
+        Common/Math/linear_quadratic_regulator.h \
+        Common/Math/math_utils.h \
         Common/Math/solve_equation.h \
         Common/Math/vector_2d.h \
         Common/Math/vehicle_body.h \
@@ -77,6 +98,13 @@ HEADERS += \
         Common/Utils/Inc/property.h \
         Common/VehicleState/GeometricTrack/geometric_track.h \
         Common/VehicleState/Interface/vehicle_state.h \
+        Control/Common/pid.h \
+        Control/Common/trajectory_analyzer.h \
+        Control/Interface/controller.h \
+        Control/LatControl/lat_control.h \
+        Control/LatControl/lat_control_lqr.h \
+        Control/LonControl/lon_control.h \
+        Eigen/Eigen \
         Interaction/CANBUS/BoRui/bo_rui_controller.h \
         Interaction/CANBUS/BoRui/bo_rui_message.h \
         Interaction/CANBUS/ChangAn/chang_an_controller.h \
@@ -90,13 +118,16 @@ HEADERS += \
         Interaction/Ultrasonic/Ultrasonic.h \
         Percaption/Interface/percaption.h \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.h \
+        Planning/Common/configuration.h \
+        Planning/Common/steering_common.h \
+        Planning/Curvature/curvature.h \
+        Planning/Interface/hc_cc_state_space.h \
         Planning/Interface/planning.h \
         Planning/ParallelParking/parallel_planning.h \
+        Planning/Path/hc_cc_circle.h \
+        Planning/Path/path_line.h \
         Planning/VerticalParking/vertical_planning.h \
         QCustomPlot/axistag.h \
-        WinZlgCan/ControlCAN.h \
-        WinZlgCan/can_rev_work_thread.h \
-        WinZlgCan/win_zlg_can.h \
         mainwindow.h \
         QCustomPlot/qcustomplot.h
 

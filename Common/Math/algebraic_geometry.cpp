@@ -61,9 +61,9 @@ void AlgebraicGeometry::Tangent_CCL(Line l,Circle cl,Circle *cr)
 	b = 2*(tan_v * Value_temp - cl.Center.getX());
 	c = powf(Value_temp,2) - powf(cl.Radius + cr->Radius ,2);
 
-	cr->Center.X = QuadraticEquation(a,b,c);
+    cr->Center.setX(QuadraticEquation(a,b,c));
 
-	cr->Center.Y = LinearAlgebra(l,cr->Center.getX()) - sec_v*cr->Radius;
+    cr->Center.setY(LinearAlgebra(l,cr->Center.getX()) - sec_v*cr->Radius);
 }
 
 void AlgebraicGeometry::Tangent_CCL_Up(Line l,Circle cl,Circle *cr)
@@ -80,9 +80,9 @@ void AlgebraicGeometry::Tangent_CCL_Up(Line l,Circle cl,Circle *cr)
 	b = 2*(tan_v * Value_temp - cl.Center.getX());
 	c = powf(Value_temp,2) - powf(cl.Radius + cr->Radius ,2);
 
-	cr->Center.X = QuadraticEquation(a,b,c);
+    cr->Center.setX(QuadraticEquation(a,b,c));
 
-	cr->Center.Y = LinearAlgebra(l,cr->Center.getX()) + sec_v*cr->Radius;
+    cr->Center.setY(LinearAlgebra(l,cr->Center.getX()) + sec_v*cr->Radius);
 }
 
 void AlgebraicGeometry::Tangent_CCL_VerticalLine(Line l,Circle cl,Circle *cr,Vector2d *lp,Vector2d *rp)
@@ -90,16 +90,16 @@ void AlgebraicGeometry::Tangent_CCL_VerticalLine(Line l,Circle cl,Circle *cr,Vec
 	float a,b,c;
 	Vector2d temp_v;
 
-	cr->Center.X = l.Point.getX() + cr->Radius;
+    cr->Center.setX(l.Point.getX() + cr->Radius);
 
 	a = 1;
 	b = -2 * cl.Center.getY();
 	c = cl.Center.getY() * cl.Center.getY() + (cl.Center.getX() - cr->Center.getX()) * (cl.Center.getX() - cr->Center.getX()) - (cl.Radius + cr->Radius) * (cl.Radius + cr->Radius);
 
-	cr->Center.Y = QuadraticEquationMin(a,b,c);
+    cr->Center.setY( QuadraticEquationMin(a,b,c) );
 
-	lp->X = l.Point.getX();
-	lp->Y = cr->Center.getY();
+    lp->setX( l.Point.getX());
+    lp->setY( cr->Center.getY());
 
 	temp_v = Vector2d(cr->Radius,0);
 	*rp = temp_v.rotate( (cl.Center - cr->Center).Angle() ) + cr->Center;
@@ -168,13 +168,13 @@ void AlgebraicGeometry::Tangent_LLC(Line l_1,Line l_2,Circle *c,Vector2d *lp,Vec
 
 	if( 0 == l_2.Angle)
 	{
-		c->Center.Y = l_2.Point.getY() - c->Radius;
+        c->Center.setY( l_2.Point.getY() - c->Radius );
 
-		lp->X = l_1.Point.getX();
-		lp->Y = c->Center.getY();
+        lp->setX( l_1.Point.getX() );
+        lp->setY( c->Center.getY() );
 
-		rp->X = c->Center.getX();
-		rp->Y = l_2.Point.getY();
+        rp->setX( c->Center.getX() );
+        rp->setY( l_2.Point.getY() );
 	}
 	else
 	{
@@ -184,14 +184,14 @@ void AlgebraicGeometry::Tangent_LLC(Line l_1,Line l_2,Circle *c,Vector2d *lp,Vec
 		l_a = tan_v;
 		l_b = l_2.Point.getY() - l_2.Point.getX() * tan_v - sec_v * c->Radius;
 
-		c->Center.X = l_1.Point.getX() + c->Radius;
-		c->Center.Y = LinearAlgebraCoefficient(l_a,l_b,c->Center.getX());
+        c->Center.setX( l_1.Point.getX() + c->Radius );
+        c->Center.setY( LinearAlgebraCoefficient(l_a,l_b,c->Center.getX()) );
 
 		temp_v = Vector2d(c->Radius,0);
 		*rp = temp_v.rotate(l_2.Angle + PI_2) + c->Center;
 
-		lp->X = l_1.Point.getX();
-		lp->Y = c->Center.getY();
+        lp->setX( l_1.Point.getX() );
+        lp->setY( c->Center.getY() );
 	}
 }
 
@@ -212,9 +212,9 @@ void AlgebraicGeometry::Tanget_LC_Margin(Line l,Vector2d p,float margin,Circle *
 	c_B = 2 * l_a * (l_b - p.getY()) - 2 * p.getX();
 	c_C = p.getX() * p.getX() + (l_b - p.getY())*(l_b - p.getY()) - (c->Radius - margin - RIGHT_EDGE_TO_CENTER) * (c->Radius - margin - RIGHT_EDGE_TO_CENTER);
 
-	c->Center.X = QuadraticEquation(c_A,c_B,c_C);
+    c->Center.setX( QuadraticEquation(c_A,c_B,c_C) );
 
-	c->Center.Y = LinearAlgebraCoefficient(l_a,l_b,c->Center.getX());
+    c->Center.setY( LinearAlgebraCoefficient(l_a,l_b,c->Center.getX()) );
 
 	temp_v = Vector2d(c->Radius,0);
 	*t_p = temp_v.rotate(l.Angle + PI_2) + c->Center;
@@ -281,9 +281,9 @@ void AlgebraicGeometry::Intersection_CC(Circle c1,Circle c2,Vector2d *p1,Vector2
 
 	_solve_equation.TrigonometricEquation(A, B, C, &theta1, &theta2);
 
-	p1->X = c1.Center.getX() + c1.Radius * cosf(theta1);
-	p1->Y = c1.Center.getY() + c1.Radius * sinf(theta1);
+    p1->setX( c1.Center.getX() + c1.Radius * cosf(theta1) );
+    p1->setY( c1.Center.getY() + c1.Radius * sinf(theta1) );
 
-	p2->X = c1.Center.getX() + c1.Radius * cosf(theta2);
-	p2->Y = c1.Center.getY() + c1.Radius * sinf(theta2);
+    p2->setX( c1.Center.getX() + c1.Radius * cosf(theta2) );
+    p2->setY( c1.Center.getY() + c1.Radius * sinf(theta2) );
 }

@@ -18,7 +18,7 @@ public:
 	CurveFitting();
 	virtual ~CurveFitting();
 
-	void LineFitting(LinkList *l,float *a,float *b);
+        float LineFitting(LinkList<ObstacleLocationPacket> *l,float *a,float *b);
 };
 
 #endif /* MATH_CURVE_FITTING_H_ */

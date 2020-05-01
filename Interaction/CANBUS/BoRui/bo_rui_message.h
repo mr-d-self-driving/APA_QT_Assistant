@@ -12,8 +12,8 @@
 #include "./Common/Utils/Inc/property.h"
 #include "./Interaction/CANBUS/Interface/message_manager.h"
 #include "./Common/Math/crc_compute.h"
+#include "Common/Configure/Configs/vehilce_config.h"
 
-#define V_M_S 0.015625
 
 class BoRuiMessage  : public MessageManager
 {

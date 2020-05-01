@@ -63,11 +63,13 @@ void ParallelPlanning::Work(Percaption *p)
 			if( (0 == _trial_status) && (_reverse_cnt >= 9))//fail
 			{
 				Command = 0;
+                qDebug("trial more than 9 time");
 //				m_ParallelPlanningTerminal.EnterParkingPositionSend(_enter_parking, _reverse_cnt,0);
 				_parallel_planning_state = WaitStart;
 			}
 			else
 			{
+                qDebug("trial %d time",_reverse_cnt);
 //				m_ParallelPlanningTerminal.EnterParkingPositionSend(_enter_parking, _reverse_cnt,0x5A);
 				_parallel_planning_state = FirstArcPlanning;
 			}
@@ -89,7 +91,7 @@ void ParallelPlanning::Work(Percaption *p)
 	}
 }
 
-void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	int8_t status;
 	switch(_parallel_control_state)
@@ -122,14 +124,14 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case InitPointAdjust:
-			if(SUCCESS == InitPositionAdjustMachine(ctl,msg,s,u))
+            if(SUCCESS == InitPositionAdjustMachine(ctl,msg,s,p))
 			{
 				_parallel_control_state = CurveTrajectory;
 			}
 			break;
 
 		case CurveTrajectory:
-			status = CurveTrajectoryMachine(ctl,msg,s,u);
+            status = CurveTrajectoryMachine(ctl,msg,s,p);
 			if(SUCCESS == status)
 			{
 				_parallel_control_state = RightFrontTrial;
@@ -141,7 +143,7 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case RightFrontTrial:
-			status = RightFrontTrialMachine(ctl,msg,s,u);
+            status = RightFrontTrialMachine(ctl,msg,s,p);
 			if(SUCCESS == status)
 			{
 				_parallel_control_state = LeftRearTrial;
@@ -153,7 +155,7 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case LeftRearTrial:
-			status = LeftRearTrialMachine(ctl,msg,s,u);
+            status = LeftRearTrialMachine(ctl,msg,s,p);
 			if(SUCCESS == status)
 			{
 				_parallel_control_state = RightFrontTrial;
@@ -165,7 +167,7 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 			break;
 
 		case ParkingComplete:
-			status = ParkingCompletedMachine(ctl,msg,s,u);
+            status = ParkingCompletedMachine(ctl,msg,s,p);
 			if(SUCCESS == status)
 			{
 				ParkingStatus = 3;
@@ -178,7 +180,7 @@ void ParallelPlanning::Control(VehicleController *ctl,MessageManager *msg,Vehicl
 	}
 }
 
-int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_adjust_state)
 	{
@@ -201,9 +203,9 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			break;
 
 		case WaitVehicleStop:
-			if(s->getPosition().X < (_line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN))
+            if(s->getPosition().getX() < (_line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN))
 			{
-				_apa_control_command.Distance = _line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+                _apa_control_command.Distance = _line_init_circle_right_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().getX();
 			}
 			else
 			{
@@ -224,7 +226,7 @@ int8_t ParallelPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 	return FAIL;
 }
 
-int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_curve_state)
 	{
@@ -282,25 +284,29 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 				_curve_state = WaitStill;
 			}
 			// 基于规划的转向点进行转向
-			if(SUCCESS == LineTurnningPointDetermination(s,_line_middle_circle_left_turn,1))
-			{
-				_curve_state = WaitStill;
-			}
+//			if(SUCCESS == LineTurnningPointDetermination(s,_line_middle_circle_left_turn,1))
+//			{
+//                _apa_control_command.SteeringAngle = _line_middle_circle_left_turn.SteeringAngle;
+//				_curve_state = WaitStill;
+//			}
 			break;
 
 		case WaitStill:
 			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-			if(SUCCESS == UltrasonicCollisionDiatance(u))
+
+            if(Normal == p->getRearObstacleDistance().status)
 			{
-				_apa_control_command.Distance = 0;
-				_apa_control_command.Velocity = 0;
-//				_apa_control_command.Velocity = VelocityPlanControl(_apa_control_command.Distance);
+                _apa_control_command.Distance = p->getRearObstacleDistance().distance;
 			}
-			else
+            else if(BlindZone == p->getRearObstacleDistance().status)
+            {
+                _apa_control_command.Distance = 0;
+            }
+            else
 			{
 				_apa_control_command.Distance = BoundaryCollisionDistance(_enter_parking.getAttitudeYaw(),s);
-//				_apa_control_command.Velocity = VelocityPlanControl(_apa_control_command.Distance);
 			}
+
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_curve_state = GearShift;
@@ -330,7 +336,7 @@ int8_t ParallelPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 	return FAIL;
 }
 
-int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_right_front_state)
 	{
@@ -353,14 +359,19 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 			break;
 
 		case RightFrontTrialWaitStill:
-			if(SUCCESS == UltrasonicCollisionDiatance(u))
-			{
-				_apa_control_command.Distance = 0;
-			}
-			else
-			{
-				_apa_control_command.Distance = BoundaryCollisionDistance(0,s);
-			}
+            if(Normal == p->getFrontObstacleDistance().status)
+            {
+                _apa_control_command.Distance = p->getFrontObstacleDistance().distance;
+            }
+            else if(BlindZone == p->getFrontObstacleDistance().status)
+            {
+                _apa_control_command.Distance = 0;
+            }
+            else
+            {
+                _apa_control_command.Distance = BoundaryCollisionDistance(0,s);
+            }
+
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_right_front_state = RightFrontTrialGearShift;
@@ -390,7 +401,7 @@ int8_t ParallelPlanning::RightFrontTrialMachine(VehicleController *ctl,MessageMa
 	return FAIL;
 }
 
-int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_left_rear_state)
 	{
@@ -404,7 +415,7 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			break;
 
 		case LeftRearTrialVehicleMove:
-			if((Reverse == msg->Gear) && (fabs(msg->SteeringAngle - _control_command.SteeringAngle ) < STEER_ANGLE_ARRIVE_ERR))
+            if((msg->getGear() == Reverse) && (fabs(msg->getSteeringAngle() - _apa_control_command.SteeringAngle ) < STEER_ANGLE_ARRIVE_ERR))
 			{
 				_apa_control_command.Velocity = STRAIGHT_VELOCITY;
 				_apa_control_command.Distance = MOTION_DISTANCE;
@@ -413,14 +424,19 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 			break;
 
 		case LeftRearTrialWaitStill:
-			if(SUCCESS == UltrasonicCollisionDiatance(u))
-			{
-				_apa_control_command.Distance = 0;
-			}
-			else
-			{
-				_apa_control_command.Distance = BoundaryCollisionDistance(0,s);
-			}
+            if(Normal == p->getRearObstacleDistance().status)
+            {
+                _apa_control_command.Distance = p->getRearObstacleDistance().distance;
+            }
+            else if(BlindZone == p->getRearObstacleDistance().status)
+            {
+                _apa_control_command.Distance = 0;
+            }
+            else
+            {
+                _apa_control_command.Distance = BoundaryCollisionDistance(0,s);
+            }
+
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				_left_rear_state = LeftRearTrialGearShift;
@@ -451,13 +467,13 @@ int8_t ParallelPlanning::LeftRearTrialMachine(VehicleController *ctl,MessageMana
 	return FAIL;
 }
 
-int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
+int8_t ParallelPlanning::ParkingCompletedMachine(VehicleController *ctl, MessageManager *msg, VehicleState *s, Percaption *p)
 {
 	float temp_distance;
 	switch(_parking_complete_state)
 	{
 		case ParkingCenterAdjust:
-			ParkingCenterAdjustment(s,u);
+            ParkingCenterAdjustment(s,p);
 //			m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 			_parking_complete_state = GearShiftJudge;
 			break;
@@ -569,9 +585,9 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 {
 	// 车位信息发送
 //	m_ParallelPlanningTerminal.ParkingMsgSend(inf,FrontMarginBoundary,RearMarginBoundary);
-	/// 车辆初始位置信息
-	_init_parking.Center      = Vector2d(inf->PositionX,inf->PositionY);
-	_init_parking.AttitudeYaw = inf->AttitudeYaw;
+    // 车辆初始位置信息
+//	_init_parking.Center      = Vector2d(inf->PositionX,inf->PositionY);
+//	_init_parking.AttitudeYaw = inf->AttitudeYaw;
 	// TODO 终端信息 车辆初始位置信息
 //	m_ParallelPlanningTerminal.VehicleInitPositionSend(_init_parking);
 	/// 车位虚拟边界计算
@@ -588,20 +604,20 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	MinParkingWidth  = LEFT_EDGE_TO_CENTER + _plan_vehilce_config.RadiusRearRight - MIN_LEFT_TURN_RADIUS + InsideMarginBoundary;
 	if(inf->ParkingWidth >= MinParkingWidth)//库位宽度足够
 	{
-		enter_point.Y = -LEFT_EDGE_TO_CENTER + OuterMarginMove;
+        enter_point.setY( -LEFT_EDGE_TO_CENTER + OuterMarginMove );
 	}
 	else //库位宽度太小，调整y轴方向位置
 	{
-		enter_point.Y = -LEFT_EDGE_TO_CENTER + MinParkingWidth - inf->ParkingWidth + InsideMarginBoundary + OuterMarginMove;
+        enter_point.setY( -LEFT_EDGE_TO_CENTER + MinParkingWidth - inf->ParkingWidth + InsideMarginBoundary + OuterMarginMove );
 	}
-	_parking_center_point = Vector2d( RearVirtualBoundary + (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.Y);
+    _parking_center_point = Vector2d( RearVirtualBoundary + (FrontVirtualBoundary - RearVirtualBoundary - LENGHT)*0.5 + REAR_EDGE_TO_CENTER,enter_point.getY());
 
 //	m_ParallelPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	// 根据车位长度，确定车辆最终的纵向位置
-	MinParkingLength = REAR_EDGE_TO_CENTER + sqrtf(powf(_plan_vehilce_config.RadiusFrontRight,2) - powf(MIN_LEFT_TURN_RADIUS + enter_point.Y,2));
+    MinParkingLength = REAR_EDGE_TO_CENTER + sqrtf(powf(_plan_vehilce_config.RadiusFrontRight,2) - powf(MIN_LEFT_TURN_RADIUS + enter_point.getY(),2));
 	if( inf->ParkingLength > (MinParkingLength + FrontMarginBoundary + RearMarginBoundary))//满足一次入库条件
 	{
-		enter_point.X = RearMarginBoundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - FrontMarginBoundary - RearMarginBoundary - MinParkingLength)*0.5;
+        enter_point.setX( RearMarginBoundary  + REAR_EDGE_TO_CENTER + (inf->ParkingLength - FrontMarginBoundary - RearMarginBoundary - MinParkingLength)*0.5 );
 		_enter_parking.setCenter(enter_point);
 		_enter_parking.setAttitudeYaw(0.0f);
 		_enter_parking.RotationCenter(MIN_LEFT_TURN_RADIUS);
@@ -613,12 +629,12 @@ void ParallelPlanning::ReversedTrial(Percaption *inf)
 	}
 	else//不满足一次入库，需多次尝试
 	{
-		enter_point.X = inf->ParkingLength - FrontMarginBoundary - FRONT_EDGE_TO_CENTER;
+        enter_point.setX( inf->ParkingLength - FrontMarginBoundary - FRONT_EDGE_TO_CENTER );
 		front_trial_body.Center = enter_point;
 		front_trial_body.AttitudeYaw = 0.0f;
 		front_trial_arrary[_reverse_cnt] = enter_point;
 
-		enter_point.X = RearMarginBoundary  + REAR_EDGE_TO_CENTER ;
+        enter_point.setX( RearMarginBoundary  + REAR_EDGE_TO_CENTER );
 		rear_trial_body.Center = enter_point;
 		rear_trial_body.AttitudeYaw = 0.0f;
 		rear_trial_arrary[_reverse_cnt]  = enter_point;
@@ -678,12 +694,14 @@ void ParallelPlanning::TransitionArc(Percaption *inf)
 	Line cr_line;
 
 	//圆心和直线变量初始化
-	_line_init.Point.X = inf->PositionX;
-	_line_init.Point.Y = inf->PositionY;
+    _line_init.Point.setX( inf->PositionX );
+    _line_init.Point.setY( inf->PositionY );
 	_line_init.Angle   = inf->AttitudeYaw;
 
 	_circle_left.Center = _enter_parking.getRotation();
 	_circle_left.Radius = MIN_LEFT_TURN_RADIUS;
+
+    emit sCircleCenterPoint(1,&_circle_left);
 
 	_circle_right.Radius = MIN_RIGHT_TURN_RADIUS;
 	// 计算初始右侧圆心位置
@@ -693,18 +711,23 @@ void ParallelPlanning::TransitionArc(Percaption *inf)
 		// 沿右下方向移动圆心坐标
 		cr_line.Point = _circle_right.Center;
 		cr_line.Angle = _line_init.Angle - PI_4;
-		_circle_right.Center.X = _circle_right.Center.getX() + 0.1;
-		_circle_right.Center.Y = _plan_algebraic_geometry.LinearAlgebra(cr_line, _circle_right.Center.getX());
+        _circle_right.Center.setX( _circle_right.Center.getX() + 0.1 );
+        _circle_right.Center.setY( _plan_algebraic_geometry.LinearAlgebra(cr_line, _circle_right.Center.getX()) );
 		// 重新根据右圆心坐标计算右圆半径和切点坐标
 		_plan_algebraic_geometry.Tangent_CL(_line_init,&_circle_right,&_line_init_circle_right_tangent);
 		// 计算左右圆之间切线的切点坐标
 		_plan_algebraic_geometry.Tangent_CLC(_circle_left, _circle_right,&_line_middle,&_line_middle_circle_left_tangent,&_line_middle_circle_right_tangent);
+        emit sCircleCenterPoint(0,&_circle_right);
 	}
 	//碰撞判定
 	while(
 			(_circle_right.Radius - RIGHT_EDGE_TO_CENTER) < (_parking_outer_front_point - _circle_right.Center).Length() ||
 			(_line_middle_circle_left_tangent - _line_middle_circle_right_tangent).Length() < 2 * K * _plan_vehilce_config.SteeringAngleCalculate(_circle_right.Radius)
 	);
+    emit sCircleCenterPoint(1,&_circle_left);
+    emit sCircleCenterPoint(0,&_circle_right);
+    qDebug("left tangent point:x=%f,y=%f",_line_middle_circle_left_tangent.getX(),_line_middle_circle_left_tangent.getY());
+    qDebug("left tangent point:x=%f,y=%f",_line_middle_circle_right_tangent.getX(),_line_middle_circle_right_tangent.getY());
 }
 
 void ParallelPlanning::TurnningPoint()

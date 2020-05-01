@@ -22,139 +22,178 @@
 
 typedef enum _GearStatus
 {
-	None = 0,
-	Parking,
-	Reverse,
-	Neutral,
-	Drive
+    None = 0,
+    Parking,
+    Reverse,
+    Neutral,
+    Drive
 }GearStatus;
 
 typedef enum _DirectStatus
 {
-	StandStill = 0,
-	Forward,
-	Backward,
-	Invalid
+    StandStill = 0,
+    Forward,
+    Backward,
+    Invalid
 }DirectStatus;
+
+typedef enum _ActuatorStatus
+{
+    ActuatorNormal = 0,
+    ActuatorErr
+}ActuatorStatus;
+
+typedef enum _SpeedStatus
+{
+    SpeedNormal = 0,
+    SpeedAbnormal
+}SpeedStatus;
 
 class MessageManager {
 public:
-	MessageManager();
-	virtual ~MessageManager();
+    MessageManager();
+    virtual ~MessageManager();
 
-	virtual void Init() = 0;
+    virtual void Init() = 0;
     virtual void Parse(const uint32_t id,const uint8_t *data,const uint32_t lenght) = 0;
 
-	// wheel speed
-	float getWheelSpeedFrontLeft();
-	void  setWheelSpeedFrontLeft(float value);
-	Property<MessageManager,float,READ_WRITE> WheelSpeedFrontLeft;
+    // wheel speed
+    float getWheelSpeedFrontLeft();
+    void  setWheelSpeedFrontLeft(float value);
+    Property<MessageManager,float,READ_WRITE> WheelSpeedFrontLeft;
 
-	float getWheelSpeedFrontRight();
-	void  setWheelSpeedFrontRight(float value);
-	Property<MessageManager,float,READ_WRITE> WheelSpeedFrontRight;
+    float getWheelSpeedFrontRight();
+    void  setWheelSpeedFrontRight(float value);
+    Property<MessageManager,float,READ_WRITE> WheelSpeedFrontRight;
 
-	float getWheelSpeedRearRight();
-	void  setWheelSpeedRearRight(float value);
-	Property<MessageManager,float,READ_WRITE> WheelSpeedRearRight;
+    float getWheelSpeedRearRight();
+    void  setWheelSpeedRearRight(float value);
+    Property<MessageManager,float,READ_WRITE> WheelSpeedRearRight;
 
-	float getWheelSpeedRearLeft();
-	void  setWheelSpeedRearLeft(float value);
-	Property<MessageManager,float,READ_WRITE> WheelSpeedRearLeft;
+    float getWheelSpeedRearLeft();
+    void  setWheelSpeedRearLeft(float value);
+    Property<MessageManager,float,READ_WRITE> WheelSpeedRearLeft;
 
-	// the middle speed of the vehicle
-	float getVehicleMiddleSpeed();
-	void  setVehicleMiddleSpeed(float value);
-	Property<MessageManager,float,READ_WRITE> VehicleMiddleSpeed;
+    // the middle speed of the vehicle
+    float getVehicleMiddleSpeed();
+    void  setVehicleMiddleSpeed(float value);
+    Property<MessageManager,float,READ_WRITE> VehicleMiddleSpeed;
 
-	// the middle speed valid single
-	uint8_t getVehicleMiddleSpeedValid();
-	void    setVehicleMiddleSpeedValid(uint8_t value);
-	Property<MessageManager,uint8_t,READ_WRITE> VehicleMiddleSpeedValid;
-	// wheel speed direction
-	DirectStatus getWheelSpeedDirection();
-	void         setWheelSpeedDirection(DirectStatus value);
-	Property<MessageManager,DirectStatus,READ_WRITE> WheelSpeedDirection;
+    // the middle speed valid single
+    uint8_t getVehicleMiddleSpeedValid();
+    void    setVehicleMiddleSpeedValid(uint8_t value);
+    Property<MessageManager,uint8_t,READ_WRITE> VehicleMiddleSpeedValid;
 
-	// wheel pulse
-	uint16_t getWheelPulseFrontLeft();
-	void     setWheelPulseFrontLeft(uint16_t value);
-	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseFrontLeft;
+    // the middle speed abnormal single
+    SpeedStatus getVehicleMiddleSpeedAbnormal();
+    void        setVehicleMiddleSpeedAbnormal(SpeedStatus value);
 
-	uint16_t getWheelPulseFrontRight();
-	void     setWheelPulseFrontRight(uint16_t value);
-	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseFrontRight;
+    // wheel speed direction
+    DirectStatus getWheelSpeedDirection();
+    void         setWheelSpeedDirection(DirectStatus value);
+    Property<MessageManager,DirectStatus,READ_WRITE> WheelSpeedDirection;
 
-	uint16_t getWheelPulseRearRight();
-	void     setWheelPulseRearRight(uint16_t value);
-	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearRight;
+    // wheel pulse
+    uint16_t getWheelPulseFrontLeft();
+    void     setWheelPulseFrontLeft(uint16_t value);
+    Property<MessageManager,uint16_t,READ_WRITE> WheelPulseFrontLeft;
 
-	uint16_t getWheelPulseRearLeft();
-	void     setWheelPulseRearLeft(uint16_t value);
-	Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearLeft;
+    uint16_t getWheelPulseFrontRight();
+    void     setWheelPulseFrontRight(uint16_t value);
+    Property<MessageManager,uint16_t,READ_WRITE> WheelPulseFrontRight;
 
-	// wheel pulse dirction
-	DirectStatus getWheelPulseDirection();
-	void         setWheelPulseDirection(DirectStatus value);
-	Property<MessageManager,DirectStatus,READ_WRITE> WheelPulseDirection;
+    uint16_t getWheelPulseRearRight();
+    void     setWheelPulseRearRight(uint16_t value);
+    Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearRight;
 
-	// SAS Steering angle
-	float getSteeringAngle();
-	void  setSteeringAngle(float value);
-	Property<MessageManager,float,READ_WRITE> SteeringAngle;
+    uint16_t getWheelPulseRearLeft();
+    void     setWheelPulseRearLeft(uint16_t value);
+    Property<MessageManager,uint16_t,READ_WRITE> WheelPulseRearLeft;
 
-	float getSteeringAngleRate();
-	void  setSteeringAngleRate(float value);
-	Property<MessageManager,float,READ_WRITE> SteeringAngleRate;
+    int32_t getWheelSumPulse();
+    void    setWheelSumPulse(int32_t value);
+    Property<MessageManager,int32_t,READ_WRITE> WheelSumPulse;
 
-	// TCU
-	GearStatus getGear();
-	void       setGear(GearStatus value);
-	Property<MessageManager,GearStatus,READ_WRITE> Gear;
+    // wheel pulse dirction
+    DirectStatus getWheelPulseDirection();
+    void         setWheelPulseDirection(DirectStatus value);
+    Property<MessageManager,DirectStatus,READ_WRITE> WheelPulseDirection;
 
-	// ESP Sensor
-	float getYawRate();
-	void  setYawRate(float value);
-	Property<MessageManager,float,READ_WRITE> YawRate;
+    // SAS Steering angle
+    float getSteeringAngle();
+    void  setSteeringAngle(float value);
+    Property<MessageManager,float,READ_WRITE> SteeringAngle;
 
-	float getLonAcc();
-	void  setLonAcc(float value);
-	Property<MessageManager,float,READ_WRITE> LonAcc;
+    float getSteeringAngleRate();
+    void  setSteeringAngleRate(float value);
+    Property<MessageManager,float,READ_WRITE> SteeringAngleRate;
 
-	float getLatAcc();
-	void  setLatAcc(float value);
-	Property<MessageManager,float,READ_WRITE> LatAcc;
+    // TCU
+    GearStatus getGear();
+    void       setGear(GearStatus value);
+    Property<MessageManager,GearStatus,READ_WRITE> Gear;
+
+    // ESP Sensor
+    float getYawRate();
+    void  setYawRate(float value);
+    Property<MessageManager,float,READ_WRITE> YawRate;
+
+    float getLonAcc();
+    void  setLonAcc(float value);
+    Property<MessageManager,float,READ_WRITE> LonAcc;
+
+    float getLatAcc();
+    void  setLatAcc(float value);
+    Property<MessageManager,float,READ_WRITE> LatAcc;
+
+    uint8_t getBrakePressure();
+    void  setBrakePressure(uint8_t value);
+    Property<MessageManager,uint8_t,READ_WRITE> BrakePressure;
+
+    ActuatorStatus getESC_Status();
+    void           setESC_Status(ActuatorStatus value);
+
+    ActuatorStatus getEPS_Status();
+    void           setEPS_Status(ActuatorStatus value);
 private:
-	// wheel speed
-	float _wheel_speed_front_left ;
-	float _wheel_speed_front_right;
-	float _wheel_speed_rear_right ;
-	float _wheel_speed_rear_left  ;
-	// vehicle speed base pulse,calculate by self
-	float   _vehicle_middle_speed;
-	uint8_t _vehicle_middle_speed_valid;
-	// wheel speed direction
-	DirectStatus _wheel_speed_direction;
+    // wheel speed
+    float _wheel_speed_front_left ;
+    float _wheel_speed_front_right;
+    float _wheel_speed_rear_right ;
+    float _wheel_speed_rear_left  ;
+    // vehicle speed base pulse,calculate by self
+    float   _vehicle_middle_speed;
+    uint8_t _vehicle_middle_speed_valid;
+    SpeedStatus _vehicle_middle_speed_abnormal;
+    // wheel speed direction
+    DirectStatus _wheel_speed_direction;
 
-	// wheel pulse
-	uint16_t _wheel_pulse_front_left ;
-	uint16_t _wheel_pulse_front_right;
-	uint16_t _wheel_pulse_rear_right ;
-	uint16_t _wheel_pulse_rear_left  ;
-	// wheel pulse dirction
-	DirectStatus _wheel_pulse_direction;
+    // wheel pulse
+    uint16_t _wheel_pulse_front_left ;
+    uint16_t _wheel_pulse_front_right;
+    uint16_t _wheel_pulse_rear_right ;
+    uint16_t _wheel_pulse_rear_left  ;
 
-	// SAS Steering angle
-	float _steering_angle;
-	float _steering_angle_rate;
+    int32_t _wheel_sum_pulse;
+    // wheel pulse dirction
+    DirectStatus _wheel_pulse_direction;
 
-	// TCU
-	GearStatus _gear;
+    // SAS Steering angle
+    float _steering_angle;
+    float _steering_angle_rate;
 
-	// ESP Sensor
-	float _yaw_rate;
-	float _lon_acc;
-	float _lat_acc;
+    // TCU
+    GearStatus _gear;
+
+    // ESP Sensor
+    float _yaw_rate;
+    float _lon_acc;
+    float _lat_acc;
+
+    uint8_t _brake_pressure;
+
+    ActuatorStatus _esc_status;
+    ActuatorStatus _eps_status;
 };
 
 #endif /* CANBUS_INTERFACE_MESSAGE_MANAGER_H_ */

@@ -7,12 +7,4 @@
 
 #include "./Common/Utils/Inc/node.h"
 
-Node::Node() {
-	// TODO Auto-generated constructor stub
-	next = NULL;
-}
-
-Node::~Node() {
-	// TODO Auto-generated destructor stub
-}
 

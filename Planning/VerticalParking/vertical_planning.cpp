@@ -25,7 +25,7 @@ VerticalPlanning::~VerticalPlanning() {
 void VerticalPlanning::Init()
 {
 	_outer_parking_boundary = 6;
-	_trial_margin = 0.3;
+    _trial_margin = 0.3f;
 
 	_vertical_planning_state = VerticalWaitStart;
 	_vertical_control_state  = VerticalWaitPlanningFinish;//初始化控制状态机
@@ -73,8 +73,8 @@ void VerticalPlanning::Work(Percaption *p)
 			break;
 
 		case ArcPlanning:
-			temp_line.Point.X = p->getPositionX();
-			temp_line.Point.Y = p->getPositionY();
+            temp_line.Point.setX( p->getPositionX() );
+            temp_line.Point.setY( p->getPositionY() );
 			temp_line.Angle   = p->getAttitudeYaw();
 			PlanningArc(temp_line);
 			Command = 0x70;
@@ -88,8 +88,8 @@ void VerticalPlanning::Work(Percaption *p)
 			break;
 
 		case TrialPlanning:
-			temp_line.Point.X = p->getPositionX();
-			temp_line.Point.Y = p->getPositionY();
+            temp_line.Point.setX( p->getPositionX() );
+            temp_line.Point.setY( p->getPositionY());
 			temp_line.Angle   = p->getAttitudeYaw();
 			EnterTrialWithMargin(temp_line);
 			Command = 0x70;
@@ -104,8 +104,8 @@ void VerticalPlanning::Work(Percaption *p)
 			break;
 
 		case EnterOuterTrialPlanning:
-			temp_line.Point.X = p->getPositionX();
-			temp_line.Point.Y = p->getPositionY();
+            temp_line.Point.setX( p->getPositionX() );
+            temp_line.Point.setY( p->getPositionY() );
 			temp_line.Angle   = p->getAttitudeYaw();
 			OuterAndEnterTrial(temp_line);
 			if(1 == _analysis_state)
@@ -142,6 +142,7 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			_analysis_state = ParkingAnalysis(p);
 			if(FAIL == _analysis_state)
 			{
+                Command = 0;
 				_vertical_planning_state = VerticalWaitStart;
 			}
 			else if(1 == _analysis_state)
@@ -159,8 +160,8 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			break;
 
 		case ArcPlanning:
-			temp_line.Point.X = s->getPosition().getX();
-			temp_line.Point.Y = s->getPosition().getY();
+            temp_line.Point.setX( s->getPosition().getX() );
+            temp_line.Point.setY( s->getPosition().getY() );
 			temp_line.Angle   = s->getYaw();
 			PlanningArc(temp_line);
 			Command = 0x70;
@@ -174,8 +175,8 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			break;
 
 		case TrialPlanning:
-			temp_line.Point.X = s->getPosition().getX();
-			temp_line.Point.Y = s->getPosition().getY();
+            temp_line.Point.setX( s->getPosition().getX() );
+            temp_line.Point.setY( s->getPosition().getY() );
 			temp_line.Angle   = s->getYaw();
 			EnterTrialWithMargin(temp_line);
 			Command = 0x70;
@@ -191,12 +192,12 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 
 		case EnterOuterTrialPlanning:
 			//TODO 实现库位的矫正
-			if(p->getValidParkingEdgePosition().Length > 3)
+            if((p->getValidParkingEdgePosition().FrontOutSide.position - p->getValidParkingEdgePosition().RearOutSide.position).Length() > 3)
 			{
-				_line_center.Point.X = (p->getValidParkingEdgePosition().First_Position.getX() + p->getValidParkingEdgePosition().Second_Position.getX()) * 0.5;
+                _line_center.Point.setX( (p->getValidParkingEdgePosition().FrontOutSide.position.getX() + p->getValidParkingEdgePosition().RearOutSide.position.getX()) * 0.5 );
 			}
-			temp_line.Point.X = s->getPosition().getX();
-			temp_line.Point.Y = s->getPosition().getY();
+            temp_line.Point.setX( s->getPosition().getX() );
+            temp_line.Point.setY( s->getPosition().getY() );
 			temp_line.Angle   = s->getYaw();
 			OuterAndEnterTrial(temp_line);
 			Command = 0x71;
@@ -217,144 +218,10 @@ void VerticalPlanning::Work(Percaption *p,VehicleState *s)
 			}
 			break;
 
-//		case NewArcPlanning:
-//			temp_line.Point.X = s->getPosition().getX();
-//			temp_line.Point.Y = s->getPosition().getY();
-//			temp_line.Angle   = s->getYaw();
-//			EnterTrialWithMargin(temp_line);
-//			Command = 0x72;
-//			_vertical_planning_state = WaitEnterOuterPlanning;
-//			break;
-//
-//		case NewTrialPlanning:
-//
-//			break;
-
 		default:
 
 			break;
 	}
-}
-
-void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Ultrasonic *u)
-{
-//	int8_t status;
-//	switch(_vertical_control_state)
-//	{
-//		case VerticalWaitPlanningFinish:
-//			if( 0x70 == Command )
-//			{
-//				// 泊车状态：控制状态
-//				ParkingStatus = 2;
-//				Command = 0x00;
-//				_apa_control_command.ControlEnable.B.APAEnable = 1;
-//				_apa_control_command.Gear              = Parking;
-//				_apa_control_command.SteeringAngle     = 0;
-//				_apa_control_command.SteeringAngleRate = STEERING_RATE;
-//				_apa_control_command.Distance          = 0;
-//				_apa_control_command.Velocity          = 0;
-//				ctl->Update(_apa_control_command);
-//				_vertical_control_state  = VerticalInitPointJudge;
-//			}
-//			break;
-//
-//		case VerticalInitPointJudge:
-//			if(1 == _analysis_state)
-//			{
-//				if(s->getPosition().getX() < _line_init_circle_parking_enter_turn.Point.getX())
-//				{
-//					_vertical_control_state = VerticalInitPointAdjust;
-//				}
-//				else
-//				{
-//					_vertical_control_state = VerticalCircleTrajectory;
-//				}
-//			}
-//			else if(2 == _analysis_state)
-//			{
-//				if(s->getPosition().getX() < _line_to_circle_enter_turn.Point.getX())
-//				{
-//					_vertical_control_state = VerticalInitPointAdjust;
-//				}
-//				else
-//				{
-//					_vertical_control_state = VerticalEnterTrial;
-//				}
-//			}
-//			else
-//			{
-//				_vertical_control_state = VerticalWaitPlanningFinish;
-//			}
-//			break;
-//
-//		case VerticalInitPointAdjust:
-//			if(SUCCESS == InitPositionAdjustMachine(ctl,msg,s,u))
-//			{
-//				if(1 == _analysis_state)
-//				{
-//					_vertical_control_state = VerticalCircleTrajectory;
-//				}
-//				else if(2 == _analysis_state)
-//				{
-//					_vertical_control_state = VerticalEnterTrial;
-//				}
-//				else
-//				{
-//
-//				}
-//			}
-//			break;
-//
-//		case VerticalCircleTrajectory://一次入库的状态控制
-//			status = CircleTrajectoryMachine(ctl,msg,s,u);
-//			if(PARKING_FINISH == status)
-//			{
-//				ParkingStatus = 3;
-//				_vertical_control_state = VerticalWaitPlanningFinish;
-//			}
-//			break;
-//
-//		case VerticalEnterTrial:
-//			status = EnterTrialMachine(ctl,msg,s,u);
-//			if(SUCCESS == status)
-//			{
-//				Command = 0x61;
-//				_vertical_control_state = VerticalWaitMarginPlanFinish;
-//			}
-//			break;
-//
-//		case VerticalWaitMarginPlanFinish:
-//			if(0x71 == Command)
-//			{
-//				_vertical_control_state = VerticalOuterTrial;
-//			}
-//			break;
-//
-//		case VerticalOuterTrial:
-//			status = OuterTrialMachine(ctl,msg,s,u);
-//			if(SUCCESS == status)
-//			{
-//				Command = 0x62;
-//				_vertical_control_state = VerticalWaitPlanningFinish;
-//			}
-//			break;
-//
-//		case VerticalCurveTrajectory://保留
-//			status = CurveTrajectoryMachine(ctl,msg,s,u);
-//			if(PARKING_FINISH == status)
-//			{
-//				_vertical_control_state = VerticalWaitPlanningFinish;
-//			}
-//			break;
-//
-//		case VerticalParkingComplete:
-//
-//			break;
-//
-//		default:
-//
-//			break;
-//	}
 }
 
 void VerticalPlanning::Control(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
@@ -510,9 +377,9 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 		case VerticalWaitVehicleStop:
 			if(1 == _analysis_state)
 			{
-				if(s->getPosition().X < (_line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN))
+                if(s->getPosition().getX() < (_line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN))
 				{
-					_apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+                    _apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().getX();
 				}
 				else
 				{
@@ -521,9 +388,9 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 			}
 			else if(2 == _analysis_state)
 			{
-				if(s->getPosition().X < (_line_to_circle_enter_turn.Point.getX() + INIT_POINT_MARGIN))
+                if(s->getPosition().getX() < (_line_to_circle_enter_turn.Point.getX() + INIT_POINT_MARGIN))
 				{
-					_apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().X;
+                    _apa_control_command.Distance = _line_init_circle_parking_enter_turn.Point.getX() + INIT_POINT_MARGIN - s->getPosition().getX();
 				}
 				else
 				{
@@ -549,6 +416,7 @@ int8_t VerticalPlanning::InitPositionAdjustMachine(VehicleController *ctl,Messag
 	return FAIL;
 }
 
+// 一次入库，圆弧轨迹控制状态机
 int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	VehicleBody motion_body;
@@ -622,7 +490,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 			if(fabs(msg->SteeringAngle) < 0.1)
 			{
 				_parking_center_x_middle = 0.5 * (s->getPosition().getX() + _parking_center_point.getX());
-				_circle_trajectory_state = VerticalWaitArrive;
+                _circle_trajectory_state = VerticalWaitStill;
 			}
 			break;
 
@@ -637,7 +505,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 			{
 				_apa_control_command.SteeringAngleRate = STEERING_RATE;
 				_apa_control_command.SteeringAngle = 0;
-				_circle_trajectory_state = VerticalWaitArrive;
+                _circle_trajectory_state = VerticalWaitStill;
 			}
 			break;
 
@@ -677,6 +545,7 @@ int8_t VerticalPlanning::CircleTrajectoryMachine(VehicleController *ctl,MessageM
 	return FAIL;
 }
 
+// 特殊情况，不太实用
 int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	float angle_vector;
@@ -696,7 +565,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 			{
 				_apa_control_command.Velocity = CURVE_VELOCITY;
 				_apa_control_command.Distance = MOTION_DISTANCE;
-				p->Command = 0x50;
+                p->Command = 0x50;//超声重定位算法
 				_curve_trajectory_state = VerticalCurveFirstTurnPoint;
 			}
 			break;
@@ -797,138 +666,7 @@ int8_t VerticalPlanning::CurveTrajectoryMachine(VehicleController *ctl,MessageMa
 	return FAIL;
 }
 
-//int8_t VerticalPlanning::TrialTrajectoryMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
-//{
-//	float angle_vector;
-//	switch(_trial_trajectory_state)
-//	{
-//		case VerticalTrialRearGearShift:
-//			_apa_control_command.Gear          = Reverse;
-//			_apa_control_command.SteeringAngle = 0;
-//			_apa_control_command.Acceleration  = planning_braking_acc_;
-//			_apa_control_command.ControlEnable.B.VelocityEnable = 0;
-//			_trial_trajectory_state = VerticalTrialVehicleMoveRear;
-//			break;
-//
-//		case VerticalTrialVehicleMoveRear:
-//			if(0x09 == msg->Gear)
-//			{
-//				_apa_control_command.Velocity = CURVE_VELOCITY;
-//				_apa_control_command.ControlEnable.B.VelocityEnable = 1;
-//				_trial_trajectory_state = VerticalTrialFirstTurnPoint;
-//			}
-//			break;
-//
-//		case VerticalTrialFirstTurnPoint:
-//			// 考虑转向角执行延迟时间
-//			if( (s->getPosition().getX() - _line_init_circle_enter_turn.Point.getX()) < s->LinearRate * turnning_feedforward_time_)
-//			{
-//				_apa_control_command.SteeringAngle = _line_init_circle_enter_turn.SteeringAngle;
-//				_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-//				_trial_trajectory_state = VerticalTrialStopWaitArrive;
-//			}
-//			break;
-//
-//		case VerticalTrialStopWaitArrive:
-//			// 根据当前车速，实时更新转向角速度
-//			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-//			// 象限点判定控制
-//			angle_vector = (s->getPosition() - _stop_circle_enter_turn.Point).Angle();
-//			if(angle_vector > 0 && angle_vector < PI_2 )
-//			{
-//				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _stop_circle_enter_turn.Point, _circle_enter.Radius) < s->LinearRate * turnning_feedforward_time_)
-//				{
-//					_apa_control_command.Acceleration  = planning_braking_acc_;
-//					_apa_control_command.ControlEnable.B.VelocityEnable = 0;
-//					_trial_trajectory_state = VerticalTrialStopWaitStill;
-//				}
-//			}
-//			else
-//			{
-//				_apa_control_command.Deceleration  = planning_braking_aeb_;
-//				_apa_control_command.Acceleration  = planning_braking_aeb_;
-//				_apa_control_command.ControlEnable.B.VelocityEnable = 0;
-//				_apa_control_command.ControlEnable.B.DecelerationEnable = 1;
-//				_trial_trajectory_state = VerticalTrialStopWaitStill;
-//			}
-//			break;
-//
-//		case VerticalTrialStopWaitStill:
-//			if(StandStill == msg->WheelSpeedDirection)
-//			{
-//				_trial_trajectory_state = VerticalTrialDriveGearShift;
-//			}
-//			else
-//			{
-//				_apa_control_command.Deceleration  = planning_braking_aeb_;
-//				_apa_control_command.Acceleration  = planning_braking_aeb_;
-//				_apa_control_command.ControlEnable.B.VelocityEnable = 0;
-//				_apa_control_command.ControlEnable.B.DecelerationEnable = 1;
-//			}
-//			break;
-//
-//		case VerticalTrialDriveGearShift:
-//			_apa_control_command.Gear          = Drive;
-//			_apa_control_command.SteeringAngle = _stop_circle_enter_turn.SteeringAngle;
-//			_apa_control_command.Acceleration  = planning_braking_acc_;
-//			_apa_control_command.ControlEnable.B.VelocityEnable = 0;
-//			_trial_trajectory_state = VerticalTrialVehicleMoveDrive;
-//			break;
-//
-//		case VerticalTrialVehicleMoveDrive:
-//			if(msg->Gear > 0 && msg->Gear < 7 && fabs(msg->SteeringAngle - _stop_circle_enter_turn.SteeringAngle) < 1)
-//			{
-//				_apa_control_command.Velocity = CURVE_VELOCITY;
-//				_apa_control_command.ControlEnable.B.VelocityEnable = 1;
-//				_trial_trajectory_state = VerticalTrialSencondTurnPoint;
-//			}
-//			break;
-//
-//		case VerticalTrialSencondTurnPoint:
-//			// 根据当前车速，实时更新转向角速度
-//			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-//			// 象限点判定控制
-//			angle_vector = (s->getPosition() - _circle_outer_circle_enter_turn.Point).Angle();
-//			if(angle_vector > -PI && angle_vector < -PI_2 )
-//			{
-//				if(_plan_algebraic_geometry.ArcLength(s->getPosition(), _circle_outer_circle_enter_turn.Point, _circle_outer.Radius) < s->LinearRate * turnning_feedforward_time_)
-//				{
-//					_apa_control_command.SteeringAngle = _circle_outer_circle_enter_turn.SteeringAngle;
-//					_trial_trajectory_state = VerticalTrialWaitArrive;
-//				}
-//			}
-//			else
-//			{
-//				_apa_control_command.SteeringAngle = _circle_outer_circle_enter_turn.SteeringAngle;
-//				_trial_trajectory_state = VerticalTrialWaitArrive;
-//			}
-//			break;
-//
-//		case VerticalTrialWaitArrive:
-//			if( s->getPosition().getX() > _next_stage_line_init_circle_enter_turn.Point.getX())
-//			{
-//				_apa_control_command.Acceleration  = planning_braking_acc_;
-//				_apa_control_command.ControlEnable.B.VelocityEnable = 0;
-//				_trial_trajectory_state = VerticalTrialWaitStill;
-//			}
-//			break;
-//
-//		case VerticalTrialWaitStill:
-//			if(StandStill == msg->WheelSpeedDirection)
-//			{
-//				_trial_trajectory_state = VerticalTrialRearGearShift;
-//				return SUCCESS;
-//			}
-//			break;
-//
-//		default:
-//
-//			break;
-//	}
-//	ctl->Update(_apa_control_command);
-//	return FAIL;
-//}
-
+// 曲线入库，多次尝试
 int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_enter_trial_state)
@@ -947,10 +685,10 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 			{
 				_apa_control_command.Velocity = CURVE_VELOCITY;
 				_apa_control_command.Distance = MOTION_DISTANCE;
-				if(_vertical_parking_correct == StepOneParkingLocation)
-				{
-					p->Command  = 0x50;
-				}
+//				if(_vertical_parking_correct == StepOneParkingLocation)
+//				{
+//					p->Command  = 0x50;
+//				}
 				_enter_trial_state = EnterTrialTurnPoint;
 			}
 			break;
@@ -973,8 +711,8 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 		case EnterTrialStopWaitStill:
 			// 根据当前车速，实时更新转向角速度
 			_apa_control_command.SteeringAngleRate = s->LinearRate * RK;
-//			_apa_control_command.Distance = ForecastYawParkingDistance(_circle_enter_stop_point_turn.Yaw,s);
-			_apa_control_command.Distance = p->getObstacleDistance().distance;
+            _apa_control_command.Distance = ForecastYawParkingDistance(_circle_enter_stop_point_turn.Yaw,s);
+//			_apa_control_command.Distance = p->getObstacleDistance().distance;
 			if(StandStill == msg->WheelSpeedDirection)
 			{
 				if(_vertical_parking_correct == StepOneParkingLocation)
@@ -999,6 +737,7 @@ int8_t VerticalPlanning::EnterTrialMachine(VehicleController *ctl,MessageManager
 	return FAIL;
 }
 
+// 曲线出库，多次尝试
 int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager *msg,VehicleState *s,Percaption *p)
 {
 	switch(_outer_trial_state)
@@ -1051,10 +790,11 @@ int8_t VerticalPlanning::OuterTrialMachine(VehicleController *ctl,MessageManager
 }
 
 /******************************************************************************************************************/
+// 泊车库位初始位置分析，确定泊车模式
 int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 {
-	_line_init.Point.X = inf->PositionX;
-	_line_init.Point.Y = inf->PositionY;
+    _line_init.Point.setX( inf->PositionX );
+    _line_init.Point.setY( inf->PositionY );
 	_line_init.Angle   = inf->AttitudeYaw;
 
 	// 车位信息发送
@@ -1066,22 +806,22 @@ int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 	_parking_outer_rear_point  = Vector2d(RearVirtualBoundary,0);
 
 	// TODO _parking_center_point 可以放到 Planning 类中
-	_parking_center_point.X = (FrontVirtualBoundary + RearVirtualBoundary) * 0.5;
-	_parking_center_point.Y = -FRONT_EDGE_TO_CENTER;
+    _parking_center_point.setX( (FrontVirtualBoundary + RearVirtualBoundary) * 0.5 );
+    _parking_center_point.setY( -FRONT_EDGE_TO_CENTER );
 //	m_VerticalPlanningTerminal.ParkingCenterPointSend(_parking_center_point);
 	_line_center.Point = _parking_center_point;
 	_line_center.Angle = PI_2;
 
-	_circle_parking_enter.Center.X = _parking_center_point.X + MIN_RIGHT_TURN_RADIUS;
+    _circle_parking_enter.Center.setX( _parking_center_point.getX() + MIN_RIGHT_TURN_RADIUS );
 	_circle_parking_enter.Radius   = MIN_RIGHT_TURN_RADIUS;
 	_plan_vehilce_config.EdgeRadius(-_circle_parking_enter.Radius);
 
-	_min_circle_parking_enter_y = -sqrtf( powf(_circle_parking_enter.Radius - RIGHT_EDGE_TO_CENTER,2) - powf(_circle_parking_enter.Center.X - FrontVirtualBoundary,2));
+    _min_circle_parking_enter_y = -sqrtf( powf(_circle_parking_enter.Radius - RIGHT_EDGE_TO_CENTER,2) - powf(_circle_parking_enter.Center.getX() - FrontVirtualBoundary,2));
 	_max_circle_parking_enter_y = _outer_parking_boundary - _plan_vehilce_config.RadiusFrontLeft;
 
-	_circle_parking_enter.Center.Y = _min_circle_parking_enter_y;
-	_critical_boundary = _circle_parking_enter.Center.Y + _circle_parking_enter.Radius;
-	if((RearVirtualBoundary + _plan_vehilce_config.RadiusRearLeft) > _circle_parking_enter.Center.X) // 库位长度太小不满足一次入库条件
+    _circle_parking_enter.Center.setY( _min_circle_parking_enter_y );
+    _critical_boundary = _circle_parking_enter.Center.getY() + _circle_parking_enter.Radius;
+    if((RearVirtualBoundary + _plan_vehilce_config.RadiusRearLeft) > _circle_parking_enter.Center.getX()) // 库位长度太小不满足一次入库条件
 	{
 		return FAIL;
 	}
@@ -1098,6 +838,7 @@ int8_t VerticalPlanning::ParkingAnalysis(Percaption *inf)
 	}
 }
 
+// 老函数，目前不用了
 void VerticalPlanning::EnterTrial(Line l_init)
 {
 	Vector2d Ahead;
@@ -1114,7 +855,7 @@ void VerticalPlanning::EnterTrial(Line l_init)
 		_analysis_state = 1;
 		// 第一个转向点计算
 		_line_init_circle_parking_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_parking_enter.Radius);
-		_ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5;
+        _ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5f;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_init_circle_parking_enter_turn.Point = _line_init_circle_parking_enter_tangent + Ahead.rotate(_line_init.Angle);
 //		m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
@@ -1142,13 +883,13 @@ void VerticalPlanning::EnterTrial(Line l_init)
 		_circle_outer.Radius = MIN_LEFT_TURN_RADIUS;
 		_trial_body.RotationCenter(MIN_LEFT_TURN_RADIUS);
 		_circle_outer.Center = _trial_body.Rotation;
-		_trial_margin = _trial_margin * 0.5;
+        _trial_margin = _trial_margin * 0.5f;
 		_plan_algebraic_geometry.Tanget_CC_Margin(_circle_outer,_parking_outer_front_point,_trial_margin,&_circle_enter,&_outer_enter_circle_line_tangent);
 //		_outer_circle_tangent = _outer_enter_circle_line_tangent.Point;
 
 		// 第一个转向点计算
 		_line_to_circle_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
-		_ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5;
+        _ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5f;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_to_circle_enter_turn.Point = _init_circle_tangent + Ahead.rotate(_line_init.Angle);
 //		m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,0);
@@ -1167,13 +908,14 @@ void VerticalPlanning::EnterTrial(Line l_init)
 //		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,2);
 
 		_next_stage_line_init_circle_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
-		_ahead_distance = - K * _next_stage_line_init_circle_enter_turn.SteeringAngle * 0.5;
+        _ahead_distance = - K * _next_stage_line_init_circle_enter_turn.SteeringAngle * 0.5f;
 		Ahead = Vector2d(_ahead_distance,0);
 		_next_stage_line_init_circle_enter_turn.Point = _outer_enter_circle_line_tangent.Point + Ahead.rotate( _outer_enter_circle_line_tangent.Angle );
 //		m_VerticalPlanningTerminal.TurnPointSend(_next_stage_line_init_circle_enter_turn,3);
 	}
 }
 
+// 入库第一步，有余量的入库
 void VerticalPlanning::EnterTrialWithMargin(Line l_init)
 {
 	Vector2d Ahead;
@@ -1183,6 +925,8 @@ void VerticalPlanning::EnterTrialWithMargin(Line l_init)
 	_circle_enter.Radius = MIN_RIGHT_TURN_RADIUS;
 	_plan_algebraic_geometry.Tanget_LC_Margin(_line_init,_parking_outer_front_point,_trial_margin,&_circle_enter,&_init_circle_tangent);
 
+    emit sCircleCenterPoint(0,&_circle_enter);
+
 	_trial_body.AttitudeYaw = _line_init.Angle;
 	_trial_body.Center      = Vector2d(_init_circle_tangent.getX(),_init_circle_tangent.getY());
 	_trial_body.VerticalTrial(-MIN_RIGHT_TURN_RADIUS, _parking_outer_rear_point);
@@ -1190,7 +934,7 @@ void VerticalPlanning::EnterTrialWithMargin(Line l_init)
 	_enter_circle_stop_Line.Angle = _trial_body.AttitudeYaw;
 	// 第一个转向点计算
 	_line_to_circle_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
-	_ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5;
+    _ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5f;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_to_circle_enter_turn.Point = _init_circle_tangent + Ahead.rotate(_line_init.Angle);
 //	m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,0);
@@ -1202,11 +946,11 @@ void VerticalPlanning::EnterTrialWithMargin(Line l_init)
 //	m_VerticalPlanningTerminal.TurnPointSend(_circle_enter_stop_point_turn,1);
 }
 
+// 带有余量地，同时计算出库和入库的转向点
 void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 {
 	Vector2d Ahead;
 	float ahead_angle;
-//	Turn temp_turn;
 
 	// 初始化车体对象
 	_trial_body.AttitudeYaw = l_init.Angle;
@@ -1222,13 +966,16 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 
 	_plan_algebraic_geometry.Tangent_CCL_VerticalLine(_line_center,_circle_outer,&_circle_enter,&_line_center_circle_parking_enter_tangent,&_line_init_circle_parking_enter_tangent);
 
+    emit sCircleCenterPoint(0,&_circle_enter);
+    emit sCircleCenterPoint(1,&_circle_outer);
+
 	if( (_circle_enter.Center - _parking_outer_front_point).Length() < (MIN_RIGHT_TURN_RADIUS - RIGHT_EDGE_TO_CENTER))//满足一次入库条件
 	{
 		_analysis_state = 1;
 
 		// 第一个转向点计算
 		_line_init_circle_parking_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
-		_ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5;
+        _ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5f;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_init_circle_parking_enter_turn.Point = _line_init_circle_parking_enter_tangent + Ahead.rotate( (_circle_enter.Center - _circle_outer.Center).Angle() + PI_2);
 //		m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
@@ -1236,19 +983,18 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 		// 第二个转向点计算
 		ahead_angle = _ahead_distance / _circle_enter.Radius;
 		_line_center_circle_parking_enter_turn.Point = _circle_enter.Center +
-				(_line_center_circle_parking_enter_tangent - _circle_enter.Center).rotate(-ahead_angle);
+          (_line_center_circle_parking_enter_tangent - _circle_enter.Center).rotate(-ahead_angle);
 		_line_center_circle_parking_enter_turn.SteeringAngle = 0;
 //		m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
 
 		// 使出转向点计算
 		_stop_point_steering_angle = _plan_vehilce_config.SteeringAngleCalculate(_circle_outer.Radius);
-		_ahead_distance = K * _stop_point_steering_angle * 0.5;
+        _ahead_distance = K * _stop_point_steering_angle * 0.5f;
 		ahead_angle = _ahead_distance / _circle_outer.Radius;
 		_circle_outer_to_line_turn.Point = _circle_outer.Center +
        (_line_init_circle_parking_enter_tangent - _circle_outer.Center).rotate(-ahead_angle);
 		_circle_outer_to_line_turn.SteeringAngle = 0;
 //		m_VerticalPlanningTerminal.TurnPointSend(_circle_outer_to_line_turn,2);
-
 //		temp_turn.Point = _line_init_circle_parking_enter_tangent;
 //		temp_turn.SteeringAngle = 0;
 //		m_VerticalPlanningTerminal.TurnPointSend(temp_turn,3);
@@ -1256,7 +1002,7 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 	else
 	{
 		_analysis_state = 2;
-		_trial_margin = _trial_margin * 0.8;
+        _trial_margin = _trial_margin * 0.8f;
 		_plan_algebraic_geometry.Tanget_CC_Margin(_circle_outer,_parking_outer_front_point,_trial_margin,&_circle_enter,&_outer_enter_circle_line_tangent);
 
 		_trial_body.AttitudeYaw = _outer_enter_circle_line_tangent.Angle;
@@ -1267,7 +1013,7 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 
 		// 使出转向点计算
 		_stop_point_steering_angle = _plan_vehilce_config.SteeringAngleCalculate(_circle_outer.Radius);
-		_ahead_distance = K * _stop_point_steering_angle * 0.5;
+        _ahead_distance = K * _stop_point_steering_angle * 0.5f;
 		ahead_angle = _ahead_distance / _circle_outer.Radius;
 		_circle_outer_to_line_turn.Point = _circle_outer.Center +
        (_outer_enter_circle_line_tangent.Point - _circle_outer.Center).rotate(-ahead_angle);
@@ -1277,7 +1023,7 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 
 		// 驶入转向点计算
 		_line_to_circle_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_enter.Radius);
-		_ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5;
+        _ahead_distance = - K * _line_to_circle_enter_turn.SteeringAngle * 0.5f;
 		Ahead = Vector2d(_ahead_distance,0);
 		_line_to_circle_enter_turn.Point = _outer_enter_circle_line_tangent.Point + Ahead.rotate(_outer_enter_circle_line_tangent.Angle);
 //		m_VerticalPlanningTerminal.TurnPointSend(_line_to_circle_enter_turn,1);
@@ -1290,6 +1036,7 @@ void VerticalPlanning::OuterAndEnterTrial(Line l_init)
 	}
 }
 
+//一次入库圆弧，规划
 void VerticalPlanning::PlanningArc(Line l_init)
 {
 	Vector2d Ahead;
@@ -1298,10 +1045,11 @@ void VerticalPlanning::PlanningArc(Line l_init)
 	_line_init = l_init;
 	_circle_parking_enter.Radius = MIN_RIGHT_TURN_RADIUS;
 	_plan_algebraic_geometry.Tangent_LLC(_line_center, _line_init, &_circle_parking_enter, &_line_center_circle_parking_enter_tangent, &_line_init_circle_parking_enter_tangent);
+    emit sCircleCenterPoint(0,&_circle_parking_enter);
 
 	// 第一个转向点计算
 	_line_init_circle_parking_enter_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(-_circle_parking_enter.Radius);
-	_ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5;
+    _ahead_distance = - K * _line_init_circle_parking_enter_turn.SteeringAngle * 0.5f;
 	Ahead = Vector2d(_ahead_distance,0);
 	_line_init_circle_parking_enter_turn.Point = _line_init_circle_parking_enter_tangent + Ahead.rotate(_line_init.Angle);
 //	m_VerticalPlanningTerminal.TurnPointSend(_line_init_circle_parking_enter_turn,0);
@@ -1314,6 +1062,7 @@ void VerticalPlanning::PlanningArc(Line l_init)
 //	m_VerticalPlanningTerminal.TurnPointSend(_line_center_circle_parking_enter_turn,1);
 }
 
+// 不用了，不太实用
 void VerticalPlanning::TransitionCurve(Percaption *inf)
 {
 	Line circle_move_line;
@@ -1326,21 +1075,21 @@ void VerticalPlanning::TransitionCurve(Percaption *inf)
 //	_line_init.Point.Y = inf->PositionY;
 //	_line_init.Angle   = inf->AttitudeYaw;
 
-	_circle_parking_enter.Center.Y = (_min_circle_parking_enter_y + _max_circle_parking_enter_y) * 0.5;
+    _circle_parking_enter.Center.setY( (_min_circle_parking_enter_y + _max_circle_parking_enter_y) * 0.5 );
 	_circle_transition.Radius = MIN_LEFT_TURN_RADIUS;
 
 	_plan_algebraic_geometry.Tangent_CCL_Up(_line_init,_circle_parking_enter,&_circle_transition);
 
-	_line_center_circle_parking_enter_tangent.X = _parking_center_point.getX();
-	_line_center_circle_parking_enter_tangent.Y = _circle_parking_enter.Center.getY();
+    _line_center_circle_parking_enter_tangent.setX( _parking_center_point.getX() );
+    _line_center_circle_parking_enter_tangent.setY( _circle_parking_enter.Center.getY() );
 	do
 	{
 		// 确定圆心移动方向
 		circle_move_line.Point = _circle_transition.Center;
 		circle_move_line.Angle = _line_init.Angle + PI_4;
 		// x方向按照0.1步长移动
-		_circle_transition.Center.X = _circle_transition.Center.getX() + 0.1;
-		_circle_transition.Center.Y = _plan_algebraic_geometry.LinearAlgebra(circle_move_line,_circle_transition.Center.getX());
+        _circle_transition.Center.setX( _circle_transition.Center.getX() + 0.1 );
+        _circle_transition.Center.setY( _plan_algebraic_geometry.LinearAlgebra(circle_move_line,_circle_transition.Center.getX()) );
 		// 根据新的圆心坐标计算与初始直线的切点和相切圆的半径
 		_plan_algebraic_geometry.Tangent_CL(_line_init,&_circle_transition,&_line_init_circle_transition_tangent);
 		// 计算左右圆之间切线的切点坐标
@@ -1352,7 +1101,8 @@ void VerticalPlanning::TransitionCurve(Percaption *inf)
 			(_line_middle_circle_parking_enter_tangent - _line_middle_circle_transition_tangent).Length() < K * _plan_vehilce_config.SteeringAngleCalculate(_circle_parking_enter.Radius) ||
 			2 * asinf((_line_init_circle_transition_tangent - cure_middle_point).Length() / _circle_transition.Radius) * _circle_transition.Radius < 1.5 * K * _plan_vehilce_config.SteeringAngleCalculate(_circle_transition.Radius)
 	);
-
+    emit sCircleCenterPoint(0,&_circle_parking_enter);
+    emit sCircleCenterPoint(1,&_circle_transition);
 	// 转向点计算
 	// 第一个转向点的计算
 	_line_init_circle_transition_turn.SteeringAngle = _plan_vehilce_config.SteeringAngleCalculate(_circle_transition.Radius);
