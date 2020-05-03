@@ -21,7 +21,7 @@ struct State
     /**
      * @brief theta :Orientation of the robot
      */
-    double theta;
+    double psi;
 
     /**
      * @brief kappa :Curvature at position (x,y)
