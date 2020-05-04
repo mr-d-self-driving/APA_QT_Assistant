@@ -35,7 +35,6 @@ public:
     double getDeltaMin(void);
 
     double getLenghtMin(void);
-
 protected:
     /**
      * @brief _kappa: Max. curvature
@@ -86,8 +85,6 @@ protected:
 class HC_CC_Circle: public HC_CC_Circle_Param
 {
 public:
-    HC_CC_Circle();
-
     /**
      * @brief Init the hc or cc circle param Constructor
      * @param start: the start point configuration
@@ -181,6 +178,18 @@ public:
      */
     double cc_turn_lenght(const Configuration &q) const;
 
+    /** Read only the variable **/
+    Configuration getStart(void);
+
+    bool getLeft(void);
+
+    bool getForward(void);
+
+    bool getRegular(void);
+
+    double getCenter_x(void);
+
+    double getCenter_y(void);
 private:
     /**
      * @brief _start: Start point configuration

@@ -74,11 +74,6 @@ double HC_CC_Circle_Param::getDeltaMin(void){ return _delta_min; }
 double HC_CC_Circle_Param::getLenghtMin(void){ return _lenght_min; }
 
 // 描述HC 和 CC圆的性质
-HC_CC_Circle::HC_CC_Circle()
-{
-
-}
-
 HC_CC_Circle::HC_CC_Circle(const Configuration &start,bool left, bool forward, bool regular,HC_CC_Circle_Param &param)
 {
     _start = start;
@@ -425,3 +420,15 @@ double HC_CC_Circle::cc_turn_lenght(const Configuration &q) const
         return lenght_default;
     }
 }
+
+Configuration HC_CC_Circle::getStart(void){ return _start; }
+
+bool HC_CC_Circle::getLeft(void){ return _left; }
+
+bool HC_CC_Circle::getForward(void){ return _forward; }
+
+bool HC_CC_Circle::getRegular(void){ return _regular; }
+
+double HC_CC_Circle::getCenter_x(void){ return _x_c; }
+
+double HC_CC_Circle::getCenter_y(void){ return _y_c; }

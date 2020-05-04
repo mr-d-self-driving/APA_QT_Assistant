@@ -211,7 +211,7 @@ inline State HC_CC_StateSpace::integrate_ODE(const State &state, const Control &
     State state_next;
     double sigma = control.sigma;
     double d = math::sgn(control.delta_s);
-    if( fabs(sigma) > math::getEpsilon() )
+    if( fabs(sigma) > math::getEpsilon() ) // 角速度不为零，动打方向盘
     {
         math::clothoid_to_end(state.x, state.y, state.psi, state.kappa,
                               sigma, d, integration_step,
@@ -220,7 +220,7 @@ inline State HC_CC_StateSpace::integrate_ODE(const State &state, const Control &
     }
     else
     {
-        if( fabs(state.kappa) > math::getEpsilon())
+        if( fabs(state.kappa) > math::getEpsilon()) // 曲率不为零，固定圆周运动
         {
             math::circular_arc_to_end(state.x, state.y, state.psi, state.kappa,
                                       d, integration_step,
@@ -228,7 +228,7 @@ inline State HC_CC_StateSpace::integrate_ODE(const State &state, const Control &
             state_next.kappa = state.kappa;
             state_next.d = d;
         }
-        else
+        else // 曲率为零，直线运动
         {
             math::straight_line_to_end(state.x, state.y, state.psi,
                                        d, integration_step,
