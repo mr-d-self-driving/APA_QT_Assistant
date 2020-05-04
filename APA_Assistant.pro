@@ -61,11 +61,15 @@ SOURCES += \
         Percaption/Interface/percaption.cpp \
         Percaption/UltrasonicPercaption/ultrasonic_obstacle_percption.cpp \
         Planning/Common/configuration.cpp \
+        Planning/Common/steering_common.cpp \
         Planning/Curvature/curvature.cpp \
+        Planning/HC_CC_StateSpace/hc00_reeds_shepp_state_space.cpp \
         Planning/Interface/hc_cc_state_space.cpp \
         Planning/Interface/planning.cpp \
         Planning/ParallelParking/parallel_planning.cpp \
         Planning/Path/hc_cc_circle.cpp \
+        Planning/Path/hc_cc_rs_path.cpp \
+        Planning/Path/path.cpp \
         Planning/Path/path_line.cpp \
         Planning/VerticalParking/vertical_planning.cpp \
         QCustomPlot/axistag.cpp \
@@ -121,10 +125,13 @@ HEADERS += \
         Planning/Common/configuration.h \
         Planning/Common/steering_common.h \
         Planning/Curvature/curvature.h \
+        Planning/HC_CC_StateSpace/hc00_reeds_shepp_state_space.h \
         Planning/Interface/hc_cc_state_space.h \
         Planning/Interface/planning.h \
         Planning/ParallelParking/parallel_planning.h \
         Planning/Path/hc_cc_circle.h \
+        Planning/Path/hc_cc_rs_path.h \
+        Planning/Path/path.h \
         Planning/Path/path_line.h \
         Planning/VerticalParking/vertical_planning.h \
         QCustomPlot/axistag.h \
