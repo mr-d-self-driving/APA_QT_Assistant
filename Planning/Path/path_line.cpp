@@ -1,12 +1,6 @@
 #include "path_line.h"
 
-using namespace math;
-
-PathLine::PathLine()
-{
-
-}
-
+namespace  math{
 /**
  * @brief Computation of the end point on a clothoid
  * @param x_i,y_i,theta_i,kappa_i: initial configuration
@@ -15,7 +9,7 @@ PathLine::PathLine()
  * @param length: length of clothoid (positive)
  * @param x_f,y_f,theta_f,kappa_f: final configuration on clothoid
  */
-void PathLine::clothoid_to_end( double x_i, double y_i, double theta_i, double kappa_i,
+void clothoid_to_end( double x_i, double y_i, double theta_i, double kappa_i,
                                 double sigma, double direction, double length,
                                 double *x_f, double *y_f, double *theta_f, double *kappa_f)
 {
@@ -64,7 +58,7 @@ void PathLine::clothoid_to_end( double x_i, double y_i, double theta_i, double k
  * @param length: the lenght of the arc (positive)
  * @param x_f,y_f,theta_f,kappa_f: final configuration on clothoid
  */
-void PathLine::circular_arc_to_end( double x_i, double y_i, double theta_i,
+void circular_arc_to_end( double x_i, double y_i, double theta_i,
                                     double kappa, double direction, double length,
                                     double *x_f, double *y_f, double *theta_f)
 {
@@ -81,10 +75,12 @@ void PathLine::circular_arc_to_end( double x_i, double y_i, double theta_i,
  * @param length: line length (positive)
  * @param x_f,y_f,theta_f,kappa_f: final configuration on straight line
  */
-void PathLine::straight_line_to_end( double x_i, double y_i,
+void straight_line_to_end( double x_i, double y_i,
                                      double theta, double direction, double length,
                                      double *x_f, double *y_f)
 {
     *x_f = x_i + direction * length * cos(theta);
     *y_f = y_i + direction * length * sin(theta);
+}
+
 }

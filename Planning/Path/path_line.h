@@ -6,11 +6,7 @@
 #include "Common/Math/vector_2d.h"
 #include "math.h"
 
-class PathLine
-{
-public:
-    PathLine();
-
+namespace math {
     /**
      * @brief Computation of the end point on a clothoid
      * @param x_i,y_i,theta_i,kappa_i: initial configuration
@@ -47,6 +43,6 @@ public:
     void straight_line_to_end(double x_i, double y_i,
                               double theta, double direction, double length,
                               double *x_f, double *y_f);
-};
+}
 
 #endif // PATHLINE_H
