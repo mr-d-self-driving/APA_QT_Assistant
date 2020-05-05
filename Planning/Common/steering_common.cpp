@@ -292,4 +292,4 @@ bool CC_ElementaryControls(HC_CC_Circle &c, const Configuration &q, double delta
     }
 }
 
-}
+}// end of name space
