@@ -76,8 +76,8 @@ void circular_arc_to_end( double x_i, double y_i, double theta_i,
  * @param x_f,y_f,theta_f,kappa_f: final configuration on straight line
  */
 void straight_line_to_end( double x_i, double y_i,
-                                     double theta, double direction, double length,
-                                     double *x_f, double *y_f)
+                           double theta, double direction, double length,
+                           double *x_f, double *y_f)
 {
     *x_f = x_i + direction * length * cos(theta);
     *y_f = y_i + direction * length * sin(theta);

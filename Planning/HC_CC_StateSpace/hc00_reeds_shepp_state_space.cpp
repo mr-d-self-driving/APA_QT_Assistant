@@ -474,11 +474,11 @@ public:
      * @param ci : the middle tangent circle
      * @param q1 : the tengent pint betwen start circle and middle circle
      * @param q2 : the tengent pint betwen end circle and middle circle
-     * @return the length of the TcTcT Path
+     * @return the length of the TTcT Path
      */
-    double TTcT_Path(HC_CC_Circle &c1, HC_CC_Circle &c2,
-                     HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                     HC_CC_Circle **ci, Configuration **q1, Configuration **q2) const
+    double TTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                      HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                      HC_CC_Circle **ci, Configuration **q1, Configuration **q2) const
     {
         Configuration *qa1, *qa2, *qb1, *qb2;
         TTcT_TangentCircles(c1, c2, &qa1, &qa2, &qb1, &qb2);
@@ -520,14 +520,1454 @@ public:
             return length2;
         }
     }
-
     /************************ TST ************************/
-    /************************ TiST ************************/
+    /**
+     * @brief Judge TiST path whether exist
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @return if exist return true,else return false
+     */
+    bool TiST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() == c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() == c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= 2 * c1.getRadius());
+        }
+    }
 
-    /************************ TeST ************************/
+    /**
+     * @brief Judge TeST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TeST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() != c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() == c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= 2 * c1.getRadius() * c1.getSinMu());
+        }
+    }
 
-    /************************ TTcT ************************/
+    /**
+     * @brief Judge TST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        return TiST_Exist(c1, c2) || TeST_Exist(c1, c2);
+    }
 
+    /**
+     * @brief Computation of the tangent point of TiST circles path
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @param q1 : the intersection pint betwen start circle and straight line
+     * @param q2 : the intersection pint betwen end circle and straight line
+     */
+    void TiST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                              Configuration **q1, Configuration **q2) const
+    {
+        double distance = c1.CenterDistance(c2);
+        double angle = atan2(c2.getCenter_y() - c1.getCenter_y(), c2.getCenter_x() - c1.getCenter_x());
+        double alpha = asin(2 * c1.getRadius() * c1.getCosMu() / distance);
+        double delta_x = c1.getRadius() * c1.getSinMu();
+        double delta_y = c1.getRadius() * c1.getCosMu();
+        double x, y, psi;
+
+        if(c1.getLeft() && c1.getForward())
+        {
+            psi = angle + alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, -delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else if(c1.getLeft() && !c1.getForward())
+        {
+            psi = angle - alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, -delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else if(!c1.getLeft() && c1.getForward())
+        {
+            psi = angle - alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, -delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else if(!c1.getLeft() && !c1.getForward())
+        {
+            psi = angle + alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, -delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else
+        {
+
+        }
+    }
+
+    /**
+     * @brief Computation of the tangent point of TiST circles path
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @param q1 :the intersection point betwen start circle and straight line
+     * @param q2 :the intersection point betwen end circle and straight line
+     */
+    void TeST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                              Configuration **q1, Configuration **q2) const
+    {
+        double psi = atan2(c2.getCenter_y() - c1.getCenter_y(), c2.getCenter_x() - c1.getCenter_x());
+        double delta_x = c1.getRadius() * c1.getSinMu();
+        double delta_y = c1.getRadius() * c1.getCosMu();
+        double x, y;
+
+        if(c1.getLeft() && c1.getForward())
+        {
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, -delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, -delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else if(c1.getLeft() && !c1.getForward())
+        {
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else if(!c1.getLeft() && c1.getForward())
+        {
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else if(!c1.getLeft() && !c1.getForward())
+        {
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         delta_x, -delta_y, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, 0);
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x, -delta_y, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else
+        {
+
+        }
+    }
+
+    /**
+     * @brief Computation of the length of TiST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the intersection pint betwen start circle and straight line
+     * @param q2 : the intersection pint betwen end circle and straight line
+     * @return the length of the TiST Path
+     */
+    double TiST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                      HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                      Configuration **q1, Configuration **q2) const
+    {
+        TiST_TangentCircles(c1, c2, q1, q2);
+        *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        return  (*cstart)->cc_turn_lenght(**q1) +
+                (**q1).distance(**q2) +
+                (*cend)->cc_turn_lenght(**q2);
+
+    }
+
+    /**
+     * @brief Computation of the length of TeST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the Intersection pint betwen start circle and straight line
+     * @param q2 : the Intersection pint betwen end circle and straight line
+     * @return the length of the TeST Path
+     */
+    double TeST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                      HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                      Configuration **q1, Configuration **q2) const
+    {
+        TeST_TangentCircles(c1, c2, q1, q2);
+        *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        return  (*cstart)->cc_turn_lenght(**q1) +
+                (**q1).distance(**q2) +
+                (*cend)->cc_turn_lenght(**q2);
+
+    }
+
+    /**
+     * @brief Computation of the length of TST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the Intersection pint betwen start circle and straight line
+     * @param q2 : the Intersection pint betwen end circle and straight line
+     * @return the length of the TST Path
+     */
+    double TST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                     HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                     Configuration **q1, Configuration **q2) const
+    {
+        if(TiST_Exist(c1, c2))
+        {
+            return TiST_Path(c1, c2, cstart, cend, q1, q2);
+        }
+        else if(TeST_Exist(c1, c2))
+        {
+            return TeST_Path(c1,c2, cstart, cend, q1, q2);
+        }
+        else
+        {
+            return numeric_limits<double>::max();
+        }
+    }
+
+    /************************ TSTcT ************************/
+    /**
+     * @brief Judge TiSTcT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TiSTcT_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() != c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= sqrt(pow(2 * c1.getRadius() * c1.getSinMu() + 2 *fabs(c1.getKappaInv()), 2) +
+                                      pow(2 * c1.getRadius() * c1.getCosMu(), 2)));
+        }
+    }
+
+    /**
+     * @brief Judge TeSTcT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TeSTcT_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        if(c1.getLeft() == c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= 2 * (fabs(c1.getKappaInv()) + c1.getRadius() * c1.getSinMu()));
+        }
+    }
+
+    /**
+     * @brief Judge TSTcT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TSTcT_Exist(HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        return TiSTcT_Exist(c1, c2) || TeSTcT_Exist(c1, c2);
+    }
+
+    /**
+     * @brief Computation of the length of TiSTcT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the tengent pint betwen start circle and straight line
+     * @param q2 : the tengent pint betwen middle circle and straight line
+     * @param q3 : the tengent pint betwen middle circle and end circle
+     * @param c1 : the middle circle
+     * @return the length of the TiSTcT Path
+     */
+    double TiSTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                        Configuration **q1, Configuration **q2, Configuration **q3, HC_CC_Circle **ci) const
+    {
+        double psi = _angle;
+        double delta_y = (4 * c2.getRadius() * c2.getCosMu()) / (fabs(c2.getKappa()) * _distance);
+        double delta_x = sqrt(pow(2 * c2.getKappaInv(), 2) - pow(delta_y, 2));
+        double x, y;
+
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, delta_y, &x, &y);
+        HC_CC_Circle middle_circle(x, y, !c2.getLeft(), c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+
+        TiST_TangentCircles(c1, middle_circle, q1, q2);
+        TcT_TangentCircles(middle_circle, c2, q3);
+
+        *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend = new HC_CC_Circle(c2);
+        *ci = new HC_CC_Circle(**q2, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        return  (*cstart)->cc_turn_lenght(**q1) +
+                (**q1).distance(**q2) +
+                (*ci)->hc_turn_lenght(**q3) +
+                (*cend)->hc_turn_lenght(**q3);
+
+    }
+
+    /**
+     * @brief Computation of the length of TeSTcT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the tengent pint betwen start circle and straight line
+     * @param q2 : the tengent pint betwen middle circle and straight line
+     * @param q3 : the tengent pint betwen middle circle and end circle
+     * @param c1 : the middle circle
+     * @return the length of the TeSTcT Path
+     */
+    double TeSTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                        Configuration **q1, Configuration **q2, Configuration **q3, HC_CC_Circle **ci) const
+    {
+        double psi = _angle;
+        double delta_x = 2 * fabs(c2.getKappaInv());
+        double delta_y = 0;
+        double x, y;
+
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, delta_y, &x, &y);
+        HC_CC_Circle middle_circle(x, y, !c2.getLeft(), c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TeST_TangentCircles(c1, middle_circle, q1, q2);
+        TcT_TangentCircles(middle_circle, c2, q3);
+
+        *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend = new HC_CC_Circle(c2);
+        *ci = new HC_CC_Circle(**q2, c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        return  (*cstart)->cc_turn_lenght(**q1) +
+                (**q1).distance(**q2) +
+                (*ci)->hc_turn_lenght(**q3) +
+                (*cend)->hc_turn_lenght(**q3);
+
+    }
+
+    /**
+     * @brief Computation of the length of TeSTcT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the tengent pint betwen start circle and straight line
+     * @param q2 : the tengent pint betwen middle circle and straight line
+     * @param q3 : the tengent pint betwen middle circle and end circle
+     * @param c1 : the middle circle
+     * @return the length of the TeSTcT Path
+     */
+    double TSTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                       HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                       Configuration **q1, Configuration **q2, Configuration **q3, HC_CC_Circle **ci) const
+    {
+        if( TiSTcT_Exist(c1, c2) )
+        {
+            return TiSTcT_Path(c1, c2, cstart, cend, q1, q2, q3, ci);
+        }
+        else if( TeSTcT_Exist(c1, c2) )
+        {
+            return TeSTcT_Path(c1, c2, cstart, cend, q1, q2, q3, ci);
+        }
+        else
+        {
+            return numeric_limits<double>::max();
+        }
+    }
+    /************************ TcTST ************************/
+    /**
+     * @brief Judge TcTiST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcTiST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() != c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= sqrt(pow(2 * c1.getRadius() * c1.getSinMu() + 2 *fabs(c1.getKappaInv()), 2) +
+                                      pow(2 * c1.getRadius() * c1.getCosMu(), 2)));
+        }
+    }
+
+    /**
+     * @brief Judge TcTeST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcTeST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        if(c1.getLeft() == c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= 2 * (fabs(c1.getKappaInv()) + c1.getRadius() * c1.getSinMu()));
+        }
+    }
+
+    /**
+     * @brief Judge TcTST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcTST_Exist(HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        return TcTiST_Exist(c1, c2) || TcTeST_Exist(c1, c2);
+    }
+
+    /**
+     * @brief Computation of the length of TcTiST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the tengent pint betwen start circle and straight line
+     * @param q2 : the tengent pint betwen middle circle and straight line
+     * @param q3 : the tengent pint betwen middle circle and end circle
+     * @param c1 : the middle circle
+     * @return the length of the TcTiST Path
+     */
+    double TcTiST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                        Configuration **q1, Configuration **q2, Configuration **q3, HC_CC_Circle **ci) const
+    {
+        double psi = _angle;
+        double delta_y = (4 * c2.getRadius() * c2.getCosMu()) / (fabs(c2.getKappa()) * _distance);
+        double delta_x = sqrt(pow(2 * c2.getKappaInv(), 2) - pow(delta_y, 2));
+        double x, y;
+
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     delta_x, -delta_y, &x, &y);
+        HC_CC_Circle middle_circle(x, y, !c2.getLeft(), !c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TcT_TangentCircles(c1, middle_circle, q1);
+        TiST_TangentCircles(middle_circle, c2, q2, q3);
+
+        *cstart = new HC_CC_Circle(c1);
+        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *ci = new HC_CC_Circle(**q2, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+
+        return  (*cstart)->hc_turn_lenght(**q1) +
+                (*ci)->hc_turn_lenght(**q1) +
+                (**q2).distance(**q3) +
+                (*cend)->cc_turn_lenght(**q3);
+    }
+
+    /**
+     * @brief Computation of the length of TcTeST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the tengent pint betwen start circle and straight line
+     * @param q2 : the tengent pint betwen middle circle and straight line
+     * @param q3 : the tengent pint betwen middle circle and end circle
+     * @param c1 : the middle circle
+     * @return the length of the TcTeST Path
+     */
+    double TcTeST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                        Configuration **q1, Configuration **q2, Configuration **q3, HC_CC_Circle **ci) const
+    {
+        double psi = _angle;
+        double delta_x = 2 * fabs(c2.getKappaInv());
+        double delta_y = 0;
+        double x, y;
+
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     delta_x, delta_y, &x, &y);
+        HC_CC_Circle middle_circle(x, y, c2.getLeft(), !c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TcT_TangentCircles(c1, middle_circle, q1);
+        TeST_TangentCircles(middle_circle, c2, q2, q3);
+
+
+        *cstart = new HC_CC_Circle(c1);
+        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *ci = new HC_CC_Circle(**q2, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+
+        return  (*cstart)->hc_turn_lenght(**q1) +
+                (*ci)->hc_turn_lenght(**q1) +
+                (**q2).distance(**q3) +
+                (*cend)->cc_turn_lenght(**q3);
+
+    }
+
+    /**
+     * @brief Computation of the length of TcTST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the tengent pint betwen start circle and straight line
+     * @param q2 : the tengent pint betwen middle circle and straight line
+     * @param q3 : the tengent pint betwen middle circle and end circle
+     * @param c1 : the middle circle
+     * @return the length of the TcTST Path
+     */
+    double TcTST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                       HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                       Configuration **q1, Configuration **q2, Configuration **q3, HC_CC_Circle **ci) const
+    {
+        if( TcTiST_Exist(c1, c2) )
+        {
+            return TcTiST_Path(c1, c2, cstart, cend, q1, q2, q3, ci);
+        }
+        else if( TcTeST_Exist(c1, c2) )
+        {
+            return TcTeST_Path(c1, c2, cstart, cend, q1, q2, q3, ci);
+        }
+        else
+        {
+            return numeric_limits<double>::max();
+        }
+    }
+    /************************ TcTSTcT ************************/
+    /**
+     * @brief Judge TcTiSTcT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcTiSTcT_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() == c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() == c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= sqrt(pow(2 * c1.getRadius(), 2) +
+                                      16 * c1.getRadius() * c1.getSinMu() * fabs(c1.getKappaInv()) +
+                                      pow(4 * c1.getKappaInv(), 2)));
+        }
+    }
+
+    /**
+     * @brief Judge TcTeSTcT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcTeSTcT_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        if(c1.getLeft() != c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() == c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance >= 4 * fabs(c1.getKappaInv()) + 2 * c1.getRadius() * c1.getSinMu() );
+        }
+    }
+
+    /**
+     * @brief Judge TcTSTcT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcTSTcT_Exist(HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        return TcTiSTcT_Exist(c1, c2) || TcTeSTcT_Exist(c1, c2);
+    }
+
+    /**
+     * @brief Computation of the length of TcTiSTcT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the intersection point betwen start circle and left middle circle
+     * @param q2 : the intersection pint betwen left middle circle and straight line
+     * @param q3 : the intersection pint betwen right middle circle and straight line
+     * @param q3 : the intersection pint betwen right middle circle and end circle
+     * @param ci1 : the left middle circle
+     * @param ci2 : the right middle circle
+     * @return the length of the TcTiSTcT Path
+     */
+    double TcTiSTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                          HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                          Configuration **q1, Configuration **q2, Configuration **q3, Configuration **q4,
+                          HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
+    {
+        double psi = _angle;
+        double delta_y = (4 * c1.getRadius() * c1.getCosMu()) / (fabs(c1.getKappa()) * _distance);
+        double delta_x = sqrt(pow(2 * c1.getKappaInv(), 2) - pow(delta_y, 2));
+        double x, y;
+
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, delta_y, &x, &y);
+        HC_CC_Circle left_middle_circle(x, y, !c1.getLeft(), !c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, -delta_y, &x, &y);
+        HC_CC_Circle right_middle_circle(x, y, !c2.getLeft(), c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TcT_TangentCircles(c1, left_middle_circle, q1);
+        TiST_TangentCircles(left_middle_circle, right_middle_circle, q2, q3);
+        TcT_TangentCircles(right_middle_circle, c2, q4);
+
+        *cstart = new HC_CC_Circle(c1);
+        *cend = new HC_CC_Circle(c2);
+        *ci1 = new HC_CC_Circle(**q2, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        *ci1 = new HC_CC_Circle(**q3, !c2.getLeft(), c2.getForward(), true, _parent->_hc_cc_circle_param);
+
+        return  (*cstart)->hc_turn_lenght(**q1) +
+                (*ci1)->hc_turn_lenght(**q1) +
+                (**q2).distance(**q3) +
+                (*ci2)->hc_turn_lenght(**q4) +
+                (*cend)->hc_turn_lenght(**q4);
+    }
+
+    /**
+     * @brief Computation of the length of TcTeSTcT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the intersection point betwen start circle and left middle circle
+     * @param q2 : the intersection pint betwen left middle circle and straight line
+     * @param q3 : the intersection pint betwen right middle circle and straight line
+     * @param q3 : the intersection pint betwen right middle circle and end circle
+     * @param ci1 : the left middle circle
+     * @param ci2 : the right middle circle
+     * @return the length of the TcTeSTcT Path
+     */
+    double TcTeSTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2, HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                          Configuration **q1, Configuration **q2, Configuration **q3, Configuration **q4,
+                          HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
+    {
+        double psi = _angle;
+        double delta_x = 2 * fabs(c1.getKappaInv());
+        double delta_y = 0;
+        double x, y;
+
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, delta_y, &x, &y);
+        HC_CC_Circle left_middle_circle(x, y, !c2.getLeft(), !c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, delta_y, &x, &y);
+        HC_CC_Circle right_middle_circle(x, y, !c2.getLeft(), c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TcT_TangentCircles(c1, left_middle_circle, q1);
+        TeST_TangentCircles(left_middle_circle, right_middle_circle, q2, q3);
+        TcT_TangentCircles(right_middle_circle, c2, q4);
+
+        *cstart = new HC_CC_Circle(c1);
+        *cend = new HC_CC_Circle(c2);
+        *ci1 = new HC_CC_Circle(**q2, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        *ci2 = new HC_CC_Circle(**q3, !c2.getLeft(), c2.getForward(), true, _parent->_hc_cc_circle_param);
+        return  (*cstart)->hc_turn_lenght(**q1) +
+                (*ci1)->hc_turn_lenght(**q1) +
+                (**q2).distance(**q3) +
+                (*ci2)->hc_turn_lenght(**q4) +
+                (*cend)->hc_turn_lenght(**q4);
+
+    }
+
+    /**
+     * @brief Computation of the length of TcTSTcT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the start circle
+     * @param cend :the end circle
+     * @param q1 : the intersection point betwen start circle and left middle circle
+     * @param q2 : the intersection pint betwen left middle circle and straight line
+     * @param q3 : the intersection pint betwen right middle circle and straight line
+     * @param q3 : the intersection pint betwen right middle circle and end circle
+     * @param ci1 : the left middle circle
+     * @param ci2 : the right middle circle
+     * @return the length of the TcTSTcT Path
+     */
+    double TcTSTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2, HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                         Configuration **q1, Configuration **q2, Configuration **q3, Configuration **q4,
+                         HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
+    {
+        if( TcTiSTcT_Exist(c1, c2) )
+        {
+            return TcTiSTcT_Path(c1, c2, cstart, cend, q1, q2, q3, q4, ci1, ci2);
+        }
+        else if( TcTeSTcT_Exist(c1, c2) )
+        {
+            return TcTeSTcT_Path(c1, c2, cstart, cend, q1, q2, q3, q4, ci1, ci2);
+        }
+        else
+        {
+            return numeric_limits<double>::max();
+        }
+    }
+
+    /************************ TTcTT ************************/
+    /**
+     * @brief Judge TTcTT path whether exist
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @return if exist return true,else return false
+     */
+    bool TTcTT_Exist(HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        if(c1.getLeft() == c2.getLeft()) // two circle tangent
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance <= 4 * c1.getRadius() + 2 * fabs(c1.getKappaInv()));
+        }
+    }
+
+    /**
+     * @brief Computation of the tangent point of internal circles
+     * @param c1 :start circle
+     * @param c2 :end circle
+     * @param qa1 :the tangent point betwen start circle and left middle circle
+     * @param qa2 :the inersection point betwen left middle circle and right middle circle
+     * @param qa3 :the tangent point betwen right middle circle and end circle
+     * @param qb1 :the tangent point betwen start circle and left middle circle
+     * @param qb2 :the inersection point betwen left middle circle and right middle circle
+     * @param qb3 :the tangent point betwen right middle circle and end circle
+     */
+    void TTcTT_TangentCircles(HC_CC_Circle &c1, HC_CC_Circle &c2,
+                              Configuration **qa1, Configuration **qa2, Configuration **qa3,
+                              Configuration **qb1, Configuration **qb2, Configuration **qb3) const
+    {
+        double psi = _angle;
+        double r1, r2, delta_x, delta_y, x, y;
+
+        r1 = 2 * fabs(c1.getKappaInv());
+        r2 = 2 * c1.getRadius();
+
+        if( _distance < 4 * c1.getRadius() - 2 * fabs(c1.getKappaInv()) )
+        {
+            delta_x = (_distance + r1) / 2;
+            delta_y = sqrt(pow(r2, 2) - pow(delta_x, 2));
+        }
+        else
+        {
+            delta_x = (_distance - r1) / 2;
+            delta_y = sqrt(pow(r2, 2) - pow(delta_x, 2));
+        }
+
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, delta_y, &x, &y);
+        HC_CC_Circle left_middle_circle1(x, y, !c1.getLeft(), c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, delta_y, &x, &y);
+        HC_CC_Circle right_middle_circle1(x, y, !c2.getLeft(), !c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, -delta_y, &x, &y);
+        HC_CC_Circle left_middle_circle2(x, y, !c1.getLeft(), c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, -delta_y, &x, &y);
+        HC_CC_Circle right_middle_circle2(x, y, !c2.getLeft(), !c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TT_TangentCircles(c1, left_middle_circle1, qa1);
+        TcT_TangentCircles(left_middle_circle1, right_middle_circle1, qa2);
+        TT_TangentCircles(right_middle_circle1, c2, qa3);
+
+        TT_TangentCircles(c1, left_middle_circle2, qb1);
+        TcT_TangentCircles(left_middle_circle2, right_middle_circle2, qb2);
+        TT_TangentCircles(right_middle_circle2, c2, qb3);
+    }
+
+    /**
+     * @brief Computation of the TTcTT path
+     * @param c1 :Configuration Start circle
+     * @param c2 :Configuration end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 :the tangent point betwen start circle and left middle circle
+     * @param q2 :the inersection point betwen left middle circle and right middle circle
+     * @param q3 :the tangent point betwen right middle circle and end circle
+     * @param ci1 :the left middle circle
+     * @param ci2 :the right middle circle
+     * @return the length of path
+     */
+    double TTcTT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2, HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                       Configuration **q1, Configuration **q2, Configuration **q3,
+                       HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
+    {
+        Configuration *qa1, *qa2, *qa3;
+        Configuration *qb1, *qb2, *qb3;
+        TTcTT_TangentCircles(c1, c2, &qa1, &qa2, &qa3, &qb1, &qb2, &qb3);
+
+        HC_CC_Circle *left_middle_cricle1, *right_middle_circle1;
+        HC_CC_Circle *left_middle_cricle2, *right_middle_circle2;
+        left_middle_cricle1  = new HC_CC_Circle(*qa1, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        right_middle_circle1 = new HC_CC_Circle(*qa3, !c2.getLeft(), c2.getForward(), true, _parent->_hc_cc_circle_param);
+        left_middle_cricle2  = new HC_CC_Circle(*qb1, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        right_middle_circle2 = new HC_CC_Circle(*qb3, !c2.getLeft(), c2.getForward(), true, _parent->_hc_cc_circle_param);
+
+        *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+
+        // select shortest connection path
+        double lenght1 = (*cstart)->cc_turn_lenght(*qa1) +
+                         left_middle_cricle1->hc_turn_lenght(*qa2) +
+                         right_middle_circle1->hc_turn_lenght(*qa2) +
+                         (*cend)->cc_turn_lenght(*qa3);
+
+        double lenght2 = (*cstart)->cc_turn_lenght(*qb1) +
+                         left_middle_cricle1->hc_turn_lenght(*qb2) +
+                         right_middle_circle1->hc_turn_lenght(*qb2) +
+                         (*cend)->cc_turn_lenght(*qb3);
+
+        if( lenght1 < lenght2 )
+        {
+            *q1 = qa1;
+            *q2 = qa2;
+            *q3 = qa3;
+            *ci1 = left_middle_cricle1;
+            *ci2 = right_middle_circle1;
+            delete qb1;
+            delete qb2;
+            delete qb3;
+            delete left_middle_cricle2;
+            delete right_middle_circle2;
+            return lenght1;
+        }
+        else
+        {
+            *q1 = qb1;
+            *q2 = qb2;
+            *q3 = qb3;
+            *ci1 = left_middle_cricle2;
+            *ci2 = right_middle_circle2;
+            delete qa1;
+            delete qa2;
+            delete qa3;
+            delete left_middle_cricle1;
+            delete right_middle_circle1;
+            return lenght2;
+        }
+    }
+
+    /************************ TcTTcT ************************/
+    /**
+     * @brief Judge TcTTcT path whether exist
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @return if exist return true,else return false
+     */
+    bool TcTTcT_Exist(HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        if(c1.getLeft() == c2.getLeft()) // two circle tangent
+        {
+            return false;
+        }
+        else if(c1.getForward() == c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return (_distance <= 4 * fabs(c1.getKappaInv()) + 2 * c1.getRadius()) &&
+                   (_distance >= 4 * fabs(c1.getKappaInv()) - 2 * c1.getRadius());
+        }
+    }
+
+    /**
+     * @brief Computation of the tangent point of internal circles
+     * @param c1 :start circle
+     * @param c2 :end circle
+     * @param qa1 :the inersection point betwen start circle and left middle circle
+     * @param qa2 :the tangent point betwen left middle circle and right middle circle
+     * @param qa3 :the inersection point betwen right middle circle and end circle
+     * @param qb1 :the inersection point betwen start circle and left middle circle
+     * @param qb2 :the tangent point betwen left middle circle and right middle circle
+     * @param qb3 :the inersection point betwen right middle circle and end circle
+     */
+    void TcTTcT_TangentCircles(HC_CC_Circle &c1, HC_CC_Circle &c2,
+                              Configuration **qa1, Configuration **qa2, Configuration **qa3,
+                              Configuration **qb1, Configuration **qb2, Configuration **qb3) const
+    {
+        double psi = _angle;
+        double r1, r2, delta_x, delta_y, x, y;
+
+        r1 = 2 * fabs(c1.getKappaInv());
+        r2 = 2 * c1.getRadius();
+
+        delta_x = (pow(r1, 2) + pow(_distance / 2, 2) - pow(r2, 2)) / _distance;
+        delta_y = sqrt(pow(r1, 2) - pow(delta_x, 2));
+
+
+
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, delta_y, &x, &y);
+        HC_CC_Circle left_middle_circle1(x, y, !c1.getLeft(), !c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, -delta_y, &x, &y);
+        HC_CC_Circle right_middle_circle1(x, y, !c2.getLeft(), c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, -delta_y, &x, &y);
+        HC_CC_Circle left_middle_circle2(x, y, !c1.getLeft(), !c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+        math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                     -delta_x, delta_y, &x, &y);
+        HC_CC_Circle right_middle_circle2(x, y, !c2.getLeft(), c2.getForward(), c2.getRegular(), _parent->_hc_cc_circle_param);
+
+        TcT_TangentCircles(c1, left_middle_circle1, qa1);
+        TT_TangentCircles(left_middle_circle1, right_middle_circle1, qa2);
+        TcT_TangentCircles(right_middle_circle1, c2, qa3);
+
+        TcT_TangentCircles(c1, left_middle_circle2, qb1);
+        TT_TangentCircles(left_middle_circle2, right_middle_circle2, qb2);
+        TcT_TangentCircles(right_middle_circle2, c2, qb3);
+    }
+
+    /**
+     * @brief Computation of the TcTTcT path
+     * @param c1 :Configuration Start circle
+     * @param c2 :Configuration end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 :the inersection point betwen start circle and left middle circle
+     * @param q2 :the tangent point betwen left middle circle and right middle circle
+     * @param q3 :the inersection point betwen right middle circle and end circle
+     * @param ci1 :the left middle circle
+     * @param ci2 :the right middle circle
+     * @return the length of path
+     */
+    double TcTTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2, HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                       Configuration **q1, Configuration **q2, Configuration **q3,
+                       HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
+    {
+        Configuration *qa1, *qa2, *qa3;
+        Configuration *qb1, *qb2, *qb3;
+        TcTTcT_TangentCircles(c1, c2, &qa1, &qa2, &qa3, &qb1, &qb2, &qb3);
+
+        HC_CC_Circle *left_middle_cricle1, *right_middle_circle1;
+        HC_CC_Circle *left_middle_cricle2, *right_middle_circle2;
+        left_middle_cricle1  = new HC_CC_Circle(*qa2, !c1.getLeft(),  c1.getForward(), true, _parent->_hc_cc_circle_param);
+        right_middle_circle1 = new HC_CC_Circle(*qa2,  c1.getLeft(), !c1.getForward(), true, _parent->_hc_cc_circle_param);
+        left_middle_cricle2  = new HC_CC_Circle(*qb2, !c1.getLeft(),  c1.getForward(), true, _parent->_hc_cc_circle_param);
+        right_middle_circle2 = new HC_CC_Circle(*qb2,  c1.getLeft(), !c1.getForward(), true, _parent->_hc_cc_circle_param);
+
+        *cstart = new HC_CC_Circle(c1);
+        *cend   = new HC_CC_Circle(c2);
+
+        // select shortest connection path
+        double lenght1 = (*cstart)->hc_turn_lenght(*qa1) +
+                         left_middle_cricle1->hc_turn_lenght(*qa1) +
+                         right_middle_circle1->hc_turn_lenght(*qa3) +
+                         (*cend)->hc_turn_lenght(*qa3);
+
+        double lenght2 = (*cstart)->hc_turn_lenght(*qb1) +
+                         left_middle_cricle1->hc_turn_lenght(*qb1) +
+                         right_middle_circle1->hc_turn_lenght(*qb3) +
+                         (*cend)->hc_turn_lenght(*qb3);
+
+        if( lenght1 < lenght2 )
+        {
+            *q1 = qa1;
+            *q2 = qa2;
+            *q3 = qa3;
+            *ci1 = left_middle_cricle1;
+            *ci2 = right_middle_circle1;
+            delete qb1;
+            delete qb2;
+            delete qb3;
+            delete left_middle_cricle2;
+            delete right_middle_circle2;
+            return lenght1;
+        }
+        else
+        {
+            *q1 = qb1;
+            *q2 = qb2;
+            *q3 = qb3;
+            *ci1 = left_middle_cricle2;
+            *ci2 = right_middle_circle2;
+            delete qa1;
+            delete qa2;
+            delete qa3;
+            delete left_middle_cricle1;
+            delete right_middle_circle1;
+            return lenght2;
+        }
+    }
+    /************************ Additional Families ************************/
+    /************************ TTT ************************/
+    /**
+     * @brief Judge TTT path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TTT_Exist(HC_CC_Circle &c1, HC_CC_Circle &c2) const
+    {
+        if(c1.getLeft() != c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() == c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return _distance <= 4 * c1.getRadius();
+        }
+    }
+
+    /**
+     * @brief Computation of the tangent point of TTT circles path
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @param qa1 :the first tangent point of upper tangent circle
+     * @param qa2 :the second tangent point of upper tangent circle
+     * @param qb1 :the first tangent point of down tangent circle
+     * @param qb2 :the second tangent point of down tangent circle
+     */
+    void TTT_TangentCircles(HC_CC_Circle &c1, HC_CC_Circle &c2,
+                             Configuration **qa1, Configuration **qa2,
+                             Configuration **qb1, Configuration **qb2) const
+    {
+        double psi = _angle;
+        double r = 2 * c1.getRadius();
+        double delta_x = 0.5 * _distance;
+        double delta_y = sqrt(pow(r, 2) - pow(delta_x,2));
+        double x,y;
+
+        // the upper tangent circle
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x,  delta_y, &x, &y);
+        HC_CC_Circle middle_tangent_circle1(x, y, !c1.getLeft(), c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+
+        // the down tangent circle
+        math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                     delta_x, -delta_y, &x, &y);
+        HC_CC_Circle middle_tangent_circle2(x, y, !c1.getLeft(), c1.getForward(), c1.getRegular(), _parent->_hc_cc_circle_param);
+
+        TT_TangentCircles(c1, middle_tangent_circle1, qa1);
+        TT_TangentCircles(middle_tangent_circle1, c2, qa2);
+
+        TT_TangentCircles(c1, middle_tangent_circle2, qb1);
+        TT_TangentCircles(middle_tangent_circle2, c2, qb2);
+    }
+
+    /**
+     * @brief Computation of the length of TTT path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the tengent pint betwen start circle and middle circle
+     * @param q2 : the tengent pint betwen end circle and middle circle
+     * @param ci : the middle tangent circle
+     * @return the length of the TcTcT Path
+     */
+    double TTT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                     HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                     Configuration **q1, Configuration **q2,
+                     HC_CC_Circle **ci) const
+    {
+        Configuration *qa1, *qa2, *qb1, *qb2;
+        TTT_TangentCircles(c1, c2, &qa1, &qa2, &qb1, &qb2);
+
+        HC_CC_Circle *middle_tangent_circle1, *middle_tangent_circle2;
+        middle_tangent_circle1 = new HC_CC_Circle(*qa1, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        middle_tangent_circle2 = new HC_CC_Circle(*qb1, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+
+        *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+
+        // select shortest connection
+        double length1 = (*cstart)->cc_turn_lenght(*qa1)
+                       + middle_tangent_circle1->cc_turn_lenght(*qa2)
+                       + (*cend)->cc_turn_lenght(*qa2);
+
+        double length2 = (*cstart)->cc_turn_lenght(*qb1)
+                       + middle_tangent_circle1->cc_turn_lenght(*qb2)
+                       + (*cend)->cc_turn_lenght(*qb2);
+
+        if(length1 < length2)
+        {
+            *q1 = qa1;
+            *q2 = qa2;
+            *ci = middle_tangent_circle1;
+            delete qb1;
+            delete qb2;
+            delete middle_tangent_circle2;
+            return length1;
+        }
+        else
+        {
+            *q1 = qb1;
+            *q2 = qb2;
+            *ci = middle_tangent_circle2;
+            delete qa1;
+            delete qa2;
+            delete middle_tangent_circle1;
+            return length2;
+        }
+    }
+
+    /************************ TcST ************************/
+    /**
+     * @brief Judge TciST path whether exist
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @return if exist return true,else return false
+     */
+    bool TciST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() == c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return _distance >= sqrt( pow(c1.getRadius() * c1.getSinMu(), 2) +
+                                      pow(c1.getRadius() * c1.getCosMu() + fabs(c1.getKappaInv()), 2));
+        }
+    }
+
+    /**
+     * @brief Judge TceST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TceST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        if(c1.getLeft() != c2.getLeft())
+        {
+            return false;
+        }
+        else if(c1.getForward() != c2.getForward())
+        {
+            return false;
+        }
+        else
+        {
+            return _distance >= sqrt( pow(c1.getRadius() * c1.getSinMu(), 2) +
+                                      pow(c1.getRadius() * c1.getCosMu() - fabs(c1.getKappaInv()), 2));
+        }
+    }
+
+    /**
+     * @brief Judge TcST path whether exist
+     * @param c1 :the start path
+     * @param c2 :the end path
+     * @return if exist return true,else return false
+     */
+    bool TcST_Exist( HC_CC_Circle &c1, HC_CC_Circle &c2 ) const
+    {
+        return TciST_Exist(c1, c2) || TceST_Exist(c1, c2);
+    }
+
+    /**
+     * @brief Computation of the tangent point of TciST circles path
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @param q1 : the intersection pint betwen start circle and straight line
+     * @param q2 : the intersection pint betwen end circle and straight line
+     */
+    void TciST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                               Configuration **q1, Configuration **q2) const
+    {
+        double alpha = asin( (c1.getRadius() * c1.getCosMu() + fabs(c1.getKappaInv())) / _distance);
+        double delta_x1 = 0.0;
+        double delta_y1 = fabs(c1.getKappaInv());
+        double delta_x2 = c1.getRadius() * c1.getSinMu();
+        double delta_y2 = c1.getRadius() * c1.getCosMu();
+        double x, y, psi;
+
+        if(c1.getLeft() && c1.getForward())
+        {
+            psi = _angle - alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1,  delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2, -delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else if(c1.getLeft() && !c1.getForward())
+        {
+            psi = _angle + alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1, -delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2,  delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else if(!c1.getLeft() && c1.getForward())
+        {
+            psi = _angle + alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1, -delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2,  delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else if(!c1.getLeft() && !c1.getForward())
+        {
+            psi = _angle - alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1,  delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2, -delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else
+        {
+
+        }
+    }
+
+    /**
+     * @brief Computation of the tangent point of TceST circles path
+     * @param c1 :the start circle
+     * @param c2 :the end circle
+     * @param q1 :the intersection point betwen start circle and straight line
+     * @param q2 :the intersection point betwen end circle and straight line
+     */
+    void TceST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                               Configuration **q1, Configuration **q2) const
+    {
+        double alpha = asin( (c1.getRadius() * c1.getCosMu() - fabs(c1.getKappaInv())) / _distance);
+        double delta_x1 = 0.0;
+        double delta_y1 = fabs(c1.getKappaInv());
+        double delta_x2 = c1.getRadius() * c1.getSinMu();
+        double delta_y2 = c1.getRadius() * c1.getCosMu();
+        double x, y, psi;
+
+        if(c1.getLeft() && c1.getForward())
+        {
+            psi = _angle + alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1,  delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2,  delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else if(c1.getLeft() && !c1.getForward())
+        {
+            psi = _angle - alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1, -delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2, -delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else if(!c1.getLeft() && c1.getForward())
+        {
+            psi = _angle - alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1, -delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi + MV_PI, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2, -delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi + MV_PI, 0);
+        }
+        else if(!c1.getLeft() && !c1.getForward())
+        {
+            psi = _angle + alpha;
+            math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
+                                         -delta_x1,  delta_y1, &x, &y);
+            *q1 = new Configuration(x, y, psi, c1.getKappa());
+
+            math::change_to_global_frame(c2.getCenter_x(), c2.getCenter_y(), psi,
+                                         -delta_x2,  delta_y2, &x, &y);
+            *q2 = new Configuration(x, y, psi, 0);
+        }
+        else
+        {
+
+        }
+    }
+
+    /**
+     * @brief Computation of the length of TciST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the intersection pint betwen start circle and straight line
+     * @param q2 : the intersection pint betwen end circle and straight line
+     * @return the length of the TciST Path
+     */
+    double TciST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                       HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                       Configuration **q1, Configuration **q2) const
+    {
+        TciST_TangentCircles(c1, c2, q1, q2);
+        *cstart = new HC_CC_Circle(c1);
+        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        return  (*cstart)->hc_turn_lenght(**q1) +
+                (**q1).distance(**q2) +
+                (*cend)->cc_turn_lenght(**q2);
+
+    }
+
+    /**
+     * @brief Computation of the length of TceST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the Intersection pint betwen start circle and straight line
+     * @param q2 : the Intersection pint betwen end circle and straight line
+     * @return the length of the TeST Path
+     */
+    double TceST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                       HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                       Configuration **q1, Configuration **q2) const
+    {
+        TceST_TangentCircles(c1, c2, q1, q2);
+        *cstart = new HC_CC_Circle(c1);
+        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        return  (*cstart)->hc_turn_lenght(**q1) +
+                (**q1).distance(**q2) +
+                (*cend)->cc_turn_lenght(**q2);
+    }
+
+    /**
+     * @brief Computation of the length of TcST path
+     * @param c1 :the start cricle
+     * @param c2 :the end circle
+     * @param cstart :the output start circle
+     * @param cend :the output end circle
+     * @param q1 : the Intersection pint betwen start circle and straight line
+     * @param q2 : the Intersection pint betwen end circle and straight line
+     * @return the length of the TST Path
+     */
+    double TcST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                      HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                      Configuration **q1, Configuration **q2) const
+    {
+        if(TciST_Exist(c1, c2))
+        {
+            return TciST_Path(c1, c2, cstart, cend, q1, q2);
+        }
+        else if(TceST_Exist(c1, c2))
+        {
+            return TceST_Path(c1,c2, cstart, cend, q1, q2);
+        }
+        else
+        {
+            return numeric_limits<double>::max();
+        }
+    }
+    /************************ TScT ************************/
+
+    /************************ TcScT ************************/
 
     /************************ private variable interface ************************/
     double getDistance(void){ return _distance; }
