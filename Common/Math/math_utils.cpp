@@ -88,6 +88,54 @@ void change_to_local_frame(double x, double y, double psi,
 }
 
 /**
+ * @brief Initialize an array with a given value
+ * @param array :init array
+ * @param size :size of the array
+ * @param value :the init value
+ */
+void DoubleArrayInit(double array[],uint16_t size, double value)
+{
+    for(uint16_t i = 0; i < size; i++)
+    {
+        array[i] = value;
+    }
+}
+
+/**
+ * @brief Initialize an array with nullptr
+ * @param array :the init array
+ * @param size :the size fo array
+ */
+void PointerArrayInit(void *array[], uint16_t size)
+{
+    for(uint16_t i = 0; i < size; i++)
+    {
+        array[i] = nullptr;
+    }
+}
+
+/**
+ * @brief Find index with minimal value in double array
+ * @param array :the finding array
+ * @param size :the size of array
+ * @return
+ */
+uint16_t ArrayIndexMin(double array[], uint16_t size)
+{
+    double min_value = array[0];
+    uint16_t index_min = 0;
+    for (uint16_t i = 1; i < size; i++)
+    {
+        if( array[i] < min_value )
+        {
+            index_min = i;
+            min_value = array[i];
+        }
+    }
+    return index_min;
+}
+
+/**
  * @brief get the epsilon value
  * @return  the epsilon value
  */

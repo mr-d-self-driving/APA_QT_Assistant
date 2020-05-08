@@ -17,6 +17,11 @@ public:
      */
     Path(const Configuration &start, const Configuration &end, double kappa, double sigma, double length);
 
+    Configuration getStart(void) { return  start_; }
+    Configuration getEnd(void) { return end_; }
+    double getKappa(void) { return kappa_; }
+    double getSigma(void) { return sigma_; }
+    double getLength(void) { return lenght_; }
 protected:
 
     /**

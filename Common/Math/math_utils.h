@@ -57,6 +57,29 @@ namespace math{
                                double *local_x, double *local_y);
 
     /**
+     * @brief Initialize an array with a given value
+     * @param array :init array
+     * @param size :size of the array
+     * @param value :the init value
+     */
+    void DoubleArrayInit(double array[],uint16_t size, double value);
+
+    /**
+     * @brief Initialize an array with nullptr
+     * @param array :the init array
+     * @param size :the size fo array
+     */
+    void PointerArrayInit(void *array[], uint16_t size);
+
+    /**
+     * @brief Find index with minimal value in double array
+     * @param array :the finding array
+     * @param size :the size of array
+     * @return
+     */
+    uint16_t ArrayIndexMin(double array[], uint16_t size);
+
+    /**
      * @brief get the epsilon value
      * @return  the epsilon value
      */
