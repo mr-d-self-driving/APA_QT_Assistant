@@ -1647,7 +1647,7 @@ public:
         }
         else
         {
-            return _distance <= 4 * c2.getRadius();
+            return _distance <= 4 * _parent->_radius;
         }
     }
 
@@ -1665,7 +1665,7 @@ public:
                              Configuration **qb1, Configuration **qb2) const
     {
         double psi = _angle;
-        double r = 2 * c2.getRadius();
+        double r = 2 * _parent->_radius;
         double delta_x = 0.5 * _distance;
         double delta_y = sqrt(pow(r, 2) - pow(delta_x,2));
         double x,y;
@@ -1708,26 +1708,30 @@ public:
 
         HC_CC_Circle *middle_tangent_circle1, *middle_tangent_circle2;
         HC_CC_Circle *start_circle1, *start_circle2;
+        HC_CC_Circle *end_circle1, *end_circle2;
+
         start_circle1          = new HC_CC_Circle(*qa1,  c1.getLeft(), !c1.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
         middle_tangent_circle1 = new HC_CC_Circle(*qa1, !c1.getLeft(),  c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        end_circle1            = new HC_CC_Circle(*qa2,  c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
         start_circle2          = new HC_CC_Circle(*qb1,  c1.getLeft(), !c1.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
         middle_tangent_circle2 = new HC_CC_Circle(*qb1, !c1.getLeft(),  c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        end_circle2            = new HC_CC_Circle(*qb2,  c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
 
-        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
         *q1   = new Configuration(c1.getStart().getX(), c1.getStart().getY(), c1.getStart().getPsi(), c1.getKappa());
-
+        *q3   = new Configuration(c1.getStart().getX(), c1.getStart().getY(), c1.getStart().getPsi(), c1.getKappa());
         // select shortest connection
         double length1 = start_circle1->hc_turn_lenght(**q1)
                        + middle_tangent_circle1->cc_turn_lenght(*qa2)
-                       + (*cend)->cc_turn_lenght(*qa2);
+                       + end_circle1->hc_turn_lenght(**q3);
 
-        double length2 = (*cstart)->hc_turn_lenght(*qb1)
+        double length2 = (*cstart)->hc_turn_lenght(**q1)
                        + middle_tangent_circle2->cc_turn_lenght(*qb2)
-                       + (*cend)->cc_turn_lenght(*qb2);
+                       + end_circle2->hc_turn_lenght(**q3);
 
         if(length1 < length2)
         {
             *cstart = start_circle1;
+            *cend   = end_circle1;
             *q2 = qa2;
             *ci = middle_tangent_circle1;
             delete qa1;
@@ -1735,11 +1739,13 @@ public:
             delete qb2;
             delete middle_tangent_circle2;
             delete start_circle2;
+            delete end_circle2;
             return length1;
         }
         else
         {
             *cstart = start_circle2;
+            *cend   = end_circle2;
             *q2 = qb2;
             *ci = middle_tangent_circle2;
             delete qa1;
@@ -1747,6 +1753,7 @@ public:
             delete qb1;
             delete middle_tangent_circle1;
             delete start_circle1;
+            delete end_circle1;
             return length2;
         }
     }
@@ -1770,8 +1777,8 @@ public:
         }
         else
         {
-            return _distance >= sqrt( pow(c2.getRadius() * c2.getSinMu(), 2) +
-                                      pow(c2.getRadius() * c2.getCosMu() + fabs(c2.getKappaInv()), 2));
+            return _distance >= sqrt( pow(_parent->_radius * _parent->_sin_mu, 2) +
+                                      pow(_parent->_radius * _parent->_cos_mu + fabs(c1.getKappaInv()), 2));
         }
     }
 
@@ -1793,8 +1800,8 @@ public:
         }
         else
         {
-            return _distance >= sqrt( pow(c2.getRadius() * c2.getSinMu(), 2) +
-                                      pow(c2.getRadius() * c2.getCosMu() - fabs(c2.getKappaInv()), 2));
+            return _distance >= sqrt( pow(_parent->_radius * _parent->_sin_mu, 2) +
+                                      pow(_parent->_radius * _parent->_cos_mu - fabs(c1.getKappaInv()), 2));
         }
     }
 
@@ -1819,11 +1826,11 @@ public:
     void TciST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                                Configuration **q1, Configuration **q2) const
     {
-        double alpha = asin( (c2.getRadius() * c2.getCosMu() + fabs(c2.getKappaInv())) / _distance);
+        double alpha = asin( (_parent->_radius * _parent->_cos_mu + fabs(c1.getKappaInv())) / _distance);
         double delta_x1 = 0.0;
-        double delta_y1 = fabs(c2.getKappaInv());
-        double delta_x2 = c2.getRadius() * c2.getSinMu();
-        double delta_y2 = c2.getRadius() * c2.getCosMu();
+        double delta_y1 = fabs(c1.getKappaInv());
+        double delta_x2 = _parent->_radius * _parent->_sin_mu;
+        double delta_y2 = _parent->_radius * _parent->_cos_mu;
         double x, y, psi;
 
         if(c1.getLeft() && c1.getForward())
@@ -1886,11 +1893,11 @@ public:
     void TceST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                                Configuration **q1, Configuration **q2) const
     {
-        double alpha = asin( (c2.getRadius() * c2.getCosMu() - fabs(c2.getKappaInv())) / _distance);
+        double alpha = asin( (_parent->_radius * _parent->_cos_mu - fabs(c1.getKappaInv())) / _distance);
         double delta_x1 = 0.0;
-        double delta_y1 = fabs(c2.getKappaInv());
-        double delta_x2 = c2.getRadius() * c2.getSinMu();
-        double delta_y2 = c2.getRadius() * c2.getCosMu();
+        double delta_y1 = fabs(c1.getKappaInv());
+        double delta_x2 = _parent->_radius * _parent->_sin_mu;
+        double delta_y2 = _parent->_radius * _parent->_cos_mu;
         double x, y, psi;
 
         if(c1.getLeft() && c1.getForward())
@@ -1955,14 +1962,15 @@ public:
      */
     double TciST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                       Configuration **q1, Configuration **q2) const
+                       Configuration **q1, Configuration **q2, Configuration **q3) const
     {
         TciST_TangentCircles(c1, c2, q1, q2);
+        *q3 = new Configuration(c2.getStart().getX(), c2.getStart().getY(), c2.getStart().getPsi(), c2.getKappa());
         *cstart = new HC_CC_Circle(c1);
-        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend   = new HC_CC_Circle(**q2, c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
         return  (*cstart)->rs_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->cc_turn_lenght(**q2);
+                (*cend)->cc_turn_lenght(**q3);
 
     }
 
@@ -1978,14 +1986,15 @@ public:
      */
     double TceST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                       Configuration **q1, Configuration **q2) const
+                       Configuration **q1, Configuration **q2, Configuration **q3) const
     {
         TceST_TangentCircles(c1, c2, q1, q2);
         *cstart = new HC_CC_Circle(c1);
-        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), !c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend   = new HC_CC_Circle(**q2, c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
+        *q3 = new Configuration(c2.getStart().getX(), c2.getStart().getY(), c2.getStart().getPsi(), c2.getKappa());
         return  (*cstart)->rs_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->hc_turn_lenght(**q3);
     }
 
     /**
@@ -2000,15 +2009,15 @@ public:
      */
     double TcST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                       HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                      Configuration **q1, Configuration **q2) const
+                      Configuration **q1, Configuration **q2, Configuration **q3) const
     {
         if(TciST_Exist(c1, c2))
         {
-            return TciST_Path(c1, c2, cstart, cend, q1, q2);
+            return TciST_Path(c1, c2, cstart, cend, q1, q2, q3);
         }
         else if(TceST_Exist(c1, c2))
         {
-            return TceST_Path(c1, c2, cstart, cend, q1, q2);
+            return TceST_Path(c1, c2, cstart, cend, q1, q2, q3);
         }
         else
         {
@@ -2034,8 +2043,8 @@ public:
         }
         else
         {
-            return _distance >= sqrt( pow(c2.getRadius() * c2.getSinMu(), 2) +
-                                      pow(c2.getRadius() * c2.getCosMu() + fabs(c2.getKappaInv()), 2));
+            return _distance >= sqrt( pow(_parent->_radius * _parent->_sin_mu, 2) +
+                                      pow(_parent->_radius * _parent->_cos_mu + fabs(c1.getKappaInv()), 2));
         }
     }
 
@@ -2057,8 +2066,8 @@ public:
         }
         else
         {
-            return _distance >= sqrt( pow(c2.getRadius() * c2.getSinMu(), 2) +
-                                      pow(c2.getRadius() * c2.getCosMu() - fabs(c2.getKappaInv()), 2));
+            return _distance >= sqrt( pow(_parent->_radius * _parent->_sin_mu, 2) +
+                                      pow(_parent->_radius * _parent->_cos_mu - fabs(c1.getKappaInv()), 2));
         }
     }
 
@@ -2083,11 +2092,11 @@ public:
     void TiScT_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                                Configuration **q1, Configuration **q2) const
     {
-        double alpha = asin( (c2.getRadius() * c2.getCosMu() + fabs(c2.getKappaInv())) / _distance);
-        double delta_x1 = c2.getRadius() * c2.getSinMu();
-        double delta_y1 = c2.getRadius() * c2.getCosMu();
+        double alpha = asin( (_parent->_radius * _parent->_cos_mu + fabs(c1.getKappaInv())) / _distance);
+        double delta_x1 = _parent->_radius * _parent->_sin_mu;
+        double delta_y1 = _parent->_radius * _parent->_cos_mu;
         double delta_x2 = 0.0;
-        double delta_y2 = fabs(c2.getKappaInv());
+        double delta_y2 = fabs(c1.getKappaInv());
         double x, y, psi;
 
         if(c1.getLeft() && c1.getForward())
@@ -2150,11 +2159,11 @@ public:
     void TeScT_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                                Configuration **q1, Configuration **q2) const
     {
-        double alpha = asin( (c2.getRadius() * c2.getCosMu() - fabs(c2.getKappaInv())) / _distance);
-        double delta_x1 = c2.getRadius() * c2.getSinMu();
-        double delta_y1 = c2.getRadius() * c2.getCosMu();
+        double alpha = asin( (_parent->_radius * _parent->_cos_mu - fabs(c1.getKappaInv())) / _distance);
+        double delta_x1 = _parent->_radius * _parent->_sin_mu;
+        double delta_y1 = _parent->_radius * _parent->_cos_mu;
         double delta_x2 = 0.0;
-        double delta_y2 = fabs(c2.getKappaInv());
+        double delta_y2 = fabs(c1.getKappaInv());
         double x, y, psi;
 
         if(c1.getLeft() && c1.getForward())
@@ -2227,7 +2236,7 @@ public:
         *q1 = new Configuration(c1.getStart().getX(), c1.getStart().getY(), c1.getStart().getPsi(), c1.getKappa());
         return  (*cstart)->hc_turn_lenght(**q1) +
                 (**q2).distance(**q3) +
-                (*cend)->hc_turn_lenght(**q3);
+                (*cend)->rs_turn_lenght(**q3);
 
     }
 
@@ -2251,7 +2260,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->hc_turn_lenght(**q1) +
                 (**q2).distance(**q3) +
-                (*cend)->hc_turn_lenght(**q3);
+                (*cend)->rs_turn_lenght(**q3);
     }
 
     /**
@@ -2300,7 +2309,7 @@ public:
         }
         else
         {
-            return _distance >= 2 * fabs(c2.getKappaInv());
+            return _distance >= 2 * fabs(c1.getKappaInv());
         }
     }
 
@@ -2347,9 +2356,9 @@ public:
     void TciScT_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                                 Configuration **q1, Configuration **q2) const
     {
-        double alpha = asin( 2 / (fabs(c2.getKappa()) * _distance));
+        double alpha = asin( 2 / (fabs(c1.getKappa()) * _distance));
         double delta_x = 0.0;
-        double delta_y = fabs(c2.getKappaInv());
+        double delta_y = fabs(c1.getKappaInv());
         double x, y, psi;
 
         if(c1.getLeft() && c1.getForward())
@@ -2414,7 +2423,7 @@ public:
     {
         double psi = _angle;
         double delta_x = 0.0;
-        double delta_y = fabs(c2.getKappaInv());
+        double delta_y = fabs(c1.getKappaInv());
         double x, y;
 
         if(c1.getLeft() && c1.getForward())
@@ -2482,7 +2491,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->rs_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->rs_turn_lenght(**q2);
 
     }
 
@@ -2505,7 +2514,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->rs_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->rs_turn_lenght(**q2);
     }
 
     /**

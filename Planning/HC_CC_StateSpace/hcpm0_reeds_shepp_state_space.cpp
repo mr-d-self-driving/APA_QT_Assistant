@@ -1699,7 +1699,7 @@ public:
                        + middle_tangent_circle1->cc_turn_lenght(*qa2)
                        + (*cend)->cc_turn_lenght(*qa2);
 
-        double length2 = (*cstart)->hc_turn_lenght(*qb1)
+        double length2 = (*cstart)->hc_turn_lenght(**q1)
                        + middle_tangent_circle2->cc_turn_lenght(*qb2)
                        + (*cend)->cc_turn_lenght(*qb2);
 
@@ -1963,7 +1963,7 @@ public:
         *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), !c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
         return  (*cstart)->rs_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->cc_turn_lenght(**q2);
     }
 
     /**
