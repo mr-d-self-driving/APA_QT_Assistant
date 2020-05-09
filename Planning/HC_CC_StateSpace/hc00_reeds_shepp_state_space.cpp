@@ -2497,7 +2497,7 @@ HC00_ReedsSheppStateSpace::HC00_ReedsSheppStateSpace(double kappa, double sigma,
     :HC_CC_StateSpace(kappa,sigma,discretization)
     ,_hc00_reeds_shepp{ unique_ptr<HC00_ReedsShepp>(new HC00_ReedsShepp(this)) }
 {
-    _rs_circle_param.setParam(_kappa, numeric_limits<double>::max(), 1/_kappa,0.0);
+    _rs_circle_param.setParam(_kappa, numeric_limits<double>::max(), 1/_kappa, 0.0);
 }
 
 /**
@@ -2774,7 +2774,7 @@ HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_ReedsSheppPath(const State &state
         delete start_circle[i];
         delete end_circle[i];
     }
-    for (uint16_t i = 0; i < 4; i++)
+    for (uint16_t i = 0; i < 16; i++)
     {
         if( i != best_path_index )
         {

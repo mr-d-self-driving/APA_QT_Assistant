@@ -1432,8 +1432,8 @@ public:
                          end_circle1->hc_turn_lenght(**q3);
 
         double lenght2 = (*cstart)->cc_turn_lenght(*qb1) +
-                         left_middle_cricle1->hc_turn_lenght(*qb2) +
-                         right_middle_circle1->hc_turn_lenght(*qb2) +
+                         left_middle_cricle2->hc_turn_lenght(*qb2) +
+                         right_middle_circle2->hc_turn_lenght(*qb2) +
                          end_circle2->hc_turn_lenght(**q3);
 
         if( lenght1 < lenght2 )
@@ -1441,28 +1441,31 @@ public:
             *cend = end_circle1;
             *q1 = qa1;
             *q2 = qa2;
-            *q3 = qa3;
             *ci1 = left_middle_cricle1;
             *ci2 = right_middle_circle1;
+            delete qa3;
             delete qb1;
             delete qb2;
             delete qb3;
             delete left_middle_cricle2;
             delete right_middle_circle2;
+            delete end_circle2;
             return lenght1;
         }
         else
         {
+            *cend = end_circle2;
             *q1 = qb1;
             *q2 = qb2;
-            *q3 = qb3;
             *ci1 = left_middle_cricle2;
             *ci2 = right_middle_circle2;
             delete qa1;
             delete qa2;
             delete qa3;
+            delete qb3;
             delete left_middle_cricle1;
             delete right_middle_circle1;
+            delete end_circle1;
             return lenght2;
         }
     }
@@ -1502,9 +1505,9 @@ public:
      * @param qb2 :the tangent point betwen left middle circle and right middle circle
      * @param qb3 :the inersection point betwen right middle circle and end circle
      */
-    void TcTTcT_TangentCircles(HC_CC_Circle &c1, HC_CC_Circle &c2,
-                              Configuration **qa1, Configuration **qa2, Configuration **qa3,
-                              Configuration **qb1, Configuration **qb2, Configuration **qb3) const
+    void TcTTcT_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                                Configuration **qa1, Configuration **qa2, Configuration **qa3,
+                                Configuration **qb1, Configuration **qb2, Configuration **qb3) const
     {
         double psi = _angle;
         double r1, r2, delta_x, delta_y, x, y;
@@ -1514,8 +1517,6 @@ public:
 
         delta_x = (pow(r1, 2) + pow(_distance / 2, 2) - pow(r2, 2)) / _distance;
         delta_y = sqrt(pow(r1, 2) - pow(delta_x, 2));
-
-
 
         math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
                                      delta_x, delta_y, &x, &y);
@@ -1548,14 +1549,14 @@ public:
      * @param cend :the output end circle
      * @param q1 :the inersection point betwen start circle and left middle circle
      * @param q2 :the tangent point betwen left middle circle and right middle circle
-     * @param q3 :the inersection point betwen right middle circle and end circle
      * @param ci1 :the left middle circle
      * @param ci2 :the right middle circle
      * @return the length of path
      */
-    double TcTTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2, HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                       Configuration **q1, Configuration **q2, Configuration **q3,
-                       HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
+    double TcTTcT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
+                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
+                        Configuration **q1, Configuration **q2,
+                        HC_CC_Circle **ci1, HC_CC_Circle **ci2) const
     {
         Configuration *qa1, *qa2, *qa3;
         Configuration *qb1, *qb2, *qb3;
@@ -1575,20 +1576,20 @@ public:
         double lenght1 = (*cstart)->hc_turn_lenght(*qa1) +
                          left_middle_cricle1->hc_turn_lenght(*qa1) +
                          right_middle_circle1->hc_turn_lenght(*qa3) +
-                         (*cend)->hc_turn_lenght(*qa3);
+                         (*cend)->rs_turn_lenght(*qa3);
 
         double lenght2 = (*cstart)->hc_turn_lenght(*qb1) +
-                         left_middle_cricle1->hc_turn_lenght(*qb1) +
-                         right_middle_circle1->hc_turn_lenght(*qb3) +
-                         (*cend)->hc_turn_lenght(*qb3);
+                         left_middle_cricle2->hc_turn_lenght(*qb1) +
+                         right_middle_circle2->hc_turn_lenght(*qb3) +
+                         (*cend)->rs_turn_lenght(*qb3);
 
         if( lenght1 < lenght2 )
         {
             *q1 = qa1;
-            *q2 = qa2;
-            *q3 = qa3;
+            *q2 = qa3;
             *ci1 = left_middle_cricle1;
             *ci2 = right_middle_circle1;
+            delete qa2;
             delete qb1;
             delete qb2;
             delete qb3;
@@ -1599,13 +1600,13 @@ public:
         else
         {
             *q1 = qb1;
-            *q2 = qb2;
-            *q3 = qb3;
+            *q2 = qb3;
             *ci1 = left_middle_cricle2;
             *ci2 = right_middle_circle2;
             delete qa1;
             delete qa2;
             delete qa3;
+            delete qb2;
             delete left_middle_cricle1;
             delete right_middle_circle1;
             return lenght2;
@@ -1684,46 +1685,53 @@ public:
      */
     double TTT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                      HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                     Configuration **q1, Configuration **q2,
+                     Configuration **q1, Configuration **q2, Configuration **q3,
                      HC_CC_Circle **ci) const
     {
         Configuration *qa1, *qa2, *qb1, *qb2;
         TTT_TangentCircles(c1, c2, &qa1, &qa2, &qb1, &qb2);
 
         HC_CC_Circle *middle_tangent_circle1, *middle_tangent_circle2;
-        middle_tangent_circle1 = new HC_CC_Circle(*qa1, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
-        middle_tangent_circle2 = new HC_CC_Circle(*qb1, !c1.getLeft(), c1.getForward(), true, _parent->_hc_cc_circle_param);
+        HC_CC_Circle *end_circle1, *end_circle2;
+        middle_tangent_circle1 = new HC_CC_Circle(*qa1, !c1.getLeft(),  c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        end_circle1            = new HC_CC_Circle(*qa2,  c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
+        middle_tangent_circle2 = new HC_CC_Circle(*qb1, !c1.getLeft(),  c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        end_circle2            = new HC_CC_Circle(*qb2,  c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
 
         *cstart = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
-        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *q3 = new Configuration(c2.getStart().getX(), c2.getStart().getY(), c2.getStart().getPsi(), c2.getKappa());
 
         // select shortest connection
         double length1 = (*cstart)->cc_turn_lenght(*qa1)
                        + middle_tangent_circle1->cc_turn_lenght(*qa2)
-                       + (*cend)->cc_turn_lenght(*qa2);
+                       + end_circle1->hc_turn_lenght(**q3);
 
         double length2 = (*cstart)->cc_turn_lenght(*qb1)
-                       + middle_tangent_circle1->cc_turn_lenght(*qb2)
-                       + (*cend)->cc_turn_lenght(*qb2);
+                       + middle_tangent_circle2->cc_turn_lenght(*qb2)
+                       + end_circle2->hc_turn_lenght(**q3);
 
         if(length1 < length2)
         {
+            *cend = end_circle1;
             *q1 = qa1;
             *q2 = qa2;
             *ci = middle_tangent_circle1;
             delete qb1;
             delete qb2;
             delete middle_tangent_circle2;
+            delete end_circle2;
             return length1;
         }
         else
         {
+            *cend = end_circle2;
             *q1 = qb1;
             *q2 = qb2;
             *ci = middle_tangent_circle2;
             delete qa1;
             delete qa2;
             delete middle_tangent_circle1;
+            delete end_circle1;
             return length2;
         }
     }
@@ -1932,14 +1940,15 @@ public:
      */
     double TciST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                       Configuration **q1, Configuration **q2) const
+                       Configuration **q1, Configuration **q2, Configuration **q3) const
     {
         TciST_TangentCircles(c1, c2, q1, q2);
+        *q3     = new Configuration(c2.getStart().getX(), c2.getStart().getY(), c2.getStart().getPsi(), c2.getKappa());
         *cstart = new HC_CC_Circle(c1);
-        *cend = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend   = new HC_CC_Circle(**q2, c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
         return  (*cstart)->hc_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->cc_turn_lenght(**q2);
+                (*cend)->hc_turn_lenght(**q3);
 
     }
 
@@ -1955,14 +1964,15 @@ public:
      */
     double TceST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                        HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                       Configuration **q1, Configuration **q2) const
+                       Configuration **q1, Configuration **q2, Configuration **q3) const
     {
         TceST_TangentCircles(c1, c2, q1, q2);
+        *q3     = new Configuration(c2.getStart().getX(), c2.getStart().getY(), c2.getStart().getPsi(), c2.getKappa());
         *cstart = new HC_CC_Circle(c1);
-        *cend   = new HC_CC_Circle(c2.getStart(), c2.getLeft(), c2.getForward(), CC_REGULAR, _parent->_hc_cc_circle_param);
+        *cend   = new HC_CC_Circle(**q2, c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
         return  (*cstart)->hc_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->cc_turn_lenght(**q2);
+                (*cend)->hc_turn_lenght(**q3);
     }
 
     /**
@@ -1977,15 +1987,15 @@ public:
      */
     double TcST_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                       HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                      Configuration **q1, Configuration **q2) const
+                      Configuration **q1, Configuration **q2, Configuration **q3) const
     {
         if(TciST_Exist(c1, c2))
         {
-            return TciST_Path(c1, c2, cstart, cend, q1, q2);
+            return TciST_Path(c1, c2, cstart, cend, q1, q2, q3);
         }
         else if(TceST_Exist(c1, c2))
         {
-            return TceST_Path(c1,c2, cstart, cend, q1, q2);
+            return TceST_Path(c1, c2, cstart, cend, q1, q2, q3);
         }
         else
         {
@@ -2203,7 +2213,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->cc_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->rs_turn_lenght(**q2);
 
     }
 
@@ -2226,7 +2236,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->cc_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->rs_turn_lenght(**q2);
     }
 
     /**
@@ -2457,7 +2467,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->hc_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->rs_turn_lenght(**q2);
 
     }
 
@@ -2480,7 +2490,7 @@ public:
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->hc_turn_lenght(**q1) +
                 (**q1).distance(**q2) +
-                (*cend)->hc_turn_lenght(**q2);
+                (*cend)->rs_turn_lenght(**q2);
     }
 
     /**
@@ -2523,8 +2533,466 @@ private:
     double _angle = 0.0;
 }; // end of HC00_ReedsShepp class function define
 
-
+/**
+ * @brief HC00_ReedsSheppStateSpace Constructor
+ * @param kappa :the max curvature of the path
+ * @param sigma :the max sharpness of the path
+ * @param discretization :the discretization step
+ */
 HC0PM_ReedsSheppStateSpace::HC0PM_ReedsSheppStateSpace(double kappa, double sigma, double discretization)
+    : HC_CC_StateSpace(kappa, sigma, discretization)
+    , _hc0pm_reeds_shepp{ unique_ptr<HC0PM_ReedsShepp>(new HC0PM_ReedsShepp(this)) }
 {
+    _rs_circle_param.setParam(_kappa, numeric_limits<double>::max(), 1 / _kappa, 0.0);
+    _radius = _hc_cc_circle_param.getRadius();
+    _mu = _hc_cc_circle_param.getMu();
+}
 
+/**
+ * @brief Destructor
+ */
+HC0PM_ReedsSheppStateSpace::~HC0PM_ReedsSheppStateSpace() = default;
+
+/**
+ * @brief Returns a sequence of turns and straight lines connecting the two circles c1 and c2
+ * @param c1 :start circle
+ * @param c2 :end circle
+ * @return a sequence of turns and straight line
+ */
+HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2)
+{
+    // table containing the lengths of the paths, the intermediate configurations and circles
+    double length[nb_hc_cc_rs_paths];
+    math::DoubleArrayInit(length, nb_hc_cc_rs_paths, numeric_limits<double>::max());
+
+    Configuration *qi1[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(qi1), nb_hc_cc_rs_paths);
+    Configuration *qi2[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(qi2), nb_hc_cc_rs_paths);
+    Configuration *qi3[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(qi3), nb_hc_cc_rs_paths);
+    Configuration *qi4[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(qi4), nb_hc_cc_rs_paths);
+
+    HC_CC_Circle *cstart[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(cstart), nb_hc_cc_rs_paths);
+    HC_CC_Circle *cend[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(cend), nb_hc_cc_rs_paths);
+    HC_CC_Circle *ci1[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(ci1), nb_hc_cc_rs_paths);
+    HC_CC_Circle *ci2[nb_hc_cc_rs_paths];
+    math::PointerArrayInit(reinterpret_cast<void **>(ci2), nb_hc_cc_rs_paths);
+
+    // precomputations
+    _hc0pm_reeds_shepp->setDistance( c1.CenterDistance(c2) );
+    _hc0pm_reeds_shepp->setAngle( atan2(c2.getCenter_y() - c1.getCenter_y(),
+                                        c2.getCenter_x() - c1.getCenter_x()));
+
+    if(c1.getStart().equal(c2.getStart()))// case E
+    {
+        length[hc_cc_rs::E] = 0.0;
+    }
+    else if(c1.getStart().aligned(c2.getStart()))// case S
+    {
+        length[hc_cc_rs::S] = c1.getStart().distance(c2.getStart());
+    }
+    else if(c2.getStart().aligned(c1.getStart()))// case S
+    {
+        length[hc_cc_rs::S] = c2.getStart().distance(c1.getStart());
+    }
+    else if(c1.isConfigurationOn_HC_CC_Circle(c2.getStart())) // case T
+    {
+        cstart[hc_cc_rs::T] = new HC_CC_Circle(c1.getStart(), c1.getLeft(), c1.getForward(), HC_REGULAR, _hc_cc_circle_param);
+        length[hc_cc_rs::T] = cstart[hc_cc_rs::T]->hc_turn_lenght(c2.getStart());
+    }
+    else
+    {
+        if( _hc0pm_reeds_shepp->TT_Exist(c1, c2)) //case TT
+        {
+            length[hc_cc_rs::TT] =
+                _hc0pm_reeds_shepp->TT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TT], &cend[hc_cc_rs::TT],
+                    &qi1[hc_cc_rs::TT], &qi2[hc_cc_rs::TT]);
+        }
+        if( _hc0pm_reeds_shepp->TcT_Exist(c1, c2) ) // case TcT
+        {
+            length[hc_cc_rs::TcT] =
+                _hc0pm_reeds_shepp->TcT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcT], &cend[hc_cc_rs::TcT],
+                    &qi1[hc_cc_rs::TcT]);
+        }
+        /************************ Reeds-Shepp families: ************************/
+        if( _hc0pm_reeds_shepp->TcTcT_Exist(c1, c2) ) // case TcTcT
+        {
+            length[hc_cc_rs::TcTcT] =
+                _hc0pm_reeds_shepp->TcTcT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcTcT], &cend[hc_cc_rs::TcTcT],
+                    &qi1[hc_cc_rs::TcTcT], &qi2[hc_cc_rs::TcTcT],
+                    &ci1[hc_cc_rs::TcTcT]);
+        }
+        if( _hc0pm_reeds_shepp->TcTT_Exist(c1, c2) ) // case TcTT
+        {
+            length[hc_cc_rs::TcTT] =
+                _hc0pm_reeds_shepp->TcTT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcTT], &cend[hc_cc_rs::TcTT],
+                    &qi1[hc_cc_rs::TcTT], &qi2[hc_cc_rs::TcTT],
+                    &ci1[hc_cc_rs::TcTT]);
+        }
+        if( _hc0pm_reeds_shepp->TTcT_Exist(c1, c2) ) // case TTcT
+        {
+            length[hc_cc_rs::TTcT] =
+                _hc0pm_reeds_shepp->TTcT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TTcT], &cend[hc_cc_rs::TTcT],
+                    &qi1[hc_cc_rs::TTcT], &qi2[hc_cc_rs::TTcT],
+                    &ci1[hc_cc_rs::TTcT]);
+        }
+        if( _hc0pm_reeds_shepp->TST_Exist(c1, c2) ) // case TST
+        {
+            length[hc_cc_rs::TST] =
+                _hc0pm_reeds_shepp->TST_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TST], &cend[hc_cc_rs::TST],
+                    &qi1[hc_cc_rs::TST], &qi2[hc_cc_rs::TST], &qi3[hc_cc_rs::TST]);
+        }
+        if( _hc0pm_reeds_shepp->TSTcT_Exist(c1, c2) ) // case TSTcT
+        {
+            length[hc_cc_rs::TSTcT] =
+                _hc0pm_reeds_shepp->TSTcT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TSTcT], &cend[hc_cc_rs::TSTcT],
+                    &qi1[hc_cc_rs::TSTcT], &qi2[hc_cc_rs::TSTcT], &qi3[hc_cc_rs::TSTcT],
+                    &ci1[hc_cc_rs::TSTcT]);
+        }
+        if( _hc0pm_reeds_shepp->TcTST_Exist(c1, c2) ) // case TcTST
+        {
+            length[hc_cc_rs::TcTST] =
+                _hc0pm_reeds_shepp->TcTST_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcTST], &cend[hc_cc_rs::TcTST],
+                    &qi1[hc_cc_rs::TcTST], &qi2[hc_cc_rs::TcTST],
+                    &qi3[hc_cc_rs::TcTST], &qi4[hc_cc_rs::TcTST],
+                    &ci1[hc_cc_rs::TcTST]);
+        }
+        if( _hc0pm_reeds_shepp->TcTSTcT_Exist(c1, c2) ) // case TcTSTcT
+        {
+            length[hc_cc_rs::TcTSTcT] =
+                _hc0pm_reeds_shepp->TcTSTcT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcTSTcT], &cend[hc_cc_rs::TcTSTcT],
+                    &qi1[hc_cc_rs::TcTSTcT], &qi2[hc_cc_rs::TcTSTcT],
+                    &qi3[hc_cc_rs::TcTSTcT], &qi4[hc_cc_rs::TcTSTcT],
+                    &ci1[hc_cc_rs::TcTSTcT], &ci2[hc_cc_rs::TcTSTcT]);
+        }
+        if( _hc0pm_reeds_shepp->TTcTT_Exist(c1, c2) ) // case TTcTT
+        {
+            length[hc_cc_rs::TTcTT] =
+                _hc0pm_reeds_shepp->TTcTT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TTcTT], &cend[hc_cc_rs::TTcTT],
+                    &qi1[hc_cc_rs::TTcTT], &qi2[hc_cc_rs::TTcTT], &qi3[hc_cc_rs::TTcTT],
+                    &ci1[hc_cc_rs::TTcTT], &ci2[hc_cc_rs::TTcTT]);
+        }
+        if( _hc0pm_reeds_shepp->TcTTcT_Exist(c1, c2) ) // case TcTTcT
+        {
+            length[hc_cc_rs::TcTTcT] =
+                _hc0pm_reeds_shepp->TcTTcT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcTTcT], &cend[hc_cc_rs::TcTTcT],
+                    &qi1[hc_cc_rs::TcTTcT], &qi2[hc_cc_rs::TcTTcT],
+                    &ci1[hc_cc_rs::TcTTcT], &ci2[hc_cc_rs::TcTTcT]);
+        }
+        /************************ Additional Families: ************************/
+        if( _hc0pm_reeds_shepp->TTT_Exist(c1, c2) ) // case TTT
+        {
+            length[hc_cc_rs::TTT] =
+                _hc0pm_reeds_shepp->TTT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TTT], &cend[hc_cc_rs::TTT],
+                    &qi1[hc_cc_rs::TTT], &qi2[hc_cc_rs::TTT], &qi3[hc_cc_rs::TTT],
+                    &ci1[hc_cc_rs::TTT]);
+        }
+        if( _hc0pm_reeds_shepp->TcST_Exist(c1, c2) ) // case TcST
+        {
+            length[hc_cc_rs::TcST] =
+                _hc0pm_reeds_shepp->TcST_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcST], &cend[hc_cc_rs::TcST],
+                    &qi1[hc_cc_rs::TcST], &qi2[hc_cc_rs::TcST], &qi3[hc_cc_rs::TcST]);
+        }
+        if( _hc0pm_reeds_shepp->TScT_Exist(c1, c2) ) // case TScT
+        {
+            length[hc_cc_rs::TScT] =
+                _hc0pm_reeds_shepp->TScT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TScT], &cend[hc_cc_rs::TScT],
+                    &qi1[hc_cc_rs::TScT], &qi2[hc_cc_rs::TScT]);
+        }
+        if( _hc0pm_reeds_shepp->TcScT_Exist(c1, c2) ) // case TcScT
+        {
+            length[hc_cc_rs::TcScT] =
+                _hc0pm_reeds_shepp->TcScT_Path(
+                    c1, c2,
+                    &cstart[hc_cc_rs::TcScT], &cend[hc_cc_rs::TcScT],
+                    &qi1[hc_cc_rs::TcScT], &qi2[hc_cc_rs::TcScT]);
+        }
+    }// end of if
+
+    // select shortest path
+    hc_cc_rs::path_type best_path_type = static_cast<hc_cc_rs::path_type>(math::ArrayIndexMin(length, nb_hc_cc_rs_paths));
+    HC_CC_RS_Path *path;
+    path = new HC_CC_RS_Path(c1.getStart(), c2.getStart(),
+                             best_path_type, _kappa, _sigma, length[best_path_type],
+                             qi1[best_path_type], qi2[best_path_type],
+                             qi3[best_path_type], qi4[best_path_type],
+                             cstart[best_path_type], cend[best_path_type],
+                             ci1[best_path_type], ci2[best_path_type]);
+    for (uint16_t i = 0; i < nb_hc_cc_rs_paths; i++)
+    {
+        if(i != best_path_type)
+        {
+            delete qi1[i];
+            delete qi2[i];
+            delete qi3[i];
+            delete qi4[i];
+            delete cstart[i];
+            delete cend[i];
+            delete ci1[i];
+            delete ci2[i];
+        }
+    }
+    return path;
+}
+
+/**
+ * @brief Returns a sequence of turns and straight lines connecting a start and an end configuration
+ * @param state1 :the start state
+ * @param state2 :the end state
+ * @return a sequence of turns and straight lines
+ */
+HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_ReedsSheppPath(const State &state1, const State &state2)
+{
+    // define the start and end configuration point
+    Configuration start(state1.x, state1.y, state1.psi, 0.0);
+    Configuration end1(state2.x, state2.y, state2.psi,  _kappa);
+    Configuration end2(state2.x, state2.y, state2.psi, -_kappa);
+
+    // compute the four circles at the start and end configuration
+    HC_CC_Circle *start_circle[4];
+    HC_CC_Circle *end_circle[4];
+
+    start_circle[0] = new HC_CC_Circle(start, true,  true,  true, _hc_cc_circle_param);
+    start_circle[1] = new HC_CC_Circle(start, false, true,  true, _hc_cc_circle_param);
+    start_circle[2] = new HC_CC_Circle(start, true,  false, true, _hc_cc_circle_param);
+    start_circle[3] = new HC_CC_Circle(start, false, false, true, _hc_cc_circle_param);
+
+    end_circle[0] = new HC_CC_Circle(end1, true,  true,  true, _rs_circle_param);
+    end_circle[1] = new HC_CC_Circle(end2, false, true,  true, _rs_circle_param);
+    end_circle[2] = new HC_CC_Circle(end1, true,  false, true, _rs_circle_param);
+    end_circle[3] = new HC_CC_Circle(end2, false, false, true, _rs_circle_param);
+
+    // compute the shortest path for the 16 combinations (4 circles at the beginning and 4 at the end)
+    HC_CC_RS_Path *path[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                              nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+
+    double lg[] = { numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max(),
+                    numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max(),
+                    numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max(),
+                    numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max(),
+                    numeric_limits<double>::max(), numeric_limits<double>::max(), numeric_limits<double>::max(),
+                    numeric_limits<double>::max() };
+
+    for (uint16_t i = 0; i < 4; i++)
+    {
+        for (uint16_t j = 0; j < 4; j++)
+        {
+            // skip circle at the end for curvature continuity
+            if( j == 0 && state2.kappa < 0 )
+            {
+                continue;
+            }
+            else if( j == 1 && state2.kappa > 0 )
+            {
+                continue;
+            }
+            else if( j == 2 && state2.kappa < 0 )
+            {
+                continue;
+            }
+            else if( j == 3 && state2.kappa > 0 )
+            {
+                continue;
+            }
+            else
+            {
+                path[4 * i + j] = HC0PM_CirclesReedsSheppPath(*start_circle[i], *end_circle[j]);
+                if (path[4 * i + j])
+                {
+                    lg[4 * i + j] = path[4 * i + j]->getLength();
+                }
+            }
+        }
+    }
+
+    // select shortest path
+    uint16_t best_path_index = math::ArrayIndexMin(lg, 16);
+
+    // clean up
+    for (uint16_t i = 0; i < 4; i++)
+    {
+        delete start_circle[i];
+        delete end_circle[i];
+    }
+    for (uint16_t i = 0; i < 16; i++)
+    {
+        if( i != best_path_index )
+        {
+            delete path[i];
+        }
+    }
+    return path[best_path_index];
+}
+
+/**
+ * @brief Returns shortest path length from state1 to state2
+ * @param state1 :the start state
+ * @param state2 :the end state
+ * @return
+ */
+double HC0PM_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2)
+{
+    HC_CC_RS_Path *path = this->HC0PM_ReedsSheppPath(state1 , state2);
+    double length = path->getLength();
+    delete path;
+    return length;
+}
+
+/**
+ * @brief Returns controls of the shortest path from state1 to state2
+ * @param state1 :the start state
+ * @param state2 :the end state
+ * @return
+ */
+vector<Control> HC0PM_ReedsSheppStateSpace::getControls(const State &state1, const State &state2)
+{
+    vector<Control> hc_rs_controls;
+    hc_rs_controls.reserve(9);
+    HC_CC_RS_Path *path = this->HC0PM_ReedsSheppPath(state1, state2);
+    switch (path->getType())
+    {
+        case hc_cc_rs::E:
+            steering::EmptyControls(hc_rs_controls);
+            break;
+
+//        case hc_cc_rs::S:
+//            steering::StraightControls(path->getStart(), path->getEnd(), hc_rs_controls);
+//            break;
+
+        case hc_cc_rs::T:
+            steering::HC_TurnControls(*(path->getCircleStart()), path->getEnd(), true, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TT:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), true, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcT:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi1()), false, hc_rs_controls);
+            break;
+        /************************ Reeds-Shepp families: ************************/
+        case hc_cc_rs::TcTcT:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCi1()), *(path->getQi2()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcTT:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi1()), false, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TTcT:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi2()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TST:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::StraightControls(*(path->getQi1()), *(path->getQi2()), hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), true, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TSTcT:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::StraightControls(*(path->getQi1()), *(path->getQi2()), hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi3()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcTST:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi1()), false, hc_rs_controls);
+            steering::StraightControls(*(path->getQi2()), *(path->getQi3()), hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi4()), true, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcTSTcT:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi1()), false, hc_rs_controls);
+            steering::StraightControls(*(path->getQi2()), *(path->getQi3()), hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi2()), *(path->getQi4()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi4()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TTcTT:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi2()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi2()), *(path->getQi2()), false, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcTTcT:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi1()), *(path->getQi1()), false, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCi2()), *(path->getQi2()), true, hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            break;
+        /************************ Additional Families: ************************/
+        case hc_cc_rs::TTT:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::CC_TurnControls(*(path->getCi1()), *(path->getQi2()), true, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), true, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcST:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::StraightControls(*(path->getQi1()), *(path->getQi2()), hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), true, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TScT:
+            steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::StraightControls(*(path->getQi1()), *(path->getQi2()), hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            break;
+
+        case hc_cc_rs::TcScT:
+            steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
+            steering::StraightControls(*(path->getQi1()), *(path->getQi2()), hc_rs_controls);
+            steering::RS_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            break;
+
+        default:
+            break;
+    }
+    delete path;
+    return hc_rs_controls;
 }

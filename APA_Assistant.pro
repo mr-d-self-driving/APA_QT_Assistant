@@ -65,6 +65,8 @@ SOURCES += \
         Planning/Curvature/curvature.cpp \
         Planning/HC_CC_StateSpace/hc00_reeds_shepp_state_space.cpp \
         Planning/HC_CC_StateSpace/hc0pm_reeds_shepp_state_space.cpp \
+        Planning/HC_CC_StateSpace/hcpm0_reeds_shepp_state_space.cpp \
+        Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.cpp \
         Planning/Interface/hc_cc_state_space.cpp \
         Planning/Interface/planning.cpp \
         Planning/ParallelParking/parallel_planning.cpp \
@@ -128,6 +130,8 @@ HEADERS += \
         Planning/Curvature/curvature.h \
         Planning/HC_CC_StateSpace/hc00_reeds_shepp_state_space.h \
         Planning/HC_CC_StateSpace/hc0pm_reeds_shepp_state_space.h \
+        Planning/HC_CC_StateSpace/hcpm0_reeds_shepp_state_space.h \
+        Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.h \
         Planning/Interface/hc_cc_state_space.h \
         Planning/Interface/planning.h \
         Planning/ParallelParking/parallel_planning.h \
