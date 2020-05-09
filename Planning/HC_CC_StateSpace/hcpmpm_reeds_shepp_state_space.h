@@ -1,0 +1,11 @@
+#ifndef HCPMPM_REEDSSHEPPSTATESPACE_H
+#define HCPMPM_REEDSSHEPPSTATESPACE_H
+
+
+class HCPMPM_ReedsSheppStateSpace
+{
+public:
+    HCPMPM_ReedsSheppStateSpace();
+};
+
+#endif // HCPMPM_REEDSSHEPPSTATESPACE_H
