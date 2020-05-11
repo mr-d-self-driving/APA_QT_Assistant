@@ -18,23 +18,23 @@ public:
      */
     void setParam(double kappa, double sigma, double radius, double mu);
 
-    double getKappa(void);
+    double getKappa(void) const { return _kappa; }
 
-    double getKappaInv(void);
+    double getKappaInv(void) const { return  _kappa_inv; }
 
-    double getSigma(void);
+    double getSigma(void) const { return _sigma; }
 
-    double getRadius(void);
+    double getRadius(void) const { return _radius; }
 
-    double getMu(void);
+    double getMu(void) const { return _mu; }
 
-    double getSinMu(void);
+    double getSinMu(void) const { return _sin_mu; }
 
-    double getCosMu(void);
+    double getCosMu(void) const { return _cos_mu; }
 
-    double getDeltaMin(void);
+    double getDeltaMin(void) const { return _delta_min; }
 
-    double getLenghtMin(void);
+    double getLenghtMin(void) const { return _lenght_min; }
 protected:
     /**
      * @brief _kappa: Max. curvature
@@ -93,7 +93,7 @@ public:
      * @param regular: Type of the circle -> [regular: true, irregular: false]
      * @param param: the circle param
      */
-    HC_CC_Circle(const Configuration &start,bool left, bool forward, bool regular,HC_CC_Circle_Param &param);
+    HC_CC_Circle(const Configuration &start,bool left, bool forward, bool regular,const HC_CC_Circle_Param &param);
 
     /**
      * @brief Init the hc or cc circle param Constructor

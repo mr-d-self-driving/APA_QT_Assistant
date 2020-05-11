@@ -1718,13 +1718,13 @@ public:
         end_circle2            = new HC_CC_Circle(*qb2,  c2.getLeft(), !c2.getForward(), HC_REGULAR, _parent->_hc_cc_circle_param);
 
         *q1   = new Configuration(c1.getStart().getX(), c1.getStart().getY(), c1.getStart().getPsi(), c1.getKappa());
-        *q3   = new Configuration(c1.getStart().getX(), c1.getStart().getY(), c1.getStart().getPsi(), c1.getKappa());
+        *q3   = new Configuration(c2.getStart().getX(), c2.getStart().getY(), c2.getStart().getPsi(), c2.getKappa());
         // select shortest connection
         double length1 = start_circle1->hc_turn_lenght(**q1)
                        + middle_tangent_circle1->cc_turn_lenght(*qa2)
                        + end_circle1->hc_turn_lenght(**q3);
 
-        double length2 = (*cstart)->hc_turn_lenght(**q1)
+        double length2 = start_circle2->hc_turn_lenght(**q1)
                        + middle_tangent_circle2->cc_turn_lenght(*qb2)
                        + end_circle2->hc_turn_lenght(**q3);
 
@@ -2509,7 +2509,7 @@ public:
                         HC_CC_Circle **cstart, HC_CC_Circle **cend,
                         Configuration **q1, Configuration **q2) const
     {
-        TeScT_TangentCircles(c1, c2, q1, q2);
+        TceScT_TangentCircles(c1, c2, q1, q2);
         *cstart = new HC_CC_Circle(c1);
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->rs_turn_lenght(**q1) +
@@ -2591,7 +2591,7 @@ HCPMPM_ReedsSheppStateSpace::~HCPMPM_ReedsSheppStateSpace() = default;
  * @param c2 :end circle
  * @return a sequence of turns and straight line
  */
-HC_CC_RS_Path* HCPMPM_ReedsSheppStateSpace::HCPMPM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2)
+HC_CC_RS_Path* HCPMPM_ReedsSheppStateSpace::HCPMPM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2) const
 {
     // table containing the lengths of the paths, the intermediate configurations and circles
     double length[nb_hc_cc_rs_paths];
@@ -2800,7 +2800,7 @@ HC_CC_RS_Path* HCPMPM_ReedsSheppStateSpace::HCPMPM_CirclesReedsSheppPath(HC_CC_C
  * @param state2 :the end state
  * @return a sequence of turns and straight lines
  */
-HC_CC_RS_Path* HCPMPM_ReedsSheppStateSpace::HCPMPM_ReedsSheppPath(const State &state1, const State &state2)
+HC_CC_RS_Path* HCPMPM_ReedsSheppStateSpace::HCPMPM_ReedsSheppPath(const State &state1, const State &state2) const
 {
     // define the start and end configuration point
     Configuration start1(state1.x, state1.y, state1.psi, _kappa);
@@ -2910,7 +2910,7 @@ HC_CC_RS_Path* HCPMPM_ReedsSheppStateSpace::HCPMPM_ReedsSheppPath(const State &s
  * @param state2 :the end state
  * @return
  */
-double HCPMPM_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2)
+double HCPMPM_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2) const
 {
     HC_CC_RS_Path *path = this->HCPMPM_ReedsSheppPath(state1 , state2);
     double length = path->getLength();
@@ -2924,7 +2924,7 @@ double HCPMPM_ReedsSheppStateSpace::getDistance(const State &state1, const State
  * @param state2 :the end state
  * @return
  */
-vector<Control> HCPMPM_ReedsSheppStateSpace::getControls(const State &state1, const State &state2)
+vector<Control> HCPMPM_ReedsSheppStateSpace::getControls(const State &state1, const State &state2) const
 {
     vector<Control> hc_rs_controls;
     hc_rs_controls.reserve(8);

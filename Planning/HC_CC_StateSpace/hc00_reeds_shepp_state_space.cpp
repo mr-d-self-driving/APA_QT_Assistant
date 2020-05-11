@@ -2511,7 +2511,7 @@ HC00_ReedsSheppStateSpace::~HC00_ReedsSheppStateSpace() = default;
  * @param c2 :end circle
  * @return a sequence of turns and straight line
  */
-HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2)
+HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2) const
 {
     // table containing the lengths of the paths, the intermediate configurations and circles
     double length[nb_hc_cc_rs_paths];
@@ -2722,7 +2722,7 @@ HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_CirclesReedsSheppPath(HC_CC_Circl
  * @param state2 :the end state
  * @return a sequence of turns and straight lines
  */
-HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_ReedsSheppPath(const State &state1, const State &state2)
+HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_ReedsSheppPath(const State &state1, const State &state2) const
 {
     // define the start and end configuration point
     Configuration start(state1.x, state1.y, state1.psi, 0.0);
@@ -2790,7 +2790,7 @@ HC_CC_RS_Path* HC00_ReedsSheppStateSpace::HC00_ReedsSheppPath(const State &state
  * @param state2 :the end state
  * @return
  */
-double HC00_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2)
+double HC00_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2) const
 {
     HC_CC_RS_Path *path = this->HC00_ReedsSheppPath(state1 , state2);
     double length = path->getLength();
@@ -2804,7 +2804,7 @@ double HC00_ReedsSheppStateSpace::getDistance(const State &state1, const State &
  * @param state2 :the end state
  * @return
  */
-vector<Control> HC00_ReedsSheppStateSpace::getControls(const State &state1, const State &state2)
+vector<Control> HC00_ReedsSheppStateSpace::getControls(const State &state1, const State &state2) const
 {
     vector<Control> hc_rs_controls;
     hc_rs_controls.reserve(10);
@@ -2919,6 +2919,7 @@ vector<Control> HC00_ReedsSheppStateSpace::getControls(const State &state1, cons
 
         default:
             break;
+
     }
     delete path;
     return hc_rs_controls;

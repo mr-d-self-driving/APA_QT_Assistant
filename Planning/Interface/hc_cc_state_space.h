@@ -25,13 +25,15 @@ public:
      */
     HC_CC_StateSpace(double kappa, double sigma, double discretization);
 
+    virtual ~HC_CC_StateSpace();
+
     /**
      * @brief getControls :Virtual function that return controls of the shortest path from stat1 to state2
      * @param state1 :the start state
      * @param state2 :the end state
      * @return the controls
      */
-    virtual vector<Control> getControls(const State &state1, const State &state2) const = 0;
+    virtual vector<Control> getControls(const State &state1, const State &state2) const= 0;
 
     /**
      * @brief get the path from state1 to state2

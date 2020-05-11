@@ -32,7 +32,7 @@ public:
     /**
      * @brief Destructor
      */
-    virtual ~HC0PM_ReedsSheppStateSpace();
+    virtual ~HC0PM_ReedsSheppStateSpace() override;
 
     /**
      * @brief Returns a sequence of turns and straight lines connecting the two circles c1 and c2
@@ -40,7 +40,7 @@ public:
      * @param c2 :end circle
      * @return a sequence of turns and straight line
      */
-    HC_CC_RS_Path* HC0PM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2);
+    HC_CC_RS_Path* HC0PM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2) const;
 
     /**
      * @brief Returns a sequence of turns and straight lines connecting a start and an end configuration
@@ -48,7 +48,7 @@ public:
      * @param state2 :the end state
      * @return a sequence of turns and straight lines
      */
-    HC_CC_RS_Path* HC0PM_ReedsSheppPath(const State &state1, const State &state2);
+    HC_CC_RS_Path* HC0PM_ReedsSheppPath(const State &state1, const State &state2) const;
 
     /**
      * @brief Returns shortest path length from state1 to state2
@@ -56,7 +56,7 @@ public:
      * @param state2 :the end state
      * @return
      */
-    double getDistance(const State &state1, const State &state2);
+    double getDistance(const State &state1, const State &state2) const;
 
     /**
      * @brief Returns controls of the shortest path from state1 to state2
@@ -64,7 +64,7 @@ public:
      * @param state2 :the end state
      * @return
      */
-    vector<Control> getControls(const State &state1, const State &state2);
+    vector<Control> getControls(const State &state1, const State &state2) const override;
 private:
     /**
      * @brief class that contains functions to compute the families

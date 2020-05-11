@@ -2559,7 +2559,7 @@ HC0PM_ReedsSheppStateSpace::~HC0PM_ReedsSheppStateSpace() = default;
  * @param c2 :end circle
  * @return a sequence of turns and straight line
  */
-HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2)
+HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2) const
 {
     // table containing the lengths of the paths, the intermediate configurations and circles
     double length[nb_hc_cc_rs_paths];
@@ -2774,7 +2774,7 @@ HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_CirclesReedsSheppPath(HC_CC_Cir
  * @param state2 :the end state
  * @return a sequence of turns and straight lines
  */
-HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_ReedsSheppPath(const State &state1, const State &state2)
+HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_ReedsSheppPath(const State &state1, const State &state2) const
 {
     // define the start and end configuration point
     Configuration start(state1.x, state1.y, state1.psi, 0.0);
@@ -2863,7 +2863,7 @@ HC_CC_RS_Path* HC0PM_ReedsSheppStateSpace::HC0PM_ReedsSheppPath(const State &sta
  * @param state2 :the end state
  * @return
  */
-double HC0PM_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2)
+double HC0PM_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2) const
 {
     HC_CC_RS_Path *path = this->HC0PM_ReedsSheppPath(state1 , state2);
     double length = path->getLength();
@@ -2877,7 +2877,7 @@ double HC0PM_ReedsSheppStateSpace::getDistance(const State &state1, const State 
  * @param state2 :the end state
  * @return
  */
-vector<Control> HC0PM_ReedsSheppStateSpace::getControls(const State &state1, const State &state2)
+vector<Control> HC0PM_ReedsSheppStateSpace::getControls(const State &state1, const State &state2) const
 {
     vector<Control> hc_rs_controls;
     hc_rs_controls.reserve(9);

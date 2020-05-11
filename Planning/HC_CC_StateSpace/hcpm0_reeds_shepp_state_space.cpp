@@ -1678,7 +1678,7 @@ public:
      */
     double TTT_Path( HC_CC_Circle &c1, HC_CC_Circle &c2,
                      HC_CC_Circle **cstart, HC_CC_Circle **cend,
-                     Configuration **q1, Configuration **q2, Configuration **q3,
+                     Configuration **q1, Configuration **q2,
                      HC_CC_Circle **ci) const
     {
         Configuration *qa1, *qa2, *qb1, *qb2;
@@ -2558,7 +2558,7 @@ HCPM0_ReedsSheppStateSpace::~HCPM0_ReedsSheppStateSpace() = default;
  * @param c2 :end circle
  * @return a sequence of turns and straight line
  */
-HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2)
+HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_CirclesReedsSheppPath(HC_CC_Circle &c1, HC_CC_Circle &c2)  const
 {
     // table containing the lengths of the paths, the intermediate configurations and circles
     double length[nb_hc_cc_rs_paths];
@@ -2704,7 +2704,7 @@ HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_CirclesReedsSheppPath(HC_CC_Cir
                 _hcpm0_reeds_shepp->TTT_Path(
                     c1, c2,
                     &cstart[hc_cc_rs::TTT], &cend[hc_cc_rs::TTT],
-                    &qi1[hc_cc_rs::TTT], &qi2[hc_cc_rs::TTT], &qi3[hc_cc_rs::TTT],
+                    &qi1[hc_cc_rs::TTT], &qi2[hc_cc_rs::TTT],
                     &ci1[hc_cc_rs::TTT]);
         }
         if( _hcpm0_reeds_shepp->TcST_Exist(c1, c2) ) // case TcST
@@ -2765,7 +2765,7 @@ HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_CirclesReedsSheppPath(HC_CC_Cir
  * @param state2 :the end state
  * @return a sequence of turns and straight lines
  */
-HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_ReedsSheppPath(const State &state1, const State &state2)
+HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_ReedsSheppPath(const State &state1, const State &state2) const
 {
     // define the start and end configuration point
     Configuration start1(state1.x, state1.y, state1.psi, _kappa);
@@ -2854,7 +2854,7 @@ HC_CC_RS_Path* HCPM0_ReedsSheppStateSpace::HCPM0_ReedsSheppPath(const State &sta
  * @param state2 :the end state
  * @return
  */
-double HCPM0_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2)
+double HCPM0_ReedsSheppStateSpace::getDistance(const State &state1, const State &state2) const
 {
     HC_CC_RS_Path *path = this->HCPM0_ReedsSheppPath(state1 , state2);
     double length = path->getLength();
@@ -2868,7 +2868,7 @@ double HCPM0_ReedsSheppStateSpace::getDistance(const State &state1, const State 
  * @param state2 :the end state
  * @return
  */
-vector<Control> HCPM0_ReedsSheppStateSpace::getControls(const State &state1, const State &state2)
+vector<Control> HCPM0_ReedsSheppStateSpace::getControls(const State &state1, const State &state2) const
 {
     vector<Control> hc_rs_controls;
     hc_rs_controls.reserve(9);

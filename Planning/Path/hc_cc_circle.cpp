@@ -55,26 +55,8 @@ void HC_CC_Circle_Param::setParam(double kappa, double sigma, double radius, dou
     _lenght_min = kappa / sigma;
 }
 
-double HC_CC_Circle_Param::getKappa(void){ return _kappa; }
-
-double HC_CC_Circle_Param::getKappaInv(void){ return  _kappa_inv; }
-
-double HC_CC_Circle_Param::getSigma(void){ return _sigma; }
-
-double HC_CC_Circle_Param::getRadius(void){ return _radius; }
-
-double HC_CC_Circle_Param::getMu(void){ return _mu; }
-
-double HC_CC_Circle_Param::getSinMu(void){ return _sin_mu; }
-
-double HC_CC_Circle_Param::getCosMu(void){ return _cos_mu; }
-
-double HC_CC_Circle_Param::getDeltaMin(void){ return _delta_min; }
-
-double HC_CC_Circle_Param::getLenghtMin(void){ return _lenght_min; }
-
 // 描述HC 和 CC圆的性质
-HC_CC_Circle::HC_CC_Circle(const Configuration &start,bool left, bool forward, bool regular,HC_CC_Circle_Param &param)
+HC_CC_Circle::HC_CC_Circle(const Configuration &start,bool left, bool forward, bool regular,const HC_CC_Circle_Param &param)
 {
     _start = start;
     _left  = left;

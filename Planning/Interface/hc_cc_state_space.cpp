@@ -39,6 +39,7 @@ HC_CC_StateSpace::HC_CC_StateSpace(double kappa, double sigma, double discretiza
     _hc_cc_circle_param.setParam(kappa, sigma, radius, mu);
 }
 
+HC_CC_StateSpace::~HC_CC_StateSpace() = default;
 /**
  * @brief get the path from state1 to state2
  * @param state1 :start state

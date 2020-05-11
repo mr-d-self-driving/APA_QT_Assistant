@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     /****************** Detect UI ******************/
     DetectUI();
     /****************** plan UI ******************/
-    PlanUI();
+    G2_PlanUI();
     /****************** Track UI ******************/
     TrackUI();
 
@@ -103,7 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(button_file_select,SIGNAL(clicked()),this,SLOT(sPercaptionDataFileSelect()));
     connect(button_start_calculate,SIGNAL(clicked()),this,SLOT(sCalculateDetect()));
 
-    connect(gParkingInformationConfirm,SIGNAL(clicked()),this,SLOT(sParkingConfirm()));
+    connect(gParkingInformationConfirm,SIGNAL(clicked()),this,SLOT(sParkingConfirmG2()));
 
     connect(mParallelPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
     connect(mVerticalPlanning,SIGNAL(sCircleCenterPoint(uint8_t,Circle*)),this,SLOT(sPathCirclePoint(uint8_t,Circle*)));
@@ -695,6 +695,190 @@ void MainWindow::PlanUI(void)
     gPlanLayout->setColumnStretch(1,9);
 }
 
+void MainWindow::G2_PlanUI(void)
+{
+    // 车辆初始位置 begin
+    QLabel *label_VehicleStartPointX_Text = new QLabel();
+    label_VehicleStartPointX_Text->setText("X:");
+    QLabel *label_VehicleStartPointY_Text = new QLabel();
+    label_VehicleStartPointY_Text->setText("Y:");
+    QLabel *label_VehicleStartPointYaw_Text = new QLabel();
+    label_VehicleStartPointYaw_Text->setText("Yaw:");
+
+    text_VehicleStartPointX = new QLineEdit();
+    text_VehicleStartPointX->setText("-6");
+    text_VehicleStartPointY = new QLineEdit();
+    text_VehicleStartPointY->setText("3");
+    text_VehicleStartPointYaw = new QLineEdit();
+    text_VehicleStartPointYaw->setText("0");
+
+    QGridLayout *gVehicleStartPosition_Layout = new QGridLayout();
+    gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointX_Text,0,0);
+    gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointY_Text,1,0);
+    gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointYaw_Text,2,0);
+
+    gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointX,0,1);
+    gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointY,1,1);
+    gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointYaw,2,1);
+
+    QGroupBox *gVehicleStartPosition_Group = new QGroupBox();
+    gVehicleStartPosition_Group->setTitle("车辆初始位置");
+    gVehicleStartPosition_Group->setFixedHeight(120);
+    gVehicleStartPosition_Group->setLayout(gVehicleStartPosition_Layout);
+    // 车辆初始位置 end
+
+    // 车辆最终位置 begin
+    QLabel *label_VehicleEndPointX_Text = new QLabel();
+    label_VehicleEndPointX_Text->setText("X:");
+    QLabel *label_VehicleEndPointY_Text = new QLabel();
+    label_VehicleEndPointY_Text->setText("Y:");
+    QLabel *label_VehicleEndPointYaw_Text = new QLabel();
+    label_VehicleEndPointYaw_Text->setText("Yaw:");
+
+    text_VehicleEndPointX = new QLineEdit();
+    text_VehicleEndPointX->setText("6");
+    text_VehicleEndPointY = new QLineEdit();
+    text_VehicleEndPointY->setText("-2");
+    text_VehicleEndPointYaw = new QLineEdit();
+    text_VehicleEndPointYaw->setText("0");
+
+    QGridLayout *gVehicleEndPosition_Layout = new QGridLayout();
+    gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointX_Text,0,0);
+    gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointY_Text,1,0);
+    gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointYaw_Text,2,0);
+
+    gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointX,0,1);
+    gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointY,1,1);
+    gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointYaw,2,1);
+
+    QGroupBox *gVehicleEndPosition_Group = new QGroupBox();
+    gVehicleEndPosition_Group->setTitle("车辆目标位置");
+    gVehicleEndPosition_Group->setFixedHeight(120);
+    gVehicleEndPosition_Group->setLayout(gVehicleEndPosition_Layout);
+    // 车辆最终位置 end
+
+    gParkingInformationConfirm = new QPushButton();
+    gParkingInformationConfirm->setText("信息确认");
+
+    // 实时车辆位置跟踪 begin
+    QLabel *label_VehiceTrackX_Text = new QLabel();
+    label_VehiceTrackX_Text->setText("X:");
+    QLabel *label_VehiceTrackY_Text = new QLabel();
+    label_VehiceTrackY_Text->setText("Y:");
+    QLabel *label_VehiceTrackYaw_Text = new QLabel();
+    label_VehiceTrackYaw_Text->setText("Yaw:");
+
+    label_VehiceTrackX_Value = new QLabel();
+    label_VehiceTrackX_Value->setText("0");
+    label_VehiceTrackY_Value = new QLabel();
+    label_VehiceTrackY_Value->setText("0");
+    label_VehiceTrackYaw_Value = new QLabel();
+    label_VehiceTrackYaw_Value->setText("0");//单位 度
+
+    QLabel *label_VehiceTrackX_Unit = new QLabel();
+    label_VehiceTrackX_Unit->setText("m");
+    QLabel *label_VehiceTrackY_Unit = new QLabel();
+    label_VehiceTrackY_Unit->setText("m");
+    QLabel *label_VehiceTrackYaw_Unit = new QLabel();
+    label_VehiceTrackYaw_Unit->setText("°");
+
+    QGridLayout *gVehicleTrack_Layout = new QGridLayout();
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackX_Text,0,0);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackY_Text,1,0);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Text,2,0);
+
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackX_Value,0,1);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackY_Value,1,1);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Value,2,1);
+
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackX_Unit,0,2);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackY_Unit,1,2);
+    gVehicleTrack_Layout->addWidget(label_VehiceTrackYaw_Unit,2,2);
+
+    gVehicleTrack_Layout->setColumnStretch(0,2);
+    gVehicleTrack_Layout->setColumnStretch(1,5);
+    gVehicleTrack_Layout->setColumnStretch(1,1);
+
+    QGroupBox *gVehicleTrack_Group = new QGroupBox();
+    gVehicleTrack_Group->setTitle("实时跟踪");
+    gVehicleTrack_Group->setFixedHeight(120);
+    gVehicleTrack_Group->setLayout(gVehicleTrack_Layout);
+    // 实时车辆位置跟踪 end
+
+    QGridLayout *gPath_IO_Layout = new QGridLayout();
+    gPath_IO_Layout->addWidget(gVehicleStartPosition_Group,0,0);
+    gPath_IO_Layout->addWidget(gVehicleEndPosition_Group,1,0);
+    gPath_IO_Layout->addWidget(gParkingInformationConfirm,2,0);
+    gPath_IO_Layout->addWidget(gVehicleTrack_Group,3,0);
+    gPath_IO_Layout->setColumnMinimumWidth(0,200);
+    gPath_IO_Layout->setRowStretch(0,1);
+    gPath_IO_Layout->setRowStretch(1,1);
+    gPath_IO_Layout->setRowStretch(2,1);
+    gPath_IO_Layout->setRowStretch(3,1);
+    gPath_IO_Layout->setRowStretch(4,1);
+
+
+    mPathPlot = new QCustomPlot();
+    mPathPlot->legend->setVisible(true);
+    mPathPlot->legend->setFont(QFont("Helvetica", 9));
+    mPathPlot->legend->setRowSpacing(-3);
+    mPathPlot->xAxis->setLabel("x");
+    mPathPlot->yAxis->setLabel("y");
+    mPathPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
+    mPathPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
+
+    mPathVehicleModuleCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathVehicleModuleCurve->setName("车辆模型");
+    mPathVehicleModuleCurve->setPen(QPen(Qt::red,3));
+    mPathVehicleModuleCurve->setBrush(QBrush(QColor(90,35,255,20)));
+
+    mPathParkingCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathParkingCurve->setName("库位");
+    mPathParkingCurve->setPen(QPen(Qt::green,4));
+    mPathParkingCurve->setBrush(QBrush(QColor(90,255,240,80)));
+
+    ParkingPointX.reserve(9);
+    ParkingPointX.push_back(BOUNDARY_LEFT);
+    ParkingPointX.push_back(0);
+    ParkingPointX.push_back(0);
+    ParkingPointX.push_back(5);
+    ParkingPointX.push_back(5);
+    ParkingPointX.push_back(BOUNDARY_RIGHT);
+    ParkingPointX.push_back(BOUNDARY_RIGHT);
+    ParkingPointX.push_back(BOUNDARY_LEFT);
+    ParkingPointX.push_back(BOUNDARY_LEFT);
+    ParkingPointY.reserve(9);
+    ParkingPointY.push_back(0);
+    ParkingPointY.push_back(0);
+    ParkingPointY.push_back(-2.3);
+    ParkingPointY.push_back(-2.3);
+    ParkingPointY.push_back(0);
+    ParkingPointY.push_back(0);
+    ParkingPointY.push_back(BOUNDARY_DOWN);
+    ParkingPointY.push_back(BOUNDARY_DOWN);
+    ParkingPointY.push_back(0);
+    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
+
+    mPathVehicleCenterCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathVehicleCenterCurve->setName("后轴中心");
+
+    mPathPlanningCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
+    mPathPlanningCurve->setName("规划曲线");
+
+//    mPathLeftCircle = new QCPItemEllipse(mPathPlot);
+//    mPathLeftCircle->setPen(QPen(Qt::yellow,1));
+//    mPathLeftCircle->setBrush(QBrush(QColor(90,125,140,20)));
+
+//    mPathRightCircle = new QCPItemEllipse(mPathPlot);
+//    mPathRightCircle->setPen(QPen(Qt::black,1));
+//    mPathRightCircle->setBrush(QBrush(QColor(20,25,140,20)));
+    gPlanLayout = new QGridLayout();
+    gPlanLayout->addLayout(gPath_IO_Layout, 0, 0);
+    gPlanLayout->addWidget(mPathPlot, 0, 1);
+    gPlanLayout->setColumnMinimumWidth(0,200);
+    gPlanLayout->setColumnStretch(0,1);
+    gPlanLayout->setColumnStretch(1,9);
+}
 /**
  * @brief MainWindow::TrackUI 跟踪UI配置函数
  */
@@ -894,6 +1078,8 @@ void MainWindow::Init()
 
     mParallelPlanning->Init();
     mVerticalPlanning->Init();
+
+    mHC_ReedsSheppStateSpace = new HC_ReedsSheppStateSpace(0.2, 0.315, 0.02);
 
     // Track
     mLatControl = new LatControl();
@@ -1285,25 +1471,29 @@ void MainWindow::DetectTask(void)
  */
 void MainWindow::PlanTask(void)
 {
+    /****** 第一代规划算法(几何规划) ******/
     // 平行泊车控制
-    mParallelPlanning->Work(&mPercaption);
-    mParallelPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
+//    mParallelPlanning->Work(&mPercaption);
+//    mParallelPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
     // 垂直泊车控制
 //    mVerticalPlanning->Work(&mPercaption,&mGeometricTrack);
 //    mVerticalPlanning->Control(mBoRuiController,mBoRuiMessage,&mGeometricTrack,&mPercaption);
 
     // 仿真信号更新
-    mSimulation->Update(mBoRuiController,mBoRuiMessage);
+//    mSimulation->Update(mBoRuiController,mBoRuiMessage);
 
     // 车辆位置更新
-    mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
+//    mGeometricTrack.VelocityUpdate(mBoRuiMessage,0.02f);
 
-    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getX()),'f',2));
-    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getY()),'f',2));
-    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
+//    label_VehiceTrackX_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getX()),'f',2));
+//    label_VehiceTrackY_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getPosition().getY()),'f',2));
+//    label_VehiceTrackYaw_Value->setText(QString::number(static_cast<double>(mGeometricTrack.getYaw()*57.3f),'f',2));
 
-    VehicleModuleShow(mGeometricTrack.getPosition(),mGeometricTrack.getYaw(),mPathVehicleCenterCurve,mPathVehicleModuleCurve,mPathPlot);
+//    VehicleModuleShow(mGeometricTrack.getPosition(),mGeometricTrack.getYaw(),mPathVehicleCenterCurve,mPathVehicleModuleCurve,mPathPlot);
+
+    /****** 第二代规划算法(基于搜索) ******/
+    mPathPlot->replot();
 }
 
 /**
@@ -1557,39 +1747,65 @@ void MainWindow::sCalculateDetect(void)
     mUltrasonicObstaclePercption.Command = 0x57;
 }
 // 库位确认按钮
-void MainWindow::sParkingConfirm()
+//void MainWindow::sParkingConfirm()
+//{
+//    mPercaption.PositionX = text_VehicleInitPointX->text().toFloat();
+//    mPercaption.PositionY = text_VehicleInitPointY->text().toFloat();
+//    mPercaption.AttitudeYaw = text_VehicleInitPointYaw->text().toFloat();
+
+//    mPercaption.ParkingLength = text_ParkingLength->text().toFloat();
+//    mPercaption.ParkingWidth  = text_ParkingWidth->text().toFloat();
+
+//    mGeometricTrack.Init(mPercaption.PositionX,mPercaption.PositionY,mPercaption.AttitudeYaw);
+
+//    ParkingPointX[1] = 0;
+//    ParkingPointX[2] = 0;
+//    ParkingPointX[3] = static_cast<double>(mPercaption.ParkingLength);
+//    ParkingPointX[4] = static_cast<double>(mPercaption.ParkingLength);
+
+//    ParkingPointY[1] = 0;
+//    ParkingPointY[2] = static_cast<double>(-mPercaption.ParkingWidth);
+//    ParkingPointY[3] = static_cast<double>(-mPercaption.ParkingWidth);
+//    ParkingPointY[4] = 0;
+
+//    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
+
+//    QVector<double> ParkingTrackPointX(1),ParkingTrackPointY(1);
+//    ParkingTrackPointX[0] = static_cast<double>(mGeometricTrack.getPosition().getX());
+//    ParkingTrackPointY[0] = static_cast<double>(mGeometricTrack.getPosition().getY());
+//    mPathVehicleCenterCurve->setData(ParkingTrackPointX,ParkingTrackPointY);
+
+//    mParallelPlanning->Init();
+//    mParallelPlanning->Command = 0x60;
+
+////    mVerticalPlanning->Init();
+////    mVerticalPlanning->Command = 0x60;
+//}
+
+void MainWindow::sParkingConfirmG2()
 {
-    mPercaption.PositionX = text_VehicleInitPointX->text().toFloat();
-    mPercaption.PositionY = text_VehicleInitPointY->text().toFloat();
-    mPercaption.AttitudeYaw = text_VehicleInitPointYaw->text().toFloat();
+    State start_state, end_state;
+    start_state.x       = text_VehicleStartPointX->text().toDouble();
+    start_state.y       = text_VehicleStartPointY->text().toDouble();
+    start_state.psi     = text_VehicleStartPointYaw->text().toDouble();
+    start_state.kappa   = 0.2;
+    start_state.d       = 1.0;
 
-    mPercaption.ParkingLength = text_ParkingLength->text().toFloat();
-    mPercaption.ParkingWidth  = text_ParkingWidth->text().toFloat();
+    end_state.x     = text_VehicleEndPointX->text().toDouble();
+    end_state.y     = text_VehicleEndPointY->text().toDouble();
+    end_state.psi   = text_VehicleEndPointYaw->text().toDouble();
+    end_state.kappa = 0.2;
+    end_state.d     = 1.0;
 
-    mGeometricTrack.Init(mPercaption.PositionX,mPercaption.PositionY,mPercaption.AttitudeYaw);
+    vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(start_state, end_state);
 
-    ParkingPointX[1] = 0;
-    ParkingPointX[2] = 0;
-    ParkingPointX[3] = static_cast<double>(mPercaption.ParkingLength);
-    ParkingPointX[4] = static_cast<double>(mPercaption.ParkingLength);
-
-    ParkingPointY[1] = 0;
-    ParkingPointY[2] = static_cast<double>(-mPercaption.ParkingWidth);
-    ParkingPointY[3] = static_cast<double>(-mPercaption.ParkingWidth);
-    ParkingPointY[4] = 0;
-
-    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
-
-    QVector<double> ParkingTrackPointX(1),ParkingTrackPointY(1);
-    ParkingTrackPointX[0] = static_cast<double>(mGeometricTrack.getPosition().getX());
-    ParkingTrackPointY[0] = static_cast<double>(mGeometricTrack.getPosition().getY());
-    mPathVehicleCenterCurve->setData(ParkingTrackPointX,ParkingTrackPointY);
-
-    mParallelPlanning->Init();
-    mParallelPlanning->Command = 0x60;
-
-//    mVerticalPlanning->Init();
-//    mVerticalPlanning->Command = 0x60;
+    QVector<double> path_x, path_y;
+    for (auto &path_state : path_points)
+    {
+        path_x.push_back(path_state.x);
+        path_y.push_back(path_state.y);
+    }
+    mPathPlanningCurve->setData(path_x, path_y);
 }
 
 //id:

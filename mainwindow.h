@@ -32,6 +32,7 @@
  */
 #include "Planning/ParallelParking/parallel_planning.h"
 #include "Planning/VerticalParking/vertical_planning.h"
+#include "Planning/HC_CC_StateSpace/hc_reeds_shepp_state_space.h"
 
 /**
  * @brief 控制
@@ -74,6 +75,7 @@ private:
     void ControlUI(void);
     void DetectUI(void);
     void PlanUI(void);
+    void G2_PlanUI(void);
     void TrackUI(void);
 
     // init function
@@ -140,6 +142,9 @@ private:
     QPushButton *button_start_calculate;
 
     /* Planning UI*/
+    /**
+     * @brief G1 Ui elements
+     */
     QLineEdit *text_VehicleInitPointX;
     QLineEdit *text_VehicleInitPointY;
     QLineEdit *text_VehicleInitPointYaw;
@@ -161,13 +166,28 @@ private:
     QCPCurve *mPathVehicleModuleCurve;
     QCPCurve *mPathParkingCurve;
     QCPCurve *mPathVehicleCenterCurve;
+
     QCPItemEllipse *mPathLeftCircle;
     QCPItemEllipse *mPathRightCircle;
 
     QVector<double> ParkingPointX,ParkingPointY;
 
-    QPointer<QCPGraph> mPathVehicleGraph;
-    QPointer<QCPGraph> mPathVehicleModuleDownGraph;
+//    QPointer<QCPGraph> mPathVehicleGraph;
+//    QPointer<QCPGraph> mPathVehicleModuleDownGraph;
+
+    /**
+     * @brief G2 UI elements
+     */
+    QLineEdit *text_VehicleStartPointX;
+    QLineEdit *text_VehicleStartPointY;
+    QLineEdit *text_VehicleStartPointYaw;
+
+    QLineEdit *text_VehicleEndPointX;
+    QLineEdit *text_VehicleEndPointY;
+    QLineEdit *text_VehicleEndPointYaw;
+
+    QCPCurve *mPathPlanningCurve;
+
     /**
      * @brief mTrackPlot: 跟踪模块
      */
@@ -227,7 +247,7 @@ private:
     ParallelPlanning *mParallelPlanning;
     VerticalPlanning *mVerticalPlanning;
     Curvature        *mCurvature;
-
+    HC_ReedsSheppStateSpace *mHC_ReedsSheppStateSpace;
     // 控制
     LatControl *mLatControl;
     LatControl_LQR *m_LatControl_LQR;
@@ -275,7 +295,8 @@ private slots:
     void sCalculateDetect(void);
 
     //规划
-    void sParkingConfirm();
+//    void sParkingConfirm();
+    void sParkingConfirmG2();
 
     void sPathCirclePoint(uint8_t id,Circle *c);
 
