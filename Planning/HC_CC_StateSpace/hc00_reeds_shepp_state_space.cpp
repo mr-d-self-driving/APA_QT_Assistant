@@ -2438,7 +2438,7 @@ public:
                         HC_CC_Circle **cstart, HC_CC_Circle **cend,
                         Configuration **q1, Configuration **q2) const
     {
-        TeScT_TangentCircles(c1, c2, q1, q2);
+        TceScT_TangentCircles(c1, c2, q1, q2);
         *cstart = new HC_CC_Circle(c1);
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->hc_turn_lenght(**q1) +

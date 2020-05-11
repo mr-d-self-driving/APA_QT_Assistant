@@ -181,10 +181,12 @@ private:
     QLineEdit *text_VehicleStartPointX;
     QLineEdit *text_VehicleStartPointY;
     QLineEdit *text_VehicleStartPointYaw;
+    QLineEdit *text_VehicleStartPointKappa;
 
     QLineEdit *text_VehicleEndPointX;
     QLineEdit *text_VehicleEndPointY;
     QLineEdit *text_VehicleEndPointYaw;
+    QLineEdit *text_VehicleEndPointKappa;
 
     QCPCurve *mPathPlanningCurve;
 

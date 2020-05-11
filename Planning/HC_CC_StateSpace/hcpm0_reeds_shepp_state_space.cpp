@@ -1699,7 +1699,7 @@ public:
                        + middle_tangent_circle1->cc_turn_lenght(*qa2)
                        + (*cend)->cc_turn_lenght(*qa2);
 
-        double length2 = (*cstart)->hc_turn_lenght(**q1)
+        double length2 = start_circle2->hc_turn_lenght(**q1)
                        + middle_tangent_circle2->cc_turn_lenght(*qb2)
                        + (*cend)->cc_turn_lenght(*qb2);
 
@@ -2478,7 +2478,7 @@ public:
                         HC_CC_Circle **cstart, HC_CC_Circle **cend,
                         Configuration **q1, Configuration **q2) const
     {
-        TeScT_TangentCircles(c1, c2, q1, q2);
+        TceScT_TangentCircles(c1, c2, q1, q2);
         *cstart = new HC_CC_Circle(c1);
         *cend   = new HC_CC_Circle(c2);
         return  (*cstart)->rs_turn_lenght(**q1) +

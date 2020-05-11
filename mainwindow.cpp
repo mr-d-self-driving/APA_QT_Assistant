@@ -704,6 +704,8 @@ void MainWindow::G2_PlanUI(void)
     label_VehicleStartPointY_Text->setText("Y:");
     QLabel *label_VehicleStartPointYaw_Text = new QLabel();
     label_VehicleStartPointYaw_Text->setText("Yaw:");
+    QLabel *label_VehicleStartPointKappa_Text = new QLabel();
+    label_VehicleStartPointKappa_Text->setText("Kappa:");
 
     text_VehicleStartPointX = new QLineEdit();
     text_VehicleStartPointX->setText("-6");
@@ -711,19 +713,23 @@ void MainWindow::G2_PlanUI(void)
     text_VehicleStartPointY->setText("3");
     text_VehicleStartPointYaw = new QLineEdit();
     text_VehicleStartPointYaw->setText("0");
+    text_VehicleStartPointKappa = new QLineEdit();
+    text_VehicleStartPointKappa->setText("0");
 
     QGridLayout *gVehicleStartPosition_Layout = new QGridLayout();
     gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointX_Text,0,0);
     gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointY_Text,1,0);
     gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointYaw_Text,2,0);
+    gVehicleStartPosition_Layout->addWidget(label_VehicleStartPointKappa_Text,3,0);
 
     gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointX,0,1);
     gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointY,1,1);
     gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointYaw,2,1);
+    gVehicleStartPosition_Layout->addWidget(text_VehicleStartPointKappa,3,1);
 
     QGroupBox *gVehicleStartPosition_Group = new QGroupBox();
     gVehicleStartPosition_Group->setTitle("车辆初始位置");
-    gVehicleStartPosition_Group->setFixedHeight(120);
+    gVehicleStartPosition_Group->setFixedHeight(180);
     gVehicleStartPosition_Group->setLayout(gVehicleStartPosition_Layout);
     // 车辆初始位置 end
 
@@ -734,6 +740,8 @@ void MainWindow::G2_PlanUI(void)
     label_VehicleEndPointY_Text->setText("Y:");
     QLabel *label_VehicleEndPointYaw_Text = new QLabel();
     label_VehicleEndPointYaw_Text->setText("Yaw:");
+    QLabel *label_VehicleEndPointKappa_Text = new QLabel();
+    label_VehicleEndPointKappa_Text->setText("Kappa:");
 
     text_VehicleEndPointX = new QLineEdit();
     text_VehicleEndPointX->setText("6");
@@ -741,19 +749,23 @@ void MainWindow::G2_PlanUI(void)
     text_VehicleEndPointY->setText("-2");
     text_VehicleEndPointYaw = new QLineEdit();
     text_VehicleEndPointYaw->setText("0");
+    text_VehicleEndPointKappa = new QLineEdit();
+    text_VehicleEndPointKappa->setText("0");
 
     QGridLayout *gVehicleEndPosition_Layout = new QGridLayout();
     gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointX_Text,0,0);
     gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointY_Text,1,0);
     gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointYaw_Text,2,0);
+    gVehicleEndPosition_Layout->addWidget(label_VehicleEndPointKappa_Text,3,0);
 
     gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointX,0,1);
     gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointY,1,1);
     gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointYaw,2,1);
+    gVehicleEndPosition_Layout->addWidget(text_VehicleEndPointKappa,3,1);
 
     QGroupBox *gVehicleEndPosition_Group = new QGroupBox();
     gVehicleEndPosition_Group->setTitle("车辆目标位置");
-    gVehicleEndPosition_Group->setFixedHeight(120);
+    gVehicleEndPosition_Group->setFixedHeight(180);
     gVehicleEndPosition_Group->setLayout(gVehicleEndPosition_Layout);
     // 车辆最终位置 end
 
@@ -1788,13 +1800,13 @@ void MainWindow::sParkingConfirmG2()
     start_state.x       = text_VehicleStartPointX->text().toDouble();
     start_state.y       = text_VehicleStartPointY->text().toDouble();
     start_state.psi     = text_VehicleStartPointYaw->text().toDouble();
-    start_state.kappa   = 0.2;
+    start_state.kappa   = text_VehicleStartPointKappa->text().toDouble();
     start_state.d       = 1.0;
 
     end_state.x     = text_VehicleEndPointX->text().toDouble();
     end_state.y     = text_VehicleEndPointY->text().toDouble();
     end_state.psi   = text_VehicleEndPointYaw->text().toDouble();
-    end_state.kappa = 0.2;
+    end_state.kappa = text_VehicleEndPointKappa->text().toDouble();
     end_state.d     = 1.0;
 
     vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(start_state, end_state);
