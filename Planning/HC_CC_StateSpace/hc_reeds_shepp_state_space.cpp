@@ -292,7 +292,7 @@ vector<Control> HC_ReedsSheppStateSpace::getControls(const State &state1, const 
                     }
                 }
                 // adjust controls by intial and final control
-                if(fabs(start_control.delta_s) < math::getEpsilon())
+                if(fabs(start_control.delta_s) > math::getEpsilon())
                 {
                     hc_rs_control.insert(hc_rs_control.begin(), start_control);
                 }
