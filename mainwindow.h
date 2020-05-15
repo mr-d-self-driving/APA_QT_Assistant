@@ -52,7 +52,7 @@
 /**
  * @brief 车位边界配置
  */
-#define BOUNDARY_LEFT  (-16.0)
+#define BOUNDARY_LEFT  (-18.0)
 #define BOUNDARY_RIGHT ( 18.0)
 #define BOUNDARY_TOP   ( 12.0)
 #define BOUNDARY_DOWN  (-12.0)
@@ -95,10 +95,25 @@ private:
     void VectorArrowShow(State base, State *head, QCPItemLine *arrow);
 
     /**
-     * @brief HC_CC_PathShow
-     * @param p
+     * @brief 显示路径并通过颜色区别路径切换
+     * @param p :the path point
      */
     void HC_CC_PathShow(vector<State> &p);
+
+    /**
+     * @brief 画圆
+     * @param x :the x axis location with the centern of circle
+     * @param y :the y axis location with the centern of circle
+     * @param radius :the radius of the circle
+     * @param e :the ellipse object
+     */
+    void CircleShow(double x, double y, double radius, QCPItemEllipse *e);
+
+    /**
+     * @brief 显示规划的几何圆
+     * @param c :the circle location
+     */
+    void HC_CC_CircleShow(HC_CC_RS_Path *c);
 
     void TargetPathShow(TrackLinkList *list);
     void TargetPathShow(std::vector<TargetTrack> *vec);

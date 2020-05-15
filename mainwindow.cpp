@@ -858,15 +858,6 @@ void MainWindow::G2_PlanUI(void)
     mEndArrow->setHead(QCPLineEnding::esSpikeArrow);
     mEndArrow->setPen(QPen(Qt::darkGreen,5));
 
-//    mStartConfigurationPoint = new QCPGraph(mPathPlot->xAxis,mPathPlot->yAxis);
-//    mStartConfigurationPoint->setName("起始点");
-//    mStartConfigurationPoint->setPen(QPen(Qt::darkRed,8));
-//    mStartConfigurationPoint->setBrush(QBrush(QColor(90,35,255,20)));
-
-//    mEndConfigurationPoint = new QCPGraph(mPathPlot->xAxis,mPathPlot->yAxis);
-//    mEndConfigurationPoint->setName("目标点");
-//    mEndConfigurationPoint->setPen(QPen(Qt::darkGreen,8));
-//    mEndConfigurationPoint->setBrush(QBrush(QColor(90,35,255,20)));
 //    mPathParkingCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
 //    mPathParkingCurve->setName("库位");
 //    mPathParkingCurve->setPen(QPen(Qt::green,4));
@@ -900,15 +891,15 @@ void MainWindow::G2_PlanUI(void)
     QPen RedDotPen, GreenDotPen, blueDotPen, BlackDotPen;
     RedDotPen.setColor(Qt::red);
     RedDotPen.setStyle(Qt::DotLine);
-    RedDotPen.setWidthF(2);
+    RedDotPen.setWidthF(5);
 
     GreenDotPen.setColor(Qt::green);
     GreenDotPen.setStyle(Qt::DotLine);
-    GreenDotPen.setWidthF(2);
+    GreenDotPen.setWidthF(5);
 
     blueDotPen.setColor(QColor(30, 40, 255, 150));
     blueDotPen.setStyle(Qt::DotLine);
-    blueDotPen.setWidthF(2);
+    blueDotPen.setWidthF(5);
 
     BlackDotPen.setColor(Qt::black);
     BlackDotPen.setStyle(Qt::DotLine);
@@ -918,25 +909,25 @@ void MainWindow::G2_PlanUI(void)
     mPathPlanningStraightLine->setName("直线段");
     mPathPlanningStraightLine->setPen(RedDotPen);
     mPathPlanningStraightLine->setLineStyle(QCPCurve::LineStyle::lsNone);
-    mPathPlanningStraightLine->setScatterStyle(QCPScatterStyle::ssStar);
+    mPathPlanningStraightLine->setScatterStyle(QCPScatterStyle::ssDot);
 
     mPathPlanningClothoid = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
     mPathPlanningClothoid->setName("回旋段");
     mPathPlanningClothoid->setPen(GreenDotPen);
     mPathPlanningClothoid->setLineStyle(QCPCurve::LineStyle::lsNone);
-    mPathPlanningClothoid->setScatterStyle(QCPScatterStyle::ssStar);
+    mPathPlanningClothoid->setScatterStyle(QCPScatterStyle::ssDot);
 
     mPathPlanningCircle = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
     mPathPlanningCircle->setName("圆弧段");
     mPathPlanningCircle->setPen(blueDotPen);
     mPathPlanningCircle->setLineStyle(QCPCurve::LineStyle::lsNone);
-    mPathPlanningCircle->setScatterStyle(QCPScatterStyle::ssStar);
+    mPathPlanningCircle->setScatterStyle(QCPScatterStyle::ssDot);
 
     mTangentCirclePoint = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
     mTangentCirclePoint->setName("切点");
     mTangentCirclePoint->setPen(BlackDotPen);
     mTangentCirclePoint->setLineStyle(QCPCurve::LineStyle::lsNone);
-    mTangentCirclePoint->setScatterStyle(QCPScatterStyle::ssCircle);
+    mTangentCirclePoint->setScatterStyle(QCPScatterStyle::ssDot);
 
     mStartCircle = new QCPItemEllipse(mPathPlot);
     mStartCircle->setPen(QPen(Qt::red,1));
@@ -1269,6 +1260,85 @@ void MainWindow::HC_CC_PathShow(vector<State> &p)
     mPathPlanningStraightLine->setData(straight_line_path_x, straight_line_path_y);
     mPathPlanningCircle->setData(circle_path_x, circle_path_y);
     mPathPlanningClothoid->setData(clothoid_path_x, clothoid_path_y);
+}
+
+/**
+ * @brief 画圆
+ * @param x :the x axis location with the centern of circle
+ * @param y :the y axis location with the centern of circle
+ * @param radius :the radius of the circle
+ * @param e :the ellipse object
+ */
+void MainWindow::CircleShow(double x, double y, double radius, QCPItemEllipse *e)
+{
+    e->topLeft->setCoords    ( x - radius, y + radius);
+    e->bottomRight->setCoords( x + radius, y - radius);
+}
+/**
+ * @brief 显示规划的几何圆
+ * @param c :the circle location
+ */
+void MainWindow::HC_CC_CircleShow(HC_CC_RS_Path *c)
+{
+    CircleShow(c->getCircleStart()->getCenter_x(),
+               c->getCircleStart()->getCenter_y(),
+               1 / c->getKappa(), mStartCircle);
+
+    CircleShow(c->getCircleEnd()->getCenter_x(),
+               c->getCircleEnd()->getCenter_y(),
+               1 / c->getKappa(), mEndCircle);
+
+
+    if(c->getCi1() != nullptr)
+    {
+        CircleShow(c->getCi1()->getCenter_x(),
+                   c->getCi1()->getCenter_y(),
+                   1 / c->getKappa(), mMiddleCircle1);
+        mMiddleCircle1->setVisible(true);
+    }
+    else
+    {
+        mMiddleCircle1->setVisible(false);
+    }
+
+    if(c->getCi2() != nullptr)
+    {
+        CircleShow(c->getCi2()->getCenter_x(),
+                   c->getCi2()->getCenter_y(),
+                   1 / c->getKappa(), mMiddleCircle2);
+        mMiddleCircle2->setVisible(true);
+    }
+    else
+    {
+        mMiddleCircle2->setVisible(false);
+    }
+
+    QVector<double> q_x, q_y;
+    q_x.push_back(c->getCircleStart()->getStart().getX());
+    q_y.push_back(c->getCircleStart()->getStart().getY());
+    if(c->getQi1() != nullptr)
+    {
+        q_x.push_back(c->getQi1()->getX());
+        q_y.push_back(c->getQi1()->getY());
+    }
+    if(c->getQi2() != nullptr)
+    {
+        q_x.push_back(c->getQi2()->getX());
+        q_y.push_back(c->getQi2()->getY());
+    }
+    if(c->getQi3() != nullptr)
+    {
+        q_x.push_back(c->getQi3()->getX());
+        q_y.push_back(c->getQi3()->getY());
+    }
+    if(c->getQi4() != nullptr)
+    {
+        q_x.push_back(c->getQi4()->getX());
+        q_y.push_back(c->getQi4()->getY());
+    }
+    q_x.push_back(c->getCircleEnd()->getStart().getX());
+    q_y.push_back(c->getCircleEnd()->getStart().getY());
+    mTangentCirclePoint->setData(q_x, q_y);
 }
 /**
  * @brief MainWindow::TargetPathShow 显示目标曲线
@@ -1938,32 +2008,8 @@ void MainWindow::sParkingConfirmG2()
     vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
     this->HC_CC_PathShow(path_points);
 
-//    QVector<double> clothoid_path_x, clothoid_path_y;
-//    QVector<double> circle_path_x, circle_path_y;
-//    QVector<double> straight_line_path_x, straight_line_path_y;
-//    for (auto &path_state : path_points)
-//    {
-//        if(fabs(path_state.kappa) < math::getEpsilon())
-//        {
-//            straight_line_path_x.push_back(path_state.x);
-//            straight_line_path_y.push_back(path_state.y);
-//        }
-//        else if( fabs(fabs(path_state.kappa) - 0.2) < math::getEpsilon() )
-//        {
-//            circle_path_x.push_back(path_state.x);
-//            circle_path_y.push_back(path_state.y);
-//        }
-//        else
-//        {
-//            clothoid_path_x.push_back(path_state.x);
-//            clothoid_path_y.push_back(path_state.y);
-//        }
-//    }
-//    mPathPlanningStraightLine->setData(straight_line_path_x, straight_line_path_y);
-//    mPathPlanningCircle->setData(circle_path_x, circle_path_y);
-//    mPathPlanningClothoid->setData(clothoid_path_x, clothoid_path_y);
-
-
+    HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
+    HC_CC_CircleShow(circle_path);
 }
 
 //id:
@@ -2109,67 +2155,8 @@ void MainWindow::sMouseMoveEvent(QMouseEvent *event)
     HC_CC_PathShow(path_points);
 
     HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
+    HC_CC_CircleShow(circle_path);
 
-    mStartCircle->topLeft->setCoords( circle_path->getCircleStart()->getCenter_x() - 5,
-                                      circle_path->getCircleStart()->getCenter_y() + 5);
-    mStartCircle->bottomRight->setCoords( circle_path->getCircleStart()->getCenter_x() + 5,
-                                          circle_path->getCircleStart()->getCenter_y() - 5);
-
-    mEndCircle->topLeft->setCoords( circle_path->getCircleEnd()->getCenter_x() - 5,
-                                    circle_path->getCircleEnd()->getCenter_y() + 5);
-    mEndCircle->bottomRight->setCoords( circle_path->getCircleEnd()->getCenter_x() + 5,
-                                        circle_path->getCircleEnd()->getCenter_y() - 5);
-
-    if(circle_path->getCi1() != nullptr)
-    {
-
-        mMiddleCircle1->topLeft->setCoords( circle_path->getCi1()->getCenter_x() - 5,
-                                            circle_path->getCi1()->getCenter_y() + 5);
-        mMiddleCircle1->bottomRight->setCoords( circle_path->getCi1()->getCenter_x() + 5,
-                                                circle_path->getCi1()->getCenter_y() - 5);
-        mMiddleCircle1->setVisible(true);
-    }
-    else
-    {
-        mMiddleCircle1->setVisible(false);
-    }
-
-    if(circle_path->getCi2() != nullptr)
-    {
-        mMiddleCircle2->topLeft->setCoords( circle_path->getCi2()->getCenter_x() - 5,
-                                            circle_path->getCi2()->getCenter_y() + 5);
-        mMiddleCircle2->bottomRight->setCoords( circle_path->getCi2()->getCenter_x() + 5,
-                                                circle_path->getCi2()->getCenter_y() - 5);
-        mMiddleCircle2->setVisible(true);
-    }
-    else
-    {
-        mMiddleCircle2->setVisible(false);
-    }
-
-    QVector<double> q_x, q_y;
-    if(circle_path->getQi1() != nullptr)
-    {
-        q_x.push_back(circle_path->getQi1()->getX());
-        q_y.push_back(circle_path->getQi1()->getY());
-    }
-    if(circle_path->getQi2() != nullptr)
-    {
-        q_x.push_back(circle_path->getQi2()->getX());
-        q_y.push_back(circle_path->getQi2()->getY());
-    }
-    if(circle_path->getQi3() != nullptr)
-    {
-        q_x.push_back(circle_path->getQi3()->getX());
-        q_y.push_back(circle_path->getQi3()->getY());
-    }
-    if(circle_path->getQi4() != nullptr)
-    {
-        q_x.push_back(circle_path->getQi4()->getX());
-        q_y.push_back(circle_path->getQi4()->getY());
-    }
-    mTangentCirclePoint->setData(q_x, q_y);
-    mPathPlot->replot();
 }
 
 void MainWindow::sTrackStart(void)
