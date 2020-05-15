@@ -41,28 +41,29 @@ public:
     {
         double x = 0.5 * (c1.getCenter_x() + c2.getCenter_x());
         double y = 0.5 * (c1.getCenter_y() + c2.getCenter_y());
-
+        double angle = atan2(c2.getCenter_y() - c1.getCenter_y(),
+                             c2.getCenter_x() - c1.getCenter_x());
         double q_psi;
         if(c1.getLeft())
         {
             if(c1.getForward())
             {
-                q_psi = _angle + MV_PI2 - c1.getMu();
+                q_psi = angle + MV_PI2 - c1.getMu();
             }
             else
             {
-                q_psi = _angle + MV_PI2 + c1.getMu();
+                q_psi = angle + MV_PI2 + c1.getMu();
             }
         }
         else
         {
             if(c1.getForward())
             {
-                q_psi = _angle - MV_PI2 + c1.getMu();
+                q_psi = angle - MV_PI2 + c1.getMu();
             }
             else
             {
-                q_psi = _angle - MV_PI2 - c1.getMu();
+                q_psi = angle - MV_PI2 - c1.getMu();
             }
         }
         *q = new Configuration(x, y, q_psi, 0.0);
@@ -119,7 +120,10 @@ public:
      */
     void TcT_TangentCircles(HC_CC_Circle &c1, HC_CC_Circle &c2, Configuration **q) const
     {
-        double delta_x = 0.5 * _distance;
+        double distance = c1.CenterDistance(c2);
+        double angle    = atan2(c2.getCenter_y() - c1.getCenter_y(),
+                                c2.getCenter_x() - c1.getCenter_x());
+        double delta_x = 0.5 * distance;
         double delta_y = 0.0;
 
         double x,y,psi;
@@ -127,14 +131,14 @@ public:
         {
             if(c1.getForward())
             {
-                psi = _angle + MV_PI2;
-                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), _angle,
+                psi = angle + MV_PI2;
+                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), angle,
                                              delta_x,  delta_y, &x, &y);
             }
             else
             {
-                psi = _angle + MV_PI2;
-                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), _angle,
+                psi = angle + MV_PI2;
+                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), angle,
                                              delta_x, -delta_y, &x, &y);
             }
         }
@@ -142,14 +146,14 @@ public:
         {
             if(c1.getForward())
             {
-                psi = _angle - MV_PI2;
-                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), _angle,
+                psi = angle - MV_PI2;
+                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), angle,
                                              delta_x, -delta_y, &x, &y);
             }
             else
             {
-                psi = _angle - MV_PI2;
-                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), _angle,
+                psi = angle - MV_PI2;
+                math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), angle,
                                              delta_x,  delta_y, &x, &y);
             }
         }
@@ -591,14 +595,17 @@ public:
     void TiST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                               Configuration **q1, Configuration **q2) const
     {
-        double alpha = asin(2 * c1.getRadius() * c1.getCosMu() / _distance);
+        double distance = c1.CenterDistance(c2);
+        double angle    = atan2( c2.getCenter_y() - c1.getCenter_y() ,
+                                 c2.getCenter_x() - c1.getCenter_x() );
+        double alpha = asin(2 * c1.getRadius() * c1.getCosMu() / distance);
         double delta_x = c1.getRadius() * c1.getSinMu();
         double delta_y = c1.getRadius() * c1.getCosMu();
         double x, y, psi;
 
         if(c1.getLeft() && c1.getForward())
         {
-            psi = _angle + alpha;
+            psi = angle + alpha;
             math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
                                          delta_x, -delta_y, &x, &y);
             *q1 = new Configuration(x, y, psi, 0);
@@ -609,7 +616,7 @@ public:
         }
         else if(c1.getLeft() && !c1.getForward())
         {
-            psi = _angle - alpha;
+            psi = angle - alpha;
             math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
                                          delta_x, delta_y, &x, &y);
             *q1 = new Configuration(x, y, psi + MV_PI, 0);
@@ -620,7 +627,7 @@ public:
         }
         else if(!c1.getLeft() && c1.getForward())
         {
-            psi = _angle - alpha;
+            psi = angle - alpha;
             math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
                                          delta_x, delta_y, &x, &y);
             *q1 = new Configuration(x, y, psi, 0);
@@ -631,7 +638,7 @@ public:
         }
         else if(!c1.getLeft() && !c1.getForward())
         {
-            psi = _angle + alpha;
+            psi = angle + alpha;
             math::change_to_global_frame(c1.getCenter_x(), c1.getCenter_y(), psi,
                                          delta_x, -delta_y, &x, &y);
             *q1 = new Configuration(x, y, psi + MV_PI, 0);
@@ -656,7 +663,8 @@ public:
     void TeST_TangentCircles( HC_CC_Circle &c1, HC_CC_Circle &c2,
                               Configuration **q1, Configuration **q2) const
     {
-        double psi = _angle;
+        double psi = atan2( c2.getCenter_y() - c1.getCenter_y() ,
+                            c2.getCenter_x() - c1.getCenter_x() );
         double delta_x = c1.getRadius() * c1.getSinMu();
         double delta_y = c1.getRadius() * c1.getCosMu();
         double x, y;
@@ -1513,7 +1521,7 @@ public:
         double r1, r2, delta_x, delta_y, x, y;
 
         r1 = 2 * fabs(c1.getKappaInv());
-        r2 = 2 * c1.getRadius();
+        r2 = c1.getRadius();
 
         delta_x = (pow(r1, 2) + pow(_distance / 2, 2) - pow(r2, 2)) / _distance;
         delta_y = sqrt(pow(r1, 2) - pow(delta_x, 2));
@@ -2915,7 +2923,7 @@ vector<Control> HC0PM_ReedsSheppStateSpace::getControls(const State &state1, con
         case hc_cc_rs::TcTT:
             steering::HC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
             steering::HC_TurnControls(*(path->getCi1()), *(path->getQi1()), false, hc_rs_controls);
-            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), false, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi2()), true, hc_rs_controls);
             break;
 
         case hc_cc_rs::TTcT:
@@ -2956,7 +2964,7 @@ vector<Control> HC0PM_ReedsSheppStateSpace::getControls(const State &state1, con
             steering::CC_TurnControls(*(path->getCircleStart()), *(path->getQi1()), true, hc_rs_controls);
             steering::HC_TurnControls(*(path->getCi1()), *(path->getQi2()), true, hc_rs_controls);
             steering::HC_TurnControls(*(path->getCi2()), *(path->getQi2()), false, hc_rs_controls);
-            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), false, hc_rs_controls);
+            steering::HC_TurnControls(*(path->getCircleEnd()), *(path->getQi3()), true, hc_rs_controls);
             break;
 
         case hc_cc_rs::TcTTcT:

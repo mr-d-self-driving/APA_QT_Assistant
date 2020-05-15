@@ -36,7 +36,7 @@ void clothoid_to_end( double x_i, double y_i, double theta_i, double kappa_i,
     clothoid_final_point = Vector2d(direction * fresnel_c_f,sgn_sigma * fresnel_s_f);
     init_point = Vector2d(x_i,y_i);
 
-    final_point = init_point + (clothoid_final_point - clothoid_init_point).rotate(rotate_theta);
+    final_point = init_point + (clothoid_final_point - clothoid_init_point).rotate(rotate_theta) * MV_PI_SQRT * sqrt_sigma_inv;
 
     *x_f = final_point.getX();
     *y_f = final_point.getY();

@@ -52,8 +52,8 @@
 /**
  * @brief 车位边界配置
  */
-#define BOUNDARY_LEFT  (-14.0)
-#define BOUNDARY_RIGHT ( 16.0)
+#define BOUNDARY_LEFT  (-16.0)
+#define BOUNDARY_RIGHT ( 18.0)
 #define BOUNDARY_TOP   ( 12.0)
 #define BOUNDARY_DOWN  (-12.0)
 
@@ -85,6 +85,21 @@ private:
     void PathVehicleModule(Vector2d p,float yaw);
 
     void VehicleModuleShow(Vector2d p,float yaw,QCPCurve *vehicle_center,QCPCurve *vehicle_modle,QCustomPlot *plot);
+    /**
+     * @brief 显示矢量箭头
+     * @param x :the x axis location
+     * @param y :the y axis location
+     * @param yaw :the yaw angle od the vectoe arrow
+     * @param arrow :the plot object
+     */
+    void VectorArrowShow(State base, State *head, QCPItemLine *arrow);
+
+    /**
+     * @brief HC_CC_PathShow
+     * @param p
+     */
+    void HC_CC_PathShow(vector<State> &p);
+
     void TargetPathShow(TrackLinkList *list);
     void TargetPathShow(std::vector<TargetTrack> *vec);
     void SteeringAngleShow(float angle);
@@ -188,8 +203,20 @@ private:
     QLineEdit *text_VehicleEndPointYaw;
     QLineEdit *text_VehicleEndPointKappa;
 
-    QCPCurve *mPathPlanningCurve;
+    QCPCurve *mPathPlanningStraightLine;
+    QCPCurve *mPathPlanningClothoid;
+    QCPCurve *mPathPlanningCircle;
 
+    QCPItemLine *mStartArrow;
+    QCPItemLine *mEndArrow;
+
+
+    QCPItemEllipse *mStartCircle;
+    QCPItemEllipse *mEndCircle;
+    QCPItemEllipse *mMiddleCircle1;
+    QCPItemEllipse *mMiddleCircle2;
+
+    QCPCurve *mTangentCirclePoint;
     /**
      * @brief mTrackPlot: 跟踪模块
      */
@@ -250,6 +277,11 @@ private:
     VerticalPlanning *mVerticalPlanning;
     Curvature        *mCurvature;
     HC_ReedsSheppStateSpace *mHC_ReedsSheppStateSpace;
+
+    State mBaseState[2];
+    State mHeadState[2];
+
+    int m_base_state_index, m_head_state_index;
     // 控制
     LatControl *mLatControl;
     LatControl_LQR *m_LatControl_LQR;
@@ -303,6 +335,26 @@ private slots:
     void sPathCirclePoint(uint8_t id,Circle *c);
 
     void sPathGenarate(void);
+
+    // 鼠标拖拽功能
+    /**
+     * @brief 鼠标按下事件处理
+     * @param event
+     */
+    void sMousePressEvent(QMouseEvent *event);
+
+    /**
+     * @brief 鼠标释放事件处理
+     * @param event
+     */
+    void sMouseReleaseEvent(QMouseEvent *event);
+
+    /**
+     * @brief 鼠标移动事件处理
+     * @param event
+     */
+    void sMouseMoveEvent(QMouseEvent *event);
+    // 跟踪模块
     void sTrackStart(void);
     void SortSmallToBig(float *array,uint8_t *index_array,uint8_t cnt);
 };

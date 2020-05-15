@@ -49,6 +49,8 @@ public:
      */
     double getDistance(const State &state1, const State &state2) const;
 
+    HC_CC_RS_Path* getCirclePath(const State &state1, const State &state2) const;
+
     /**
      * @brief Returns controls of the shortest path from state1 to state2
      * @param state1
