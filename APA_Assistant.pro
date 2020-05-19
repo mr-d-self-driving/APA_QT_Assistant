@@ -112,7 +112,6 @@ HEADERS += \
         Control/LatControl/lat_control.h \
         Control/LatControl/lat_control_lqr.h \
         Control/LonControl/lon_control.h \
-        Eigen/Eigen \
         Interaction/CANBUS/BoRui/bo_rui_controller.h \
         Interaction/CANBUS/BoRui/bo_rui_message.h \
         Interaction/CANBUS/ChangAn/chang_an_controller.h \
@@ -144,9 +143,11 @@ HEADERS += \
         Planning/VerticalParking/vertical_planning.h \
         QCustomPlot/axistag.h \
         mainwindow.h \
-        QCustomPlot/qcustomplot.h
+        QCustomPlot/qcustomplot.h \
 
 LIBS += -L$$PWD/WinZlgCan/ -lControlCAN
+
+INCLUDEPATH += C:\eigen-3.3.7
 
 FORMS += \
         mainwindow.ui
