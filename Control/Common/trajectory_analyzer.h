@@ -15,9 +15,9 @@
 typedef struct _TargetTrack
 {
     Vector2d point;
-    float    yaw;
-    float    curvature;
-    float    velocity;
+    double    yaw;
+    double    curvature;
+    double    velocity;
 }TargetTrack;
 
 /**
