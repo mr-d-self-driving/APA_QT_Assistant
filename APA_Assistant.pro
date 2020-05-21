@@ -147,7 +147,9 @@ HEADERS += \
 
 LIBS += -L$$PWD/WinZlgCan/ -lControlCAN
 
-INCLUDEPATH += C:\eigen-3.3.7
+INCLUDEPATH += C:\eigen-3.3.7 C:\Boost\include\boost-1_73
+
+DEFINES += BOOST_USE_LIB
 
 FORMS += \
         mainwindow.ui
