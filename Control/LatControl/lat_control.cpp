@@ -191,17 +191,17 @@ void LatControl::ProcV1_0(MessageManager *msg,VehicleController *ctl,GeometricTr
  */
 void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,GeometricTrack *a_track,TargetTrack t_track)
 {
-    float err_yaw=0.0f,err_cro=0.0f;
+    double err_yaw=0.0,err_cro=0.0;
 	Vector2d vec_d,vec_t;
-	float psi_omega;
-    float v_x = 0.0f,k = 0.0f;
-	float delta_ctl;
+    double psi_omega;
+    double v_x = 0.0,k = 0.0;
+    double delta_ctl;
 
     vec_d = a_track->getPosition() - t_track.point;
 
     if(Drive == msg->getGear())
     {
-        vec_t = Vector2d(cosf(t_track.yaw),sinf(t_track.yaw));
+        vec_t = Vector2d(cos(t_track.yaw),sin(t_track.yaw));
         err_yaw = pi2pi(a_track->getYaw() - t_track.yaw);
 //        v_x = msg->getVehicleMiddleSpeed();
         v_x = ctl->getVelocity();
@@ -216,7 +216,7 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
     }
     else
     {
-        vec_t = Vector2d(0.0f,0.0f);
+        vec_t = Vector2d(0.0,0.0);
         err_yaw = 0.0f;
         v_x = 0.0f;
     }
@@ -227,6 +227,7 @@ void LatControl::RearWheelFeedback(MessageManager *msg,VehicleController *ctl,Ge
               - COEFFICIENT_KE   * v_x  * sinf(err_yaw) * err_cro / err_yaw
               - COEFFICIENT_KPSI * fabs(v_x) * err_yaw;
 
+    // TODO 对于err_yaw为0，输出上一时刻的转向角
 	if(fabs(psi_omega) < 1.0e-6f || fabs(err_yaw) < 1.0e-6f)
 	{
 		ctl->SteeringAngle 		= 0.0f;
@@ -272,8 +273,8 @@ void LatControl::Work(MessageManager *msg,VehicleController *ctl,GeometricTrack 
 		case process_status:
 			if(ctl->getAPAEnable())
 			{
-                ProcV1_0(msg,ctl,a_track,t_track);
-//                RearWheelFeedback(msg,ctl,a_track,t_track);
+//                ProcV1_0(msg,ctl,a_track,t_track);
+                RearWheelFeedback(msg,ctl,a_track,t_track);
                 nerest_distance = (a_track->getPosition() - last_track.point).Length();
                 cross_err = last_track.point.CrossProduct(a_track->getPosition());
                 if( nerest_distance < 0.1f)
