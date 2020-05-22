@@ -2090,7 +2090,7 @@ void MainWindow::sParkingConfirmG2()
     ompl_motion_planner(mBaseState[0], mBaseState[1]);
 
 //    vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
-    this->HC_CC_PathShow(path_points);
+//    this->HC_CC_PathShow(path_points);
 
 //    HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
 //    HC_CC_CircleShow(circle_path);
