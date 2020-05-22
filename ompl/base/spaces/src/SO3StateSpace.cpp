@@ -99,7 +99,7 @@ void ompl::base::SO3StateSampler::sampleUniform(State *state)
     rng_.quaternion(&state->as<SO3StateSpace::StateType>()->x);
 }
 
-void ompl::base::SO3StateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::SO3StateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     if (distance >= .25 * boost::math::constants::pi<double>())
     {
@@ -108,7 +108,7 @@ void ompl::base::SO3StateSampler::sampleUniformNear(State *state, const State *n
     }
     double d = rng_.uniform01();
     SO3StateSpace::StateType q, *qs = static_cast<SO3StateSpace::StateType *>(state);
-    const auto *qnear = static_cast<const SO3StateSpace::StateType *>(near);
+    const auto *qnear = static_cast<const SO3StateSpace::StateType *>(xnear);
     computeAxisAngle(q, rng_.gaussian01(), rng_.gaussian01(), rng_.gaussian01(),
                      2. * pow(d, boost::math::constants::third<double>()) * distance);
     quaternionProduct(*qs, *qnear, q);

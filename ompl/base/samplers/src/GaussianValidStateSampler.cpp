@@ -78,14 +78,14 @@ bool ompl::base::GaussianValidStateSampler::sample(State *state)
     return result;
 }
 
-bool ompl::base::GaussianValidStateSampler::sampleNear(State *state, const State *near, const double distance)
+bool ompl::base::GaussianValidStateSampler::sampleNear(State *state, const State *xnear, const double distance)
 {
     bool result = false;
     unsigned int attempts = 0;
     State *temp = si_->allocState();
     do
     {
-        sampler_->sampleUniformNear(state, near, distance);
+        sampler_->sampleUniformNear(state, xnear, distance);
         bool v1 = si_->isValid(state);
         sampler_->sampleGaussian(temp, state, distance);
         bool v2 = si_->isValid(temp);

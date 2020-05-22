@@ -38,8 +38,8 @@
 #include "ompl/base/goals/GoalState.h"
 #include "ompl/base/goals/GoalStates.h"
 #include "ompl/base/OptimizationObjective.h"
-#include "ompl/control/SpaceInformation.h"
-#include "ompl/control/PathControl.h"
+//#include "ompl/control/SpaceInformation.h"
+//#include "ompl/control/PathControl.h"
 #include "ompl/tools/config/MagicConstants.h"
 #include <sstream>
 #include <algorithm>
@@ -277,89 +277,89 @@ void ompl::base::ProblemDefinition::getInputStates(std::vector<const State *> &s
 ompl::base::PathPtr ompl::base::ProblemDefinition::isStraightLinePathValid() const
 {
     PathPtr path;
-    if (control::SpaceInformationPtr sic = std::dynamic_pointer_cast<control::SpaceInformation, SpaceInformation>(si_))
-    {
-        unsigned int startIndex;
-        if (isTrivial(&startIndex, nullptr))
-        {
-            auto pc(std::make_shared<control::PathControl>(sic));
-            pc->append(startStates_[startIndex]);
-            control::Control *null = sic->allocControl();
-            sic->nullControl(null);
-            pc->append(startStates_[startIndex], null, 0.0);
-            sic->freeControl(null);
-            path = pc;
-        }
-        else
-        {
-            control::Control *nc = sic->allocControl();
-            State *result1 = sic->allocState();
-            State *result2 = sic->allocState();
-            sic->nullControl(nc);
+//    if (control::SpaceInformationPtr sic = std::dynamic_pointer_cast<control::SpaceInformation, SpaceInformation>(si_))
+//    {
+//        unsigned int startIndex;
+//        if (isTrivial(&startIndex, nullptr))
+//        {
+//            auto pc(std::make_shared<control::PathControl>(sic));
+//            pc->append(startStates_[startIndex]);
+//            control::Control *null = sic->allocControl();
+//            sic->nullControl(null);
+//            pc->append(startStates_[startIndex], null, 0.0);
+//            sic->freeControl(null);
+//            path = pc;
+//        }
+//        else
+//        {
+//            control::Control *nc = sic->allocControl();
+//            State *result1 = sic->allocState();
+//            State *result2 = sic->allocState();
+//            sic->nullControl(nc);
 
-            for (unsigned int k = 0; k < startStates_.size() && !path; ++k)
-            {
-                const State *start = startStates_[k];
-                if (start && si_->isValid(start) && si_->satisfiesBounds(start))
-                {
-                    sic->copyState(result1, start);
-                    for (unsigned int i = 0; i < sic->getMaxControlDuration() && !path; ++i)
-                        if (sic->propagateWhileValid(result1, nc, 1, result2))
-                        {
-                            if (goal_->isSatisfied(result2))
-                            {
-                                auto pc(std::make_shared<control::PathControl>(sic));
-                                pc->append(start);
-                                pc->append(result2, nc, (i + 1) * sic->getPropagationStepSize());
-                                path = pc;
-                                break;
-                            }
-                            std::swap(result1, result2);
-                        }
-                }
-            }
-            sic->freeState(result1);
-            sic->freeState(result2);
-            sic->freeControl(nc);
-        }
-    }
-    else
-    {
-        std::vector<const State *> states;
-        auto *goal = dynamic_cast<GoalState *>(goal_.get());
-        if (goal)
-            if (si_->isValid(goal->getState()) && si_->satisfiesBounds(goal->getState()))
-                states.push_back(goal->getState());
-        auto *goals = dynamic_cast<GoalStates *>(goal_.get());
-        if (goals)
-            for (unsigned int i = 0; i < goals->getStateCount(); ++i)
-                if (si_->isValid(goals->getState(i)) && si_->satisfiesBounds(goals->getState(i)))
-                    states.push_back(goals->getState(i));
+//            for (unsigned int k = 0; k < startStates_.size() && !path; ++k)
+//            {
+//                const State *start = startStates_[k];
+//                if (start && si_->isValid(start) && si_->satisfiesBounds(start))
+//                {
+//                    sic->copyState(result1, start);
+//                    for (unsigned int i = 0; i < sic->getMaxControlDuration() && !path; ++i)
+//                        if (sic->propagateWhileValid(result1, nc, 1, result2))
+//                        {
+//                            if (goal_->isSatisfied(result2))
+//                            {
+//                                auto pc(std::make_shared<control::PathControl>(sic));
+//                                pc->append(start);
+//                                pc->append(result2, nc, (i + 1) * sic->getPropagationStepSize());
+//                                path = pc;
+//                                break;
+//                            }
+//                            std::swap(result1, result2);
+//                        }
+//                }
+//            }
+//            sic->freeState(result1);
+//            sic->freeState(result2);
+//            sic->freeControl(nc);
+//        }
+//    }
+//    else
+//    {
+//        std::vector<const State *> states;
+//        auto *goal = dynamic_cast<GoalState *>(goal_.get());
+//        if (goal)
+//            if (si_->isValid(goal->getState()) && si_->satisfiesBounds(goal->getState()))
+//                states.push_back(goal->getState());
+//        auto *goals = dynamic_cast<GoalStates *>(goal_.get());
+//        if (goals)
+//            for (unsigned int i = 0; i < goals->getStateCount(); ++i)
+//                if (si_->isValid(goals->getState(i)) && si_->satisfiesBounds(goals->getState(i)))
+//                    states.push_back(goals->getState(i));
 
-        if (states.empty())
-        {
-            unsigned int startIndex;
-            if (isTrivial(&startIndex))
-                path =
-                    std::make_shared<geometric::PathGeometric>(si_, startStates_[startIndex], startStates_[startIndex]);
-        }
-        else
-        {
-            for (unsigned int i = 0; i < startStates_.size() && !path; ++i)
-            {
-                const State *start = startStates_[i];
-                if (start && si_->isValid(start) && si_->satisfiesBounds(start))
-                {
-                    for (unsigned int j = 0; j < states.size() && !path; ++j)
-                        if (si_->checkMotion(start, states[j]))
-                        {
-                            path = std::make_shared<geometric::PathGeometric>(si_, start, states[j]);
-                            break;
-                        }
-                }
-            }
-        }
-    }
+//        if (states.empty())
+//        {
+//            unsigned int startIndex;
+//            if (isTrivial(&startIndex))
+//                path =
+//                    std::make_shared<geometric::PathGeometric>(si_, startStates_[startIndex], startStates_[startIndex]);
+//        }
+//        else
+//        {
+//            for (unsigned int i = 0; i < startStates_.size() && !path; ++i)
+//            {
+//                const State *start = startStates_[i];
+//                if (start && si_->isValid(start) && si_->satisfiesBounds(start))
+//                {
+//                    for (unsigned int j = 0; j < states.size() && !path; ++j)
+//                        if (si_->checkMotion(start, states[j]))
+//                        {
+//                            path = std::make_shared<geometric::PathGeometric>(si_, start, states[j]);
+//                            break;
+//                        }
+//                }
+//            }
+//        }
+//    }
 
     return path;
 }

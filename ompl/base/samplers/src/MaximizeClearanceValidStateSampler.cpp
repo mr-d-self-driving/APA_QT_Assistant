@@ -90,14 +90,14 @@ bool ompl::base::MaximizeClearanceValidStateSampler::sample(State *state)
     return false;
 }
 
-bool ompl::base::MaximizeClearanceValidStateSampler::sampleNear(State *state, const State *near, const double distance)
+bool ompl::base::MaximizeClearanceValidStateSampler::sampleNear(State *state, const State *xnear, const double distance)
 {
     unsigned int attempts = 0;
     bool valid = false;
     double dist = 0.0;
     do
     {
-        sampler_->sampleUniformNear(state, near, distance);
+        sampler_->sampleUniformNear(state, xnear, distance);
         valid = si_->getStateValidityChecker()->isValid(state, dist);
         ++attempts;
     } while (!valid && attempts < attempts_);
@@ -109,7 +109,7 @@ bool ompl::base::MaximizeClearanceValidStateSampler::sampleNear(State *state, co
         attempts = 0;
         while (attempts < improveAttempts_)
         {
-            sampler_->sampleUniformNear(work_, near, distance);
+            sampler_->sampleUniformNear(work_, xnear, distance);
             validW = si_->getStateValidityChecker()->isValid(work_, distW);
             ++attempts;
             if (validW && distW > dist)

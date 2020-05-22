@@ -183,8 +183,8 @@ ompl::geometric::VFRRT::Motion *ompl::geometric::VFRRT::extendTree(Motion *m, ba
 
 void ompl::geometric::VFRRT::updateExplorationEfficiency(Motion *m)
 {
-    Motion *near = nn_->nearest(m);
-    if (distanceFunction(m, near) < si_->getStateValidityCheckingResolution())
+    Motion *xnear = nn_->nearest(m);
+    if (distanceFunction(m, xnear) < si_->getStateValidityCheckingResolution())
         inefficientCount_++;
     else
         efficientCount_++;

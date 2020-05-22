@@ -38,14 +38,14 @@ bool ompl::base::BridgeTestValidStateSampler::sample(State *state)
     return valid;
 }
 
-bool ompl::base::BridgeTestValidStateSampler::sampleNear(State *state, const State *near, const double distance)
+bool ompl::base::BridgeTestValidStateSampler::sampleNear(State *state, const State *xnear, const double distance)
 {
     unsigned int attempts = 0;
     bool valid = false;
     State *endpoint = si_->allocState();
     do
     {
-        sampler_->sampleUniformNear(state, near, distance);
+        sampler_->sampleUniformNear(state, xnear, distance);
         bool v1 = si_->isValid(state);
         if (!v1)
         {

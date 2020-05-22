@@ -168,18 +168,18 @@ namespace ompl
             // No else.
         }
 
-        void InformedStateSampler::sampleUniformNear(State *statePtr, const State *near, const double distance)
+        void InformedStateSampler::sampleUniformNear(State *statePtr, const State *xnear, const double distance)
         {
             // Warn:
             OMPL_WARN("sampleUniformNear is not informed.");
-            return baseSampler_->sampleUniformNear(statePtr, near, distance);
+            baseSampler_->sampleUniformNear(statePtr, xnear, distance);
         }
 
         void InformedStateSampler::sampleGaussian(State *statePtr, const State *mean, const double stdDev)
         {
             // Warn:
             OMPL_WARN("sampleGaussian is not informed.");
-            return baseSampler_->sampleGaussian(statePtr, mean, stdDev);
+            baseSampler_->sampleGaussian(statePtr, mean, stdDev);
         }
         /////////////////////////////////////////////////////////////////////////////////////////////
     };  // base

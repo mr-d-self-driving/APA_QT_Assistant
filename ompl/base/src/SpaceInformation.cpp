@@ -158,10 +158,10 @@ unsigned int ompl::base::SpaceInformation::randomBounceMotion(const StateSampler
 }
 
 bool ompl::base::SpaceInformation::searchValidNearby(const ValidStateSamplerPtr &sampler, State *state,
-                                                     const State *near, double distance) const
+                                                     const State *xnear, double distance) const
 {
-    if (state != near)
-        copyState(state, near);
+    if (state != xnear)
+        copyState(state, xnear);
 
     // fix bounds, if needed
     if (!satisfiesBounds(state))
@@ -180,13 +180,13 @@ bool ompl::base::SpaceInformation::searchValidNearby(const ValidStateSamplerPtr 
     return result;
 }
 
-bool ompl::base::SpaceInformation::searchValidNearby(State *state, const State *near, double distance,
+bool ompl::base::SpaceInformation::searchValidNearby(State *state, const State *xnear, double distance,
                                                      unsigned int attempts) const
 {
-    if (satisfiesBounds(near) && isValid(near))
+    if (satisfiesBounds(xnear) && isValid(xnear))
     {
-        if (state != near)
-            copyState(state, near);
+        if (state != xnear)
+            copyState(state, xnear);
         return true;
     }
     else
@@ -194,7 +194,7 @@ bool ompl::base::SpaceInformation::searchValidNearby(State *state, const State *
         // try to find a valid state nearby
         auto uvss = std::make_shared<UniformValidStateSampler>(this);
         uvss->setNrAttempts(attempts);
-        return searchValidNearby(uvss, state, near, distance);
+        return searchValidNearby(uvss, state, xnear, distance);
     }
 }
 
@@ -398,7 +398,7 @@ double ompl::base::SpaceInformation::averageValidMotionLength(unsigned int attem
         return 0.0;
 }
 
-void ompl::base::SpaceInformation::samplesPerSecond(double &uniform, double &near, double &gaussian,
+void ompl::base::SpaceInformation::samplesPerSecond(double &uniform, double &xnear, double &gaussian,
                                                     unsigned int attempts) const
 {
     StateSamplerPtr ss = allocStateSampler();
@@ -416,7 +416,7 @@ void ompl::base::SpaceInformation::samplesPerSecond(double &uniform, double &nea
     start = time::now();
     for (unsigned int i = 1; i <= attempts; ++i)
         ss->sampleUniformNear(states[i - 1], states[i], d);
-    near = (double)attempts / time::seconds(time::now() - start);
+    xnear = (double)attempts / time::seconds(time::now() - start);
 
     start = time::now();
     for (unsigned int i = 1; i <= attempts; ++i)
@@ -472,10 +472,10 @@ void ompl::base::SpaceInformation::printProperties(std::ostream &out) const
         out << "  - probability of valid states: " << probabilityOfValidState(magic::TEST_STATE_COUNT) << std::endl;
         out << "  - average length of a valid motion: " << averageValidMotionLength(magic::TEST_STATE_COUNT)
             << std::endl;
-        double uniform, near, gaussian;
-        samplesPerSecond(uniform, near, gaussian, magic::TEST_STATE_COUNT);
+        double uniform, xnear, gaussian;
+        samplesPerSecond(uniform, xnear, gaussian, magic::TEST_STATE_COUNT);
         out << "  - average number of samples drawn per second: sampleUniform()=" << uniform
-            << " sampleUniformNear()=" << near << " sampleGaussian()=" << gaussian << std::endl;
+            << " sampleUniformNear()=" << xnear << " sampleGaussian()=" << gaussian << std::endl;
     }
     else
         out << "Call setup() before to get more information" << std::endl;

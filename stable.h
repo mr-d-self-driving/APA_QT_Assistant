@@ -53,61 +53,61 @@
 
 #if defined __cplusplus
 /* Add C++ includes here */
-//# include <cassert>
+# include <cassert>
 # include <iostream>
-//# include <sstream>
-//# include <fstream>
+# include <sstream>
+# include <fstream>
 
 # include <vector>
 # include <list>
 # include <map>
 # include <set>
 # include <queue>
+# include <memory>
 
-//# include <cmath>
-//# include <ctime>
-//# include <utility>
-//# include <functional>
-//# include <string>
-//# include <memory>
-//# include <cstdlib>
-//# include <cstdint>
-//# include <limits>
-//# include <valarray>
-//# include <unordered_set>
-//# include <unordered_map>
-//# include <algorithm>
-//# include <random>
-//# include <mutex>
-//# include <type_traits>
-//# include <chrono>
-//# include <iomanip>
+# include <cmath>
+# include <ctime>
+# include <utility>
+# include <functional>
+# include <string>
+# include <cstdlib>
+# include <cstdint>
+# include <limits>
+# include <valarray>
+# include <unordered_set>
+# include <unordered_map>
+# include <algorithm>
+# include <random>
+# include <mutex>
+# include <type_traits>
+# include <chrono>
+# include <iomanip>
 
 //# include <QMainWindow>
 # include <QApplication>
-//# include <QObject>
-//# include <qglobal.h>
-//# include <QDir>
-//# include <QIntValidator>
-//# include <QToolTip>
-//# include <QDebug>
-//# include <QMainWindow>
-//# include <QDialog>
-//# include <QFileDialog>
-//# include <QPushButton>
-//# include <QLabel>
-//# include <QLineEdit>
-//# include <QTimer>
-//# include <QTextCodec>
-//# include <QThread>
+# include <QObject>
+# include <qglobal.h>
+# include <QDir>
+# include <QIntValidator>
+# include <QToolTip>
+# include <QDebug>
+# include <QMainWindow>
+# include <QDialog>
+# include <QFileDialog>
+# include <QPushButton>
+# include <QLabel>
+# include <QLineEdit>
+# include <QTimer>
+# include <QTextCodec>
+# include <QThread>
 # if (QT_VERSION > QT_VERSION_CHECK(5,0,0))
-//# include <QtWidgets>
+# include <QtWidgets>
 # endif
 
-//# include <QGraphicsScene>
-//# include <QGraphicsItem>
-//# include <QGraphicsPixmapItem>
-//# include <QGraphicsSceneWheelEvent>
+# include <QGraphicsScene>
+# include <QGraphicsItem>
+# include <QGraphicsPixmapItem>
+# include <QGraphicsSceneWheelEvent>
 
 
 //#include <Eigen/Core>

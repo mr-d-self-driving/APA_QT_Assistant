@@ -52,13 +52,13 @@ void ompl::base::RealVectorStateSampler::sampleUniform(State *state)
         rstate->values[i] = rng_.uniformReal(bounds.low[i], bounds.high[i]);
 }
 
-void ompl::base::RealVectorStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::RealVectorStateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     const unsigned int dim = space_->getDimension();
     const RealVectorBounds &bounds = static_cast<const RealVectorStateSpace *>(space_)->getBounds();
 
     auto *rstate = static_cast<RealVectorStateSpace::StateType *>(state);
-    const auto *rnear = static_cast<const RealVectorStateSpace::StateType *>(near);
+    const auto *rnear = static_cast<const RealVectorStateSpace::StateType *>(xnear);
     for (unsigned int i = 0; i < dim; ++i)
         rstate->values[i] = rng_.uniformReal(std::max(bounds.low[i], rnear->values[i] - distance),
                                              std::min(bounds.high[i], rnear->values[i] + distance));

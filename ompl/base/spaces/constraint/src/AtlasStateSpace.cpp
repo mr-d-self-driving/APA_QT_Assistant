@@ -96,11 +96,11 @@ void ompl::base::AtlasStateSampler::sampleUniform(State *state)
     astate->setChart(atlas_->owningChart(astate));
 }
 
-void ompl::base::AtlasStateSampler::sampleUniformNear(State *state, const State *near, const double dist)
+void ompl::base::AtlasStateSampler::sampleUniformNear(State *state, const State *xnear, const double dist)
 {
     // Find the chart that the starting point is on.
     auto astate = state->as<AtlasStateSpace::StateType>();
-    auto anear = near->as<AtlasStateSpace::StateType>();
+    auto anear = xnear->as<AtlasStateSpace::StateType>();
 
     const std::size_t k = atlas_->getManifoldDimension();
 
@@ -133,7 +133,7 @@ void ompl::base::AtlasStateSampler::sampleUniformNear(State *state, const State 
         // problem. Check planner code to see how it gets chosen.
         OMPL_WARN("ompl::base:::AtlasStateSpace::sampleUniformNear(): "
                   "Took too long; returning initial point.");
-        atlas_->copyState(state, near);
+        atlas_->copyState(state, xnear);
     }
 
     space_->enforceBounds(state);
@@ -290,12 +290,12 @@ ompl::base::AtlasChart *ompl::base::AtlasStateSpace::newChart(const StateType *s
         std::vector<NNElement> nearbyCharts;
         chartNN_.nearestR(std::make_pair(cstate, 0), 2 * rho_s_, nearbyCharts);
 
-        for (auto &&near : nearbyCharts)
+        for (auto &&xnear : nearbyCharts)
         {
-            AtlasChart *other = charts_[near.second];
+            AtlasChart *other = charts_[xnear.second];
             AtlasChart::generateHalfspace(other, chart);
 
-            chartPDF_.update(chartPDF_.getElements()[near.second], biasFunction_(other));
+            chartPDF_.update(chartPDF_.getElements()[xnear.second], biasFunction_(other));
         }
     }
 
@@ -346,19 +346,19 @@ ompl::base::AtlasChart *ompl::base::AtlasStateSpace::owningChart(const StateType
 
     double best = epsilon_;
     AtlasChart *chart = nullptr;
-    for (auto near = nearby.begin(); near != nearby.end(); ++near)
+    for (auto xnear = nearby.begin(); xnear != nearby.end(); ++xnear)
     {
         // The point must lie in the chart's validity region and polytope
-        auto owner = charts_[near->second];
+        auto owner = charts_[xnear->second];
         owner->psiInverse(*state, u_t);
         owner->phi(u_t, *temp);
 
-        double far;
+        double xfar;
         if (owner->inPolytope(u_t)                       // in polytope
-            && (far = distance(state, temp)) < epsilon_  // within epsilon
-            && far < best)
+            && (xfar = distance(state, temp)) < epsilon_  // within epsilon
+            && xfar < best)
         {
-            best = far;
+            best = xfar;
             chart = owner;
         }
     }

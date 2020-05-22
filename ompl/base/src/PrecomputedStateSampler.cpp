@@ -66,12 +66,12 @@ void ompl::base::PrecomputedStateSampler::sampleUniform(State *state)
     space_->copyState(state, states_[rng_.uniformInt(minStateIndex_, maxStateIndex_)]);
 }
 
-void ompl::base::PrecomputedStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::PrecomputedStateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     int index = rng_.uniformInt(minStateIndex_, maxStateIndex_);
-    double dist = space_->distance(near, states_[index]);
+    double dist = space_->distance(xnear, states_[index]);
     if (dist > distance)
-        space_->interpolate(near, states_[index], distance / dist, state);
+        space_->interpolate(xnear, states_[index], distance / dist, state);
     else
         space_->copyState(state, states_[index]);
 }

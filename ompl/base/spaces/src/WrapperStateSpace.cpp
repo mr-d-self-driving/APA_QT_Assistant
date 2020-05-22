@@ -41,10 +41,10 @@ void ompl::base::WrapperStateSampler::sampleUniform(State *state)
     sampler_->sampleUniform(state->as<ompl::base::WrapperStateSpace::StateType>()->getState());
 }
 
-void ompl::base::WrapperStateSampler::sampleUniformNear(State *state, const State *near, double distance)
+void ompl::base::WrapperStateSampler::sampleUniformNear(State *state, const State *xnear, double distance)
 {
     sampler_->sampleUniformNear(state->as<ompl::base::WrapperStateSpace::StateType>()->getState(),
-                                near->as<ompl::base::WrapperStateSpace::StateType>()->getState(), distance);
+                                xnear->as<ompl::base::WrapperStateSpace::StateType>()->getState(), distance);
 }
 
 void ompl::base::WrapperStateSampler::sampleGaussian(State *state, const State *mean, double stdDev)

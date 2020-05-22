@@ -77,14 +77,14 @@ bool ompl::base::MinimumClearanceValidStateSampler::sample(State *state)
     return valid;
 }
 
-bool ompl::base::MinimumClearanceValidStateSampler::sampleNear(State *state, const State *near, const double distance)
+bool ompl::base::MinimumClearanceValidStateSampler::sampleNear(State *state, const State *xnear, const double distance)
 {
     unsigned int attempts = 0;
     bool valid = false;
     double dist = 0.0;
     do
     {
-        sampler_->sampleUniformNear(state, near, distance);
+        sampler_->sampleUniformNear(state, xnear, distance);
         valid = si_->getStateValidityChecker()->isValid(state, dist);
 
         // Also check for distance to nearest obstacle and invalidate if too close

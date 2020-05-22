@@ -51,10 +51,10 @@ void ompl::base::CompoundStateSampler::sampleUniform(State *state)
         samplers_[i]->sampleUniform(comps[i]);
 }
 
-void ompl::base::CompoundStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::CompoundStateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     State **comps = state->as<CompoundState>()->components;
-    State **nearComps = near->as<CompoundState>()->components;
+    State **nearComps = xnear->as<CompoundState>()->components;
     for (unsigned int i = 0; i < samplerCount_; ++i)
         if (weightImportance_[i] > std::numeric_limits<double>::epsilon())
             samplers_[i]->sampleUniformNear(comps[i], nearComps[i], distance * weightImportance_[i]);
@@ -94,9 +94,9 @@ void ompl::base::SubspaceStateSampler::sampleUniform(State *state)
     copyStateData(space_, state, subspace_, work_, subspaces_);
 }
 
-void ompl::base::SubspaceStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::SubspaceStateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
-    copyStateData(subspace_, work2_, space_, near);
+    copyStateData(subspace_, work2_, space_, xnear);
     subspaceSampler_->sampleUniformNear(work_, work2_, distance * weight_);
     copyStateData(space_, state, subspace_, work_, subspaces_);
 }

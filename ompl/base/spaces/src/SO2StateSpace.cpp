@@ -52,10 +52,10 @@ void ompl::base::SO2StateSampler::sampleUniform(State *state)
         rng_.uniformReal(-boost::math::constants::pi<double>(), boost::math::constants::pi<double>());
 }
 
-void ompl::base::SO2StateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::SO2StateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     state->as<SO2StateSpace::StateType>()->value = rng_.uniformReal(
-        near->as<SO2StateSpace::StateType>()->value - distance, near->as<SO2StateSpace::StateType>()->value + distance);
+        xnear->as<SO2StateSpace::StateType>()->value - distance, xnear->as<SO2StateSpace::StateType>()->value + distance);
     space_->enforceBounds(state);
 }
 

@@ -48,11 +48,11 @@ void ompl::base::TimeStateSampler::sampleUniform(State *state)
         state->as<TimeStateSpace::StateType>()->position = 0.0;
 }
 
-void ompl::base::TimeStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::TimeStateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     state->as<TimeStateSpace::StateType>()->position =
-        rng_.uniformReal(near->as<TimeStateSpace::StateType>()->position - distance,
-                         near->as<TimeStateSpace::StateType>()->position + distance);
+        rng_.uniformReal(xnear->as<TimeStateSpace::StateType>()->position - distance,
+                         xnear->as<TimeStateSpace::StateType>()->position + distance);
     space_->enforceBounds(state);
 }
 

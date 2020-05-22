@@ -44,12 +44,12 @@ void ompl::base::CForestStateSampler::sampleUniform(State *state)
         sampler_->sampleUniform(state);
 }
 
-void ompl::base::CForestStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
+void ompl::base::CForestStateSampler::sampleUniformNear(State *state, const State *xnear, const double distance)
 {
     if (!statesToSample_.empty())
         getNextSample(state);
     else
-        sampler_->sampleUniformNear(state, near, distance);
+        sampler_->sampleUniformNear(state, xnear, distance);
 }
 
 void ompl::base::CForestStateSampler::sampleGaussian(State *state, const State *mean, const double stdDev)

@@ -56,13 +56,13 @@ bool ompl::base::UniformValidStateSampler::sample(State *state)
     return valid;
 }
 
-bool ompl::base::UniformValidStateSampler::sampleNear(State *state, const State *near, const double distance)
+bool ompl::base::UniformValidStateSampler::sampleNear(State *state, const State *xnear, const double distance)
 {
     unsigned int attempts = 0;
     bool valid = false;
     do
     {
-        sampler_->sampleUniformNear(state, near, distance);
+        sampler_->sampleUniformNear(state, xnear, distance);
         valid = si_->isValid(state);
         ++attempts;
     } while (!valid && attempts < attempts_);
