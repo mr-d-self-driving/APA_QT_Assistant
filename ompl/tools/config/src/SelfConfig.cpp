@@ -243,11 +243,11 @@ void ompl::tools::SelfConfig::print(std::ostream &out) const
 ompl::base::PlannerPtr ompl::tools::SelfConfig::getDefaultPlanner(const base::GoalPtr &goal)
 {
     base::PlannerPtr planner;
-//    if (!goal)
-//        throw Exception("Unable to allocate default planner for unspecified goal definition");
+    if (!goal)
+        throw Exception("Unable to allocate default planner for unspecified goal definition");
 
-//    base::SpaceInformationPtr si(goal->getSpaceInformation());
-//    const base::StateSpacePtr &space(si->getStateSpace());
+    base::SpaceInformationPtr si(goal->getSpaceInformation());
+    const base::StateSpacePtr &space(si->getStateSpace());
 //    control::SpaceInformationPtr siC(std::dynamic_pointer_cast<control::SpaceInformation, base::SpaceInformation>(si));
 //    if (siC)  // kinodynamic planning
 //    {
@@ -258,28 +258,28 @@ ompl::base::PlannerPtr ompl::tools::SelfConfig::getDefaultPlanner(const base::Go
 //        else
 //            planner = std::make_shared<control::RRT>(siC);
 //    }
-//    // if we can sample the goal region and interpolation between states is symmetric,
-//    // use a bi-directional planner
-//    else if (goal->hasType(base::GOAL_SAMPLEABLE_REGION) && space->hasSymmetricInterpolate())
-//    {
-//        // if we have a default projection
-//        if (space->hasDefaultProjection())
-//            planner = std::make_shared<geometric::LBKPIECE1>(goal->getSpaceInformation());
-//        else
-//            planner = std::make_shared<geometric::RRTConnect>(goal->getSpaceInformation());
-//    }
-//    // otherwise use a single-tree planner
-//    else
-//    {
-//        // if we have a default projection
-//        if (space->hasDefaultProjection())
-//            planner = std::make_shared<geometric::KPIECE1>(goal->getSpaceInformation());
-//        else
-//            planner = std::make_shared<geometric::RRT>(goal->getSpaceInformation());
-//    }
+    // if we can sample the goal region and interpolation between states is symmetric,
+    // use a bi-directional planner
+    if (goal->hasType(base::GOAL_SAMPLEABLE_REGION) && space->hasSymmetricInterpolate())
+    {
+        // if we have a default projection
+        if (space->hasDefaultProjection())
+            planner = std::make_shared<geometric::LBKPIECE1>(goal->getSpaceInformation());
+        else
+            planner = std::make_shared<geometric::RRTConnect>(goal->getSpaceInformation());
+    }
+    // otherwise use a single-tree planner
+    else
+    {
+        // if we have a default projection
+        if (space->hasDefaultProjection())
+            planner = std::make_shared<geometric::KPIECE1>(goal->getSpaceInformation());
+        else
+            planner = std::make_shared<geometric::RRT>(goal->getSpaceInformation());
+    }
 
-//    if (!planner)
-//        throw Exception("Unable to allocate default planner");
+    if (!planner)
+        throw Exception("Unable to allocate default planner");
 
     return planner;
 }

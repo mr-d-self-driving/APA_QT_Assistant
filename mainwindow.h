@@ -14,6 +14,13 @@
  */
 #include <Eigen/Dense>
 
+
+#include "ompl/base/spaces/DubinsStateSpace.h"
+#include "ompl/base/spaces/ReedsSheppStateSpace.h"
+#include "ompl/base/ScopedState.h"
+#include "ompl/geometric/SimpleSetup.h"
+#include <boost/program_options.hpp>
+
 /**
  * @brief ZLG CAN 驱动
  */
@@ -57,8 +64,12 @@
 #define BOUNDARY_TOP   ( 12.0)
 #define BOUNDARY_DOWN  (-12.0)
 
+
+
 namespace Ui {
+
 class MainWindow;
+
 }
 
 class MainWindow : public QMainWindow
@@ -122,6 +133,13 @@ private:
     //文件解析
     void FileDataInit(void);
     void AnalyzeOneLine(const QByteArray &baLine);
+
+
+    // ompl planner test
+//    bool isStateValid(const ompl::base::SpaceInformation *si,
+//                      const ompl::base::State *state);
+    void ompl_motion_planner(State start, State end);
+    void ompl_path_show(std::vector<ompl::base::State *> state, const ompl::base::SpaceInformation *si);
 
     void DetectTask(void);
     void PlanTask(void);

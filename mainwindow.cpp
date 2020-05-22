@@ -3,6 +3,8 @@
 
 using Eigen::MatrixXd;
 using namespace math;
+using namespace ompl;
+using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -1392,6 +1394,86 @@ void MainWindow::SteeringAngleShow(float angle)
 
     mTrackSinglePlot->replot();
 }
+
+bool isStateValid( const ompl::base::SpaceInformation *si,
+                               const ompl::base::State *state)
+{
+    const auto *pos = state->as<ompl::base::SE2StateSpace::StateType>();
+    double x = pos->getX();
+    double y = pos->getY();
+    return si->satisfiesBounds(pos) && (x < -1 || x > 1 || (y > -1 && y < 1));
+}
+
+void MainWindow::ompl_motion_planner(State set_start, State set_end)
+{
+    ompl::base::StateSpacePtr space(std::make_shared<ompl::base::ReedsSheppStateSpace>());
+
+    ompl::base::ScopedState<> start(space), goal(space);
+
+    ompl::base::RealVectorBounds bounds(2);
+
+    bounds.low[0]=-18.0;
+    bounds.low[1]=-12.0;
+
+    bounds.high[0] = 18.0;
+    bounds.high[1] = 12.0;
+
+    space->as<ompl::base::SE2StateSpace>()->setBounds(bounds);
+
+    ompl::geometric::SimpleSetup ss(space);
+
+    const ompl::base::SpaceInformation *si = ss.getSpaceInformation().get();
+
+    auto vFun = isStateValid;
+    ss.setStateValidityChecker([vFun, si](const ompl::base::State *state)
+    {
+        return vFun(si, state);
+    });
+
+    start[0] = set_start.x;
+    start[1] = set_start.y;
+    start[2] = set_start.psi;
+
+    goal[0] = set_end.x;
+    goal[1] = set_end.y;
+    goal[2] = set_end.psi;
+
+    ss.setStartAndGoalStates(start, goal);
+
+    ss.getSpaceInformation()->setStateValidityCheckingResolution(0.005);
+    ss.setup();
+    ss.print();
+
+    ompl::base::PlannerStatus solved = ss.solve(30.0);
+
+    if(solved)
+    {
+        ss.simplifySolution();
+        ompl::geometric::PathGeometric path = ss.getSolutionPath();
+        path.interpolate(1000);
+        ompl_path_show(path.getStates(),si);
+//        path.printAsMatrix(std::cout);
+    }
+    else
+    {
+        std::cout << "No solution found" << std::endl;
+    }
+}
+
+void MainWindow::ompl_path_show(std::vector<ompl::base::State *> xstate,
+                                const ompl::base::SpaceInformation *si)
+{
+    const ompl::base::StateSpace *space(si->getStateSpace().get());
+    std::vector<double> reals;
+    QVector<double> path_x, path_y;
+    for (auto state : xstate)
+    {
+        space->copyToReals(reals, state);
+        path_x.push_back(reals.at(0));
+        path_y.push_back(reals.at(1));
+    }
+    mPathPlanningClothoid->setData(path_x, path_y);
+}
 /**
  * @brief MainWindow::FileDataInit 注入文件数据的缓存区初始化
  * @param  None
@@ -2005,11 +2087,13 @@ void MainWindow::sParkingConfirmG2()
     VectorArrowShow(mBaseState[0], &mHeadState[0], mStartArrow);
     VectorArrowShow(mBaseState[1], &mHeadState[1], mEndArrow);
 
-    vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
+    ompl_motion_planner(mBaseState[0], mBaseState[1]);
+
+//    vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
     this->HC_CC_PathShow(path_points);
 
-    HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
-    HC_CC_CircleShow(circle_path);
+//    HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
+//    HC_CC_CircleShow(circle_path);
 }
 
 //id:
