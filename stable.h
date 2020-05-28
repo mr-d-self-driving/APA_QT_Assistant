@@ -83,7 +83,6 @@
 # include <chrono>
 # include <iomanip>
 
-//# include <QMainWindow>
 # include <QApplication>
 # include <QObject>
 # include <qglobal.h>
@@ -113,13 +112,13 @@
 //#include <Eigen/Core>
 //#include <Eigen/Dense>
 
-//#include <boost/archive/binary_oarchive.hpp>
-//#include <boost/archive/binary_iarchive.hpp>
-//#include <boost/concept_check.hpp>
-//#include <boost/serialization/access.hpp>
-//#include <boost/serialization/vector.hpp>
-//#include <boost/serialization/utility.hpp>
-//#include <boost/graph/adjacency_list.hpp>
-//#include <boost/graph/graph_traits.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/concept_check.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graph_traits.hpp>
 #endif
 //! [0]

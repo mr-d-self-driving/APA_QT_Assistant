@@ -40,7 +40,7 @@
 #include "Planning/ParallelParking/parallel_planning.h"
 #include "Planning/VerticalParking/vertical_planning.h"
 #include "Planning/HC_CC_StateSpace/hc_reeds_shepp_state_space.h"
-
+#include "Planning/OMPL_Path/ompl_planner.h"
 /**
  * @brief 控制
  */
@@ -59,12 +59,13 @@
 /**
  * @brief 车位边界配置
  */
-#define BOUNDARY_LEFT  (-18.0)
-#define BOUNDARY_RIGHT ( 18.0)
-#define BOUNDARY_TOP   ( 12.0)
-#define BOUNDARY_DOWN  (-12.0)
+//#define BOUNDARY_LEFT  (-18.0)
+//#define BOUNDARY_RIGHT ( 18.0)
+//#define BOUNDARY_TOP   ( 12.0)
+//#define BOUNDARY_DOWN  (-12.0)
 
-
+//#define BOUNDARY_X_SIZE     (36)
+//#define BOUNDARY_Y_SIZE     (24)
 
 namespace Ui {
 
@@ -79,6 +80,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
 private:
     /********************************************************************************/
     /********************************* UI function **********************************/
@@ -130,16 +132,20 @@ private:
     void TargetPathShow(std::vector<TargetTrack> *vec);
     void SteeringAngleShow(float angle);
 
+    /**
+     * @brief update the map data
+     */
+    void MapDataUpdate();
+
     //文件解析
     void FileDataInit(void);
     void AnalyzeOneLine(const QByteArray &baLine);
 
 
     // ompl planner test
-//    bool isStateValid(const ompl::base::SpaceInformation *si,
-//                      const ompl::base::State *state);
-    void ompl_motion_planner(State start, State end);
-    void ompl_path_show(std::vector<ompl::base::State *> state, const ompl::base::SpaceInformation *si);
+//    void ompl_motion_planner(State start, State end);
+    void ompl_path_show(std::vector<ompl::base::State *> state,
+                        const ob::SpaceInformationPtr& si);
 
     void DetectTask(void);
     void PlanTask(void);
@@ -236,20 +242,35 @@ private:
     QLineEdit *text_VehicleEndPointYaw;
     QLineEdit *text_VehicleEndPointKappa;
 
+    QRadioButton *radio_obstacle_configure;
+    QRadioButton *radio_start_gaol_configure;
+    /**
+     * @brief 规划路径，根据曲率不同显示不同的颜色
+     */
     QCPCurve *mPathPlanningStraightLine;
     QCPCurve *mPathPlanningClothoid;
     QCPCurve *mPathPlanningCircle;
 
+    /**
+     * @brief Arrow for start and goal position
+     */
     QCPItemLine *mStartArrow;
     QCPItemLine *mEndArrow;
 
-
+    /**
+     * @brief Circle for HC CC RS
+     */
     QCPItemEllipse *mStartCircle;
     QCPItemEllipse *mEndCircle;
     QCPItemEllipse *mMiddleCircle1;
     QCPItemEllipse *mMiddleCircle2;
 
+    /**
+     * @brief 描述圆和圆之间的切点
+     */
     QCPCurve *mTangentCirclePoint;
+
+    QCPColorMap *SpaceInformationMap;
     /**
      * @brief mTrackPlot: 跟踪模块
      */
@@ -268,7 +289,6 @@ private:
 
     QGridLayout *gPlotLayout;
     QGridLayout *gTrackLayout;
-
 
     QRadioButton *radio_sin_curvature;
     QRadioButton *radio_double_line;
@@ -310,11 +330,20 @@ private:
     VerticalPlanning *mVerticalPlanning;
     Curvature        *mCurvature;
     HC_ReedsSheppStateSpace *mHC_ReedsSheppStateSpace;
-
+    OMPL_Planner *m_OMPL_Planner;
+    /**
+     * @brief 箭头显示相关参数
+     */
     State mBaseState[2];
     State mHeadState[2];
-
     int m_base_state_index, m_head_state_index;
+
+    /**
+     * @brief 障碍物显示和配置相关参数
+     */
+//    uint8_t ObstacleArray[BOUNDARY_X_SIZE][BOUNDARY_Y_SIZE];
+    uint8_t selected_grid_colour;
+
     // 控制
     LatControl *mLatControl;
     LatControl_LQR *m_LatControl_LQR;

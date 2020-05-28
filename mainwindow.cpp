@@ -646,8 +646,8 @@ void MainWindow::PlanUI(void)
     mPathPlot->legend->setRowSpacing(-3);
     mPathPlot->xAxis->setLabel("x");
     mPathPlot->yAxis->setLabel("y");
-    mPathPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
-    mPathPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
+//    mPathPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
+//    mPathPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
 
     mPathVehicleModuleCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
     mPathVehicleModuleCurve->setName("车辆模型");
@@ -670,29 +670,29 @@ void MainWindow::PlanUI(void)
     mPathRightCircle->setPen(QPen(Qt::black,1));
     mPathRightCircle->setBrush(QBrush(QColor(20,25,140,20)));
 
-    ParkingPointX.resize(9);
-    ParkingPointX[0] = BOUNDARY_LEFT;
-    ParkingPointX[1] = 0;
-    ParkingPointX[2] = 0;
-    ParkingPointX[3] = 5;
-    ParkingPointX[4] = 5;
-    ParkingPointX[5] = BOUNDARY_RIGHT;
-    ParkingPointX[6] = BOUNDARY_RIGHT;
-    ParkingPointX[7] = BOUNDARY_LEFT;
-    ParkingPointX[8] = BOUNDARY_LEFT;
+//    ParkingPointX.resize(9);
+//    ParkingPointX[0] = BOUNDARY_LEFT;
+//    ParkingPointX[1] = 0;
+//    ParkingPointX[2] = 0;
+//    ParkingPointX[3] = 5;
+//    ParkingPointX[4] = 5;
+//    ParkingPointX[5] = BOUNDARY_RIGHT;
+//    ParkingPointX[6] = BOUNDARY_RIGHT;
+//    ParkingPointX[7] = BOUNDARY_LEFT;
+//    ParkingPointX[8] = BOUNDARY_LEFT;
 
-    ParkingPointY.resize(9);
-    ParkingPointY[0] = 0;
-    ParkingPointY[1] = 0;
-    ParkingPointY[2] = -2.3;
-    ParkingPointY[3] = -2.3;
-    ParkingPointY[4] = 0;
-    ParkingPointY[5] = 0;
-    ParkingPointY[6] = BOUNDARY_DOWN;
-    ParkingPointY[7] = BOUNDARY_DOWN;
-    ParkingPointY[8] = 0;
+//    ParkingPointY.resize(9);
+//    ParkingPointY[0] = 0;
+//    ParkingPointY[1] = 0;
+//    ParkingPointY[2] = -2.3;
+//    ParkingPointY[3] = -2.3;
+//    ParkingPointY[4] = 0;
+//    ParkingPointY[5] = 0;
+//    ParkingPointY[6] = BOUNDARY_DOWN;
+//    ParkingPointY[7] = BOUNDARY_DOWN;
+//    ParkingPointY[8] = 0;
 
-    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
+//    mPathParkingCurve->setData(ParkingPointX,ParkingPointY);
 
     gPlanLayout = new QGridLayout();
     gPlanLayout->addLayout(gPath_IO_Layout, 0, 0);
@@ -816,7 +816,7 @@ void MainWindow::G2_PlanUI(void)
 
     gVehicleTrack_Layout->setColumnStretch(0,2);
     gVehicleTrack_Layout->setColumnStretch(1,5);
-    gVehicleTrack_Layout->setColumnStretch(1,1);
+    gVehicleTrack_Layout->setColumnStretch(2,1);
 
     QGroupBox *gVehicleTrack_Group = new QGroupBox();
     gVehicleTrack_Group->setTitle("实时跟踪");
@@ -824,17 +824,38 @@ void MainWindow::G2_PlanUI(void)
     gVehicleTrack_Group->setLayout(gVehicleTrack_Layout);
     // 实时车辆位置跟踪 end
 
+    // 规划相关配置 begin
+    radio_obstacle_configure = new QRadioButton();
+    radio_obstacle_configure->setText("障碍物配置");
+    radio_obstacle_configure->setChecked(true);
+    radio_start_gaol_configure = new QRadioButton();
+    radio_start_gaol_configure->setText("起始目标点配置");
+
+    QGridLayout *gPlannerConfigureTypeLayout = new QGridLayout();
+    gPlannerConfigureTypeLayout->addWidget(radio_obstacle_configure,0,0);
+    gPlannerConfigureTypeLayout->addWidget(radio_start_gaol_configure,1,0);
+    gPlannerConfigureTypeLayout->setRowStretch(0,1);
+    gPlannerConfigureTypeLayout->setRowStretch(1,1);
+
+    QGroupBox *gGroupConfigureType = new QGroupBox();
+    gGroupConfigureType->setTitle("配置类型");
+    gGroupConfigureType->setFixedHeight(100);
+    gGroupConfigureType->setLayout(gPlannerConfigureTypeLayout);
+    // 规划相关配置 end
+
     QGridLayout *gPath_IO_Layout = new QGridLayout();
     gPath_IO_Layout->addWidget(gVehicleStartPosition_Group,0,0);
     gPath_IO_Layout->addWidget(gVehicleEndPosition_Group,1,0);
     gPath_IO_Layout->addWidget(gParkingInformationConfirm,2,0);
     gPath_IO_Layout->addWidget(gVehicleTrack_Group,3,0);
+    gPath_IO_Layout->addWidget(gGroupConfigureType,4,0);
     gPath_IO_Layout->setColumnMinimumWidth(0,200);
     gPath_IO_Layout->setRowStretch(0,1);
     gPath_IO_Layout->setRowStretch(1,1);
     gPath_IO_Layout->setRowStretch(2,1);
     gPath_IO_Layout->setRowStretch(3,1);
     gPath_IO_Layout->setRowStretch(4,1);
+    gPath_IO_Layout->setRowStretch(5,1);
 
 
     mPathPlot = new QCustomPlot();
@@ -844,8 +865,26 @@ void MainWindow::G2_PlanUI(void)
     mPathPlot->legend->setRowSpacing(-3);
     mPathPlot->xAxis->setLabel("x");
     mPathPlot->yAxis->setLabel("y");
-    mPathPlot->xAxis->setRange(BOUNDARY_LEFT,BOUNDARY_RIGHT);
-    mPathPlot->yAxis->setRange(BOUNDARY_DOWN,BOUNDARY_TOP);
+
+    mPathPlot->xAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
+                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[0]);
+    mPathPlot->yAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
+                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]);
+
+    SpaceInformationMap = new QCPColorMap(mPathPlot->xAxis,mPathPlot->yAxis);
+    SpaceInformationMap->setName("地图");
+    SpaceInformationMap->setInterpolate(false);
+    SpaceInformationMap->setTightBoundary(true);
+    SpaceInformationMap->data()->setSize(m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(),
+                                         m_OMPL_Planner->getOmplSpace()->getBoundarySizeY());
+    SpaceInformationMap->data()->setRange(QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
+                                                   m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[0]),
+                                          QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
+                                                   m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]));
+    SpaceInformationMap->setGradient(QCPColorGradient::gpGrayscale);
+    SpaceInformationMap->rescaleDataRange(true);
+    SpaceInformationMap->rescaleAxes();
+    this->MapDataUpdate();
 
     mPathVehicleModuleCurve = new QCPCurve(mPathPlot->xAxis,mPathPlot->yAxis);
     mPathVehicleModuleCurve->setName("车辆模型");
@@ -931,6 +970,7 @@ void MainWindow::G2_PlanUI(void)
     mTangentCirclePoint->setLineStyle(QCPCurve::LineStyle::lsNone);
     mTangentCirclePoint->setScatterStyle(QCPScatterStyle::ssDot);
 
+
     mStartCircle = new QCPItemEllipse(mPathPlot);
     mStartCircle->setPen(QPen(Qt::red,1));
     mStartCircle->setBrush(QBrush(QColor(90,125,140,20)));
@@ -946,6 +986,8 @@ void MainWindow::G2_PlanUI(void)
     mMiddleCircle2 = new QCPItemEllipse(mPathPlot);
     mMiddleCircle2->setPen(QPen(Qt::darkYellow,1));
     mMiddleCircle2->setBrush(QBrush(QColor(10,125,100,20)));
+
+
 
     gPlanLayout = new QGridLayout();
     gPlanLayout->addLayout(gPath_IO_Layout, 0, 0);
@@ -1156,8 +1198,11 @@ void MainWindow::Init()
 
     mHC_ReedsSheppStateSpace = new HC_ReedsSheppStateSpace(0.2, 0.215, 0.02);
 
+    m_OMPL_Planner = new OMPL_Planner();
+
     m_base_state_index = -1;
     m_head_state_index = -1;
+    selected_grid_colour = 0xA5;
     // Track
     mLatControl = new LatControl();
     mLatControl->Init();
@@ -1395,73 +1440,102 @@ void MainWindow::SteeringAngleShow(float angle)
     mTrackSinglePlot->replot();
 }
 
-bool isStateValid( const ompl::base::SpaceInformation *si,
-                               const ompl::base::State *state)
+/**
+ * @brief update the map data
+ */
+void MainWindow::MapDataUpdate()
 {
-    const auto *pos = state->as<ompl::base::SE2StateSpace::StateType>();
-    double x = pos->getX();
-    double y = pos->getY();
-    return si->satisfiesBounds(pos) && (x < -1 || x > 1 || (y > -1 && y < 1));
-}
-
-void MainWindow::ompl_motion_planner(State set_start, State set_end)
-{
-    ompl::base::StateSpacePtr space(std::make_shared<ompl::base::ReedsSheppStateSpace>());
-
-    ompl::base::ScopedState<> start(space), goal(space);
-
-    ompl::base::RealVectorBounds bounds(2);
-
-    bounds.low[0]=-18.0;
-    bounds.low[1]=-12.0;
-
-    bounds.high[0] = 18.0;
-    bounds.high[1] = 12.0;
-
-    space->as<ompl::base::SE2StateSpace>()->setBounds(bounds);
-
-    ompl::geometric::SimpleSetup ss(space);
-
-    const ompl::base::SpaceInformation *si = ss.getSpaceInformation().get();
-
-    auto vFun = isStateValid;
-    ss.setStateValidityChecker([vFun, si](const ompl::base::State *state)
+    for(int i = 0; i< m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(); i++)
     {
-        return vFun(si, state);
-    });
-
-    start[0] = set_start.x;
-    start[1] = set_start.y;
-    start[2] = set_start.psi;
-
-    goal[0] = set_end.x;
-    goal[1] = set_end.y;
-    goal[2] = set_end.psi;
-
-    ss.setStartAndGoalStates(start, goal);
-
-    ss.getSpaceInformation()->setStateValidityCheckingResolution(0.005);
-    ss.setup();
-    ss.print();
-
-    ompl::base::PlannerStatus solved = ss.solve(30.0);
-
-    if(solved)
-    {
-        ss.simplifySolution();
-        ompl::geometric::PathGeometric path = ss.getSolutionPath();
-        path.interpolate(1000);
-        ompl_path_show(path.getStates(),si);
-//        path.printAsMatrix(std::cout);
-    }
-    else
-    {
-        std::cout << "No solution found" << std::endl;
+        for (int j = 0; j < m_OMPL_Planner->getOmplSpace()->getBoundarySizeY(); j++)
+        {
+            SpaceInformationMap->data()->setAlpha(i, j,
+                                                  *(m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->getObstacleArray() +
+                                                    i * m_OMPL_Planner->getOmplSpace()->getBoundarySizeY() + j));
+        }
     }
 }
+
+
+//bool isStateValid( const ompl::base::SpaceInformation *si,
+//                   const ompl::base::State *state)
+//{
+//    const auto *pos = state->as<ompl::base::SE2StateSpace::StateType>();
+//    double x = pos->getX();
+//    double y = pos->getY();
+
+//    if(x < BOUNDARY_LEFT || x > BOUNDARY_RIGHT || y < BOUNDARY_DOWN || y > BOUNDARY_TOP)
+//    {
+//        return false;
+//    }
+
+//    int16_t x_index = static_cast<int16_t>(std::floor( (x + BOUNDARY_RIGHT) * BOUNDARY_X_SIZE / (BOUNDARY_RIGHT - BOUNDARY_LEFT)));
+//    x_index = x_index < BOUNDARY_X_SIZE ? x_index : BOUNDARY_X_SIZE - 1;
+
+//    int16_t y_index = static_cast<int16_t>(std::floor( (y + BOUNDARY_TOP) * BOUNDARY_Y_SIZE / (BOUNDARY_TOP - BOUNDARY_DOWN)));
+//    y_index = y_index < BOUNDARY_Y_SIZE ? y_index : BOUNDARY_Y_SIZE - 1;
+
+//    return si->satisfiesBounds(pos)  /*&&(ObstacleArray[x_index][y_index] == 0)*/;
+//}
+
+//void MainWindow::ompl_motion_planner(State set_start, State set_end)
+//{
+//    ompl::base::StateSpacePtr space(std::make_shared<ompl::base::ReedsSheppStateSpace>());
+
+//    ompl::base::ScopedState<> start(space), goal(space);
+
+//    ompl::base::RealVectorBounds bounds(2);
+
+//    bounds.low[0]=-18.0;
+//    bounds.low[1]=-12.0;
+
+//    bounds.high[0] = 18.0;
+//    bounds.high[1] = 12.0;
+
+//    space->as<ompl::base::SE2StateSpace>()->setBounds(bounds);
+
+//    ompl::geometric::SimpleSetup ss(space);
+
+//    const ompl::base::SpaceInformation *si = ss.getSpaceInformation().get();
+
+//    auto vFun = isStateValid;
+//    ss.setStateValidityChecker([vFun, si](const ompl::base::State *state)
+//    {
+//        return vFun(si, state);
+//    });
+
+//    start[0] = set_start.x;
+//    start[1] = set_start.y;
+//    start[2] = set_start.psi;
+
+//    goal[0] = set_end.x;
+//    goal[1] = set_end.y;
+//    goal[2] = set_end.psi;
+
+//    ss.setStartAndGoalStates(start, goal);
+
+//    ss.getSpaceInformation()->setStateValidityCheckingResolution(0.005);
+//    ss.setup();
+//    ss.print();
+
+//    ompl::base::PlannerStatus solved = ss.solve(30.0);
+
+//    if(solved)
+//    {
+//        ss.simplifySolution();
+//        ompl::geometric::PathGeometric path = ss.getSolutionPath();
+//        path.interpolate(1000);
+//        ompl_path_show(path.getStates(),si);
+////        path.printAsMatrix(std::cout);
+//    }
+//    else
+//    {
+//        std::cout << "No solution found" << std::endl;
+//    }
+//}
 
 void MainWindow::ompl_path_show(std::vector<ompl::base::State *> xstate,
-                                const ompl::base::SpaceInformation *si)
+                                const ob::SpaceInformationPtr& si)
 {
     const ompl::base::StateSpace *space(si->getStateSpace().get());
     std::vector<double> reals;
@@ -2087,7 +2161,8 @@ void MainWindow::sParkingConfirmG2()
     VectorArrowShow(mBaseState[0], &mHeadState[0], mStartArrow);
     VectorArrowShow(mBaseState[1], &mHeadState[1], mEndArrow);
 
-    ompl_motion_planner(mBaseState[0], mBaseState[1]);
+//    m_OMPL_Planner->ompl_motion_planner(mBaseState[0], mBaseState[1]);
+//    ompl_motion_planner(mBaseState[0], mBaseState[1]);
 
 //    vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
 //    this->HC_CC_PathShow(path_points);
@@ -2165,23 +2240,34 @@ void MainWindow::sMousePressEvent(QMouseEvent *event)
     double x_val = mPathPlot->xAxis->pixelToCoord(x_pos);
     double y_val = mPathPlot->yAxis->pixelToCoord(y_pos);
 
-    for (int var = 0; var < 2; ++var)
+    if(radio_obstacle_configure->isChecked())
     {
-        if(fabs(mBaseState[var].x - x_val) < 0.3 &&
-           fabs(mBaseState[var].y - y_val) < 0.3 )
+        selected_grid_colour = m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->getCurrentGridColour(x_val, y_val);
+    }
+    else if(radio_start_gaol_configure->isChecked())
+    {
+        for (int var = 0; var < 2; ++var)
         {
-            m_base_state_index = var;
-            break;
+            if(fabs(mBaseState[var].x - x_val) < 0.3 &&
+               fabs(mBaseState[var].y - y_val) < 0.3 )
+            {
+                m_base_state_index = var;
+                break;
+            }
+        }
+        for (int var = 0; var < 2; ++var)
+        {
+            if(fabs(mHeadState[var].x - x_val) < 0.3 &&
+               fabs(mHeadState[var].y - y_val) < 0.3 )
+            {
+                m_head_state_index = var;
+                break;
+            }
         }
     }
-    for (int var = 0; var < 2; ++var)
+    else
     {
-        if(fabs(mHeadState[var].x - x_val) < 0.3 &&
-           fabs(mHeadState[var].y - y_val) < 0.3 )
-        {
-            m_head_state_index = var;
-            break;
-        }
+
     }
 }
 
@@ -2193,8 +2279,48 @@ void MainWindow::sMouseReleaseEvent(QMouseEvent *event)
 {
     mPathPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    m_base_state_index = -1;
-    m_head_state_index = -1;
+    int x_pos = event->pos().x();
+    int y_pos = event->pos().y();
+
+    double x_val = mPathPlot->xAxis->pixelToCoord(x_pos);
+    double y_val = mPathPlot->yAxis->pixelToCoord(y_pos);
+
+    if(radio_obstacle_configure->isChecked())
+    {
+        m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->setGridValue(x_val, y_val, ~selected_grid_colour);
+        MapDataUpdate();
+        selected_grid_colour = 0xA5;
+    }
+    else if(radio_start_gaol_configure->isChecked())
+    {
+        if(m_base_state_index >= 0 && m_base_state_index < 2)
+        {
+            mBaseState[m_base_state_index].x = x_val;
+            mBaseState[m_base_state_index].y = y_val;
+        }
+        if(m_head_state_index >= 0 && m_head_state_index < 2)
+        {
+            Vector2d base, head;
+            base.setX(mBaseState[m_head_state_index].x);
+            base.setY(mBaseState[m_head_state_index].y);
+            head.setX(x_val);
+            head.setY(y_val);
+            mBaseState[m_head_state_index].psi = (head - base).Angle();
+        }
+
+        VectorArrowShow(mBaseState[0], &mHeadState[0], mStartArrow);
+        VectorArrowShow(mBaseState[1], &mHeadState[1], mEndArrow);
+
+        m_OMPL_Planner->ompl_motion_planner(mBaseState[0], mBaseState[1]);
+        ompl_path_show(m_OMPL_Planner->getPath()->getStates(),
+                       m_OMPL_Planner->getOmplSpace()->getSpaceInformation());
+        m_base_state_index = -1;
+        m_head_state_index = -1;
+    }
+    else
+    {
+
+    }
 }
 
 /**
@@ -2203,13 +2329,7 @@ void MainWindow::sMouseReleaseEvent(QMouseEvent *event)
  */
 void MainWindow::sMouseMoveEvent(QMouseEvent *event)
 {
-    if(-1 == m_base_state_index && -1 == m_head_state_index)
-    {
-        return;
-    }
-
     mPathPlot->setInteractions(QCP::iRangeZoom);
-
 
     int x_pos = event->pos().x();
     int y_pos = event->pos().y();
@@ -2217,30 +2337,49 @@ void MainWindow::sMouseMoveEvent(QMouseEvent *event)
     double x_val = mPathPlot->xAxis->pixelToCoord(x_pos);
     double y_val = mPathPlot->yAxis->pixelToCoord(y_pos);
 
-    if(m_base_state_index >= 0 && m_base_state_index < 2)
+    if(radio_obstacle_configure->isChecked())
     {
-        mBaseState[m_base_state_index].x = x_val;
-        mBaseState[m_base_state_index].y = y_val;
+        if(0xA5 == selected_grid_colour)
+        {
+            return;
+        }
+        m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->setGridValue(x_val, y_val, ~selected_grid_colour);
+        MapDataUpdate();
     }
-    if(m_head_state_index >= 0 && m_head_state_index < 2)
+    else if(radio_start_gaol_configure->isChecked())
     {
-        Vector2d base, head;
-        base.setX(mBaseState[m_head_state_index].x);
-        base.setY(mBaseState[m_head_state_index].y);
-        head.setX(x_val);
-        head.setY(y_val);
-        mBaseState[m_head_state_index].psi = (head - base).Angle();
+        if(-1 == m_base_state_index && -1 == m_head_state_index)
+        {
+            return;
+        }
+        if(m_base_state_index >= 0 && m_base_state_index < 2)
+        {
+            mBaseState[m_base_state_index].x = x_val;
+            mBaseState[m_base_state_index].y = y_val;
+        }
+        if(m_head_state_index >= 0 && m_head_state_index < 2)
+        {
+            Vector2d base, head;
+            base.setX(mBaseState[m_head_state_index].x);
+            base.setY(mBaseState[m_head_state_index].y);
+            head.setX(x_val);
+            head.setY(y_val);
+            mBaseState[m_head_state_index].psi = (head - base).Angle();
+        }
+
+        VectorArrowShow(mBaseState[0], &mHeadState[0], mStartArrow);
+        VectorArrowShow(mBaseState[1], &mHeadState[1], mEndArrow);
+
+//        vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
+//        HC_CC_PathShow(path_points);
+
+//        HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
+//        HC_CC_CircleShow(circle_path);
     }
+    else
+    {
 
-    VectorArrowShow(mBaseState[0], &mHeadState[0], mStartArrow);
-    VectorArrowShow(mBaseState[1], &mHeadState[1], mEndArrow);
-
-    vector<State> path_points = mHC_ReedsSheppStateSpace->getPath(mBaseState[0], mBaseState[1]);
-    HC_CC_PathShow(path_points);
-
-    HC_CC_RS_Path* circle_path = mHC_ReedsSheppStateSpace->getCirclePath(mBaseState[0], mBaseState[1]);
-    HC_CC_CircleShow(circle_path);
-
+    }
 }
 
 void MainWindow::sTrackStart(void)
