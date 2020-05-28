@@ -72,16 +72,19 @@ SOURCES += \
         Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.cpp \
         Planning/Interface/hc_cc_state_space.cpp \
         Planning/Interface/planning.cpp \
+    Planning/OMPL_Path/ompl_obstacle.cpp \
+    Planning/OMPL_Path/ompl_planner.cpp \
+    Planning/OMPL_Path/ompl_space.cpp \
         Planning/ParallelParking/parallel_planning.cpp \
         Planning/Path/hc_cc_circle.cpp \
         Planning/Path/hc_cc_rs_path.cpp \
         Planning/Path/path.cpp \
         Planning/Path/path_line.cpp \
         Planning/VerticalParking/vertical_planning.cpp \
+        QCustomPlot/qcustomplot.cpp \
         QCustomPlot/axistag.cpp \
         main.cpp \
         mainwindow.cpp \
-        QCustomPlot/qcustomplot.cpp \
         ompl/base/goals/src/GoalLazySamples.cpp \
         ompl/base/goals/src/GoalRegion.cpp \
         ompl/base/goals/src/GoalState.cpp \
@@ -137,6 +140,62 @@ SOURCES += \
         ompl/base/src/StateSpace.cpp \
         ompl/base/src/StateStorage.cpp \
         ompl/base/src/ValidStateSampler.cpp \
+        ompl/geometric/planners/AnytimePathShortening.cpp \
+        ompl/geometric/planners/bitstar/datastructures/src/ImplicitGraph.cpp \
+        ompl/geometric/planners/bitstar/datastructures/src/SearchQueue.cpp \
+        ompl/geometric/planners/bitstar/datastructures/src/Vertex.cpp \
+        ompl/geometric/planners/bitstar/src/BITstar.cpp \
+        ompl/geometric/planners/cforest/src/CForest.cpp \
+        ompl/geometric/planners/cforest/src/CForestStateSampler.cpp \
+        ompl/geometric/planners/cforest/src/CForestStateSpaceWrapper.cpp \
+        ompl/geometric/planners/est/src/BiEST.cpp \
+        ompl/geometric/planners/est/src/EST.cpp \
+        ompl/geometric/planners/est/src/ProjEST.cpp \
+        ompl/geometric/planners/fmt/src/BFMT.cpp \
+        ompl/geometric/planners/fmt/src/FMT.cpp \
+        ompl/geometric/planners/kpiece/src/BKPIECE1.cpp \
+        ompl/geometric/planners/kpiece/src/KPIECE1.cpp \
+        ompl/geometric/planners/kpiece/src/LBKPIECE1.cpp \
+        ompl/geometric/planners/pdst/src/PDST.cpp \
+        ompl/geometric/planners/prm/src/LazyPRM.cpp \
+        ompl/geometric/planners/prm/src/LazyPRMstar.cpp \
+        ompl/geometric/planners/prm/src/PRM.cpp \
+        ompl/geometric/planners/prm/src/PRMstar.cpp \
+        ompl/geometric/planners/prm/src/SPARS.cpp \
+        ompl/geometric/planners/prm/src/SPARStwo.cpp \
+        ompl/geometric/planners/rrt/src/BiTRRT.cpp \
+        ompl/geometric/planners/rrt/src/InformedRRTstar.cpp \
+        ompl/geometric/planners/rrt/src/LBTRRT.cpp \
+        ompl/geometric/planners/rrt/src/LazyLBTRRT.cpp \
+        ompl/geometric/planners/rrt/src/LazyRRT.cpp \
+        ompl/geometric/planners/rrt/src/RRT.cpp \
+        ompl/geometric/planners/rrt/src/RRTConnect.cpp \
+        ompl/geometric/planners/rrt/src/RRTXstatic.cpp \
+        ompl/geometric/planners/rrt/src/RRTsharp.cpp \
+        ompl/geometric/planners/rrt/src/RRTstar.cpp \
+        ompl/geometric/planners/rrt/src/SORRTstar.cpp \
+        ompl/geometric/planners/rrt/src/TRRT.cpp \
+        ompl/geometric/planners/rrt/src/VFRRT.cpp \
+        ompl/geometric/planners/rrt/src/pRRT.cpp \
+        ompl/geometric/planners/sbl/src/SBL.cpp \
+        ompl/geometric/planners/sbl/src/pSBL.cpp \
+        ompl/geometric/planners/sst/src/SST.cpp \
+        ompl/geometric/planners/stride/src/STRIDE.cpp \
+        ompl/geometric/src/GeneticSearch.cpp \
+        ompl/geometric/src/HillClimbing.cpp \
+        ompl/geometric/src/PathGeometric.cpp \
+        ompl/geometric/src/PathHybridization.cpp \
+        ompl/geometric/src/PathSimplifier.cpp \
+        ompl/geometric/src/SimpleSetup.cpp \
+        ompl/util/src/Console.cpp \
+        ompl/util/src/GeometricEquations.cpp \
+        ompl/util/src/PPM.cpp \
+        ompl/util/src/ProlateHyperspheroid.cpp \
+        ompl/util/src/RandomNumbers.cpp \
+        ompl/util/src/String.cpp \
+        ompl/tools/config/src/SelfConfig.cpp \
+#        ompl/geometric/planners/experience/src/LightningRetrieveRepair.cpp \
+#        ompl/geometric/planners/experience/src/ThunderRetrieveRepair.cpp \
 #        ompl/control/planners/est/src/EST.cpp \
 #        ompl/control/planners/kpiece/src/KPIECE1.cpp \
 #        ompl/control/planners/ltl/src/Automaton.cpp \
@@ -179,58 +238,8 @@ SOURCES += \
 #        ompl/extensions/opende/src/OpenDEStateValidityChecker.cpp \
 #        ompl/extensions/triangle/src/PropositionalTriangularDecomposition.cpp \
 #        ompl/extensions/triangle/src/TriangularDecomposition.cpp \
-        ompl/geometric/planners/AnytimePathShortening.cpp \
-        ompl/geometric/planners/bitstar/datastructures/src/ImplicitGraph.cpp \
-        ompl/geometric/planners/bitstar/datastructures/src/SearchQueue.cpp \
-        ompl/geometric/planners/bitstar/datastructures/src/Vertex.cpp \
-        ompl/geometric/planners/bitstar/src/BITstar.cpp \
-        ompl/geometric/planners/cforest/src/CForest.cpp \
-        ompl/geometric/planners/cforest/src/CForestStateSampler.cpp \
-        ompl/geometric/planners/cforest/src/CForestStateSpaceWrapper.cpp \
-        ompl/geometric/planners/est/src/BiEST.cpp \
-        ompl/geometric/planners/est/src/EST.cpp \
-        ompl/geometric/planners/est/src/ProjEST.cpp \
-#        ompl/geometric/planners/experience/src/LightningRetrieveRepair.cpp \
-#        ompl/geometric/planners/experience/src/ThunderRetrieveRepair.cpp \
-        ompl/geometric/planners/fmt/src/BFMT.cpp \
-        ompl/geometric/planners/fmt/src/FMT.cpp \
-        ompl/geometric/planners/kpiece/src/BKPIECE1.cpp \
-        ompl/geometric/planners/kpiece/src/KPIECE1.cpp \
-        ompl/geometric/planners/kpiece/src/LBKPIECE1.cpp \
-        ompl/geometric/planners/pdst/src/PDST.cpp \
-        ompl/geometric/planners/prm/src/LazyPRM.cpp \
-        ompl/geometric/planners/prm/src/LazyPRMstar.cpp \
-        ompl/geometric/planners/prm/src/PRM.cpp \
-        ompl/geometric/planners/prm/src/PRMstar.cpp \
-        ompl/geometric/planners/prm/src/SPARS.cpp \
-        ompl/geometric/planners/prm/src/SPARStwo.cpp \
-        ompl/geometric/planners/rrt/src/BiTRRT.cpp \
-        ompl/geometric/planners/rrt/src/InformedRRTstar.cpp \
-        ompl/geometric/planners/rrt/src/LBTRRT.cpp \
-        ompl/geometric/planners/rrt/src/LazyLBTRRT.cpp \
-        ompl/geometric/planners/rrt/src/LazyRRT.cpp \
-        ompl/geometric/planners/rrt/src/RRT.cpp \
-        ompl/geometric/planners/rrt/src/RRTConnect.cpp \
-        ompl/geometric/planners/rrt/src/RRTXstatic.cpp \
-        ompl/geometric/planners/rrt/src/RRTsharp.cpp \
-        ompl/geometric/planners/rrt/src/RRTstar.cpp \
-        ompl/geometric/planners/rrt/src/SORRTstar.cpp \
-        ompl/geometric/planners/rrt/src/TRRT.cpp \
-        ompl/geometric/planners/rrt/src/VFRRT.cpp \
-        ompl/geometric/planners/rrt/src/pRRT.cpp \
-        ompl/geometric/planners/sbl/src/SBL.cpp \
-        ompl/geometric/planners/sbl/src/pSBL.cpp \
-        ompl/geometric/planners/sst/src/SST.cpp \
-        ompl/geometric/planners/stride/src/STRIDE.cpp \
-        ompl/geometric/src/GeneticSearch.cpp \
-        ompl/geometric/src/HillClimbing.cpp \
-        ompl/geometric/src/PathGeometric.cpp \
-        ompl/geometric/src/PathHybridization.cpp \
-        ompl/geometric/src/PathSimplifier.cpp \
-        ompl/geometric/src/SimpleSetup.cpp \
 #        ompl/tools/benchmark/src/Benchmark.cpp \
 #        ompl/tools/benchmark/src/MachineSpecs.cpp \
-        ompl/tools/config/src/SelfConfig.cpp \
 #        ompl/tools/debug/src/PlannerMonitor.cpp \
 #        ompl/tools/debug/src/Profiler.cpp \
 #        ompl/tools/experience/src/ExperienceSetup.cpp \
@@ -242,12 +251,6 @@ SOURCES += \
 #        ompl/tools/thunder/src/SPARSdb.cpp \
 #        ompl/tools/thunder/src/Thunder.cpp \
 #        ompl/tools/thunder/src/ThunderDB.cpp \
-        ompl/util/src/Console.cpp \
-        ompl/util/src/GeometricEquations.cpp \
-        ompl/util/src/PPM.cpp \
-        ompl/util/src/ProlateHyperspheroid.cpp \
-        ompl/util/src/RandomNumbers.cpp \
-        ompl/util/src/String.cpp
 
 HEADERS += \
         Common/Configure/Configs/system_config.h \
@@ -303,6 +306,9 @@ HEADERS += \
         Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.h \
         Planning/Interface/hc_cc_state_space.h \
         Planning/Interface/planning.h \
+    Planning/OMPL_Path/ompl_obstacle.h \
+    Planning/OMPL_Path/ompl_planner.h \
+    Planning/OMPL_Path/ompl_space.h \
         Planning/ParallelParking/parallel_planning.h \
         Planning/Path/hc_cc_circle.h \
         Planning/Path/hc_cc_rs_path.h \
@@ -310,9 +316,10 @@ HEADERS += \
         Planning/Path/path_line.h \
         Planning/VerticalParking/vertical_planning.h \
         QCustomPlot/axistag.h \
+        QCustomPlot/qcustomplot.h \
         mainwindow.h \
         stable.h \
-        QCustomPlot/qcustomplot.h \ \
+        ompl/config.h \
         ompl/base/ConstrainedSpaceInformation.h \
         ompl/base/Constraint.h \
         ompl/base/Cost.h \
@@ -384,7 +391,90 @@ HEADERS += \
         ompl/base/spaces/constraint/ConstrainedStateSpace.h \
         ompl/base/spaces/constraint/ProjectedStateSpace.h \
         ompl/base/spaces/constraint/TangentBundleStateSpace.h \
-        ompl/config.h \
+        ompl/datastructures/BinaryHeap.h \
+        ompl/datastructures/DynamicSSSP.h \
+        ompl/datastructures/GreedyKCenters.h \
+        ompl/datastructures/Grid.h \
+        ompl/datastructures/GridB.h \
+        ompl/datastructures/GridN.h \
+        ompl/datastructures/LPAstarOnGraph.h \
+        ompl/datastructures/NearestNeighbors.h \
+        ompl/datastructures/NearestNeighborsFLANN.h \
+        ompl/datastructures/NearestNeighborsGNAT.h \
+        ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h \
+        ompl/datastructures/NearestNeighborsLinear.h \
+        ompl/datastructures/NearestNeighborsSqrtApprox.h \
+        ompl/datastructures/PDF.h \
+        ompl/datastructures/Permutation.h \
+        ompl/geometric/GeneticSearch.h \
+        ompl/geometric/HillClimbing.h \
+        ompl/geometric/PathGeometric.h \
+        ompl/geometric/PathHybridization.h \
+        ompl/geometric/PathSimplifier.h \
+        ompl/geometric/SimpleSetup.h \
+        ompl/geometric/planners/AnytimePathShortening.h \
+        ompl/geometric/planners/PlannerIncludes.h \
+        ompl/geometric/planners/bitstar/BITstar.h \
+        ompl/geometric/planners/bitstar/datastructures/CostHelper.h \
+        ompl/geometric/planners/bitstar/datastructures/HelperFunctions.h \
+        ompl/geometric/planners/bitstar/datastructures/IdGenerator.h \
+        ompl/geometric/planners/bitstar/datastructures/ImplicitGraph.h \
+        ompl/geometric/planners/bitstar/datastructures/SearchQueue.h \
+        ompl/geometric/planners/bitstar/datastructures/Vertex.h \
+        ompl/geometric/planners/cforest/CForest.h \
+        ompl/geometric/planners/cforest/CForestStateSampler.h \
+        ompl/geometric/planners/cforest/CForestStateSpaceWrapper.h \
+        ompl/geometric/planners/est/BiEST.h \
+        ompl/geometric/planners/est/EST.h \
+        ompl/geometric/planners/est/ProjEST.h \
+        ompl/geometric/planners/fmt/BFMT.h \
+        ompl/geometric/planners/fmt/FMT.h \
+        ompl/geometric/planners/kpiece/BKPIECE1.h \
+        ompl/geometric/planners/kpiece/Discretization.h \
+        ompl/geometric/planners/kpiece/KPIECE1.h \
+        ompl/geometric/planners/kpiece/LBKPIECE1.h \
+        ompl/geometric/planners/pdst/PDST.h \
+        ompl/geometric/planners/prm/ConnectionStrategy.h \
+        ompl/geometric/planners/prm/LazyPRM.h \
+        ompl/geometric/planners/prm/LazyPRMstar.h \
+        ompl/geometric/planners/prm/PRM.h \
+        ompl/geometric/planners/prm/PRMstar.h \
+        ompl/geometric/planners/prm/SPARS.h \
+        ompl/geometric/planners/prm/SPARStwo.h \
+        ompl/geometric/planners/prm/src/GoalVisitor.hpp \
+        ompl/geometric/planners/rrt/BiTRRT.h \
+        ompl/geometric/planners/rrt/InformedRRTstar.h \
+        ompl/geometric/planners/rrt/LBTRRT.h \
+        ompl/geometric/planners/rrt/LazyLBTRRT.h \
+        ompl/geometric/planners/rrt/LazyRRT.h \
+        ompl/geometric/planners/rrt/RRT.h \
+        ompl/geometric/planners/rrt/RRTConnect.h \
+        ompl/geometric/planners/rrt/RRTXstatic.h \
+        ompl/geometric/planners/rrt/RRTsharp.h \
+        ompl/geometric/planners/rrt/RRTstar.h \
+        ompl/geometric/planners/rrt/SORRTstar.h \
+        ompl/geometric/planners/rrt/TRRT.h \
+        ompl/geometric/planners/rrt/VFRRT.h \
+        ompl/geometric/planners/rrt/pRRT.h \
+        ompl/geometric/planners/sbl/SBL.h \
+        ompl/geometric/planners/sbl/pSBL.h \
+        ompl/geometric/planners/sst/SST.h \
+        ompl/geometric/planners/stride/STRIDE.h \
+        ompl/util/ClassForward.h \
+        ompl/util/Console.h \
+        ompl/util/Deprecation.h \
+        ompl/util/DisableCompilerWarning.h \
+        ompl/util/Exception.h \
+        ompl/util/GeometricEquations.h \
+        ompl/util/Hash.h \
+        ompl/util/PPM.h \
+        ompl/util/ProlateHyperspheroid.h \
+        ompl/util/RandomNumbers.h \
+        ompl/util/String.h \
+        ompl/util/Time.h \
+        ompl/tools/config/SelfConfig.h \
+#        ompl/geometric/planners/experience/LightningRetrieveRepair.h \
+#        ompl/geometric/planners/experience/ThunderRetrieveRepair.h \
 #        ompl/control/Control.h \
 #        ompl/control/ControlSampler.h \
 #        ompl/control/ControlSpace.h \
@@ -419,21 +509,6 @@ HEADERS += \
 #        ompl/control/planners/syclop/SyclopRRT.h \
 #        ompl/control/spaces/DiscreteControlSpace.h \
 #        ompl/control/spaces/RealVectorControlSpace.h \
-        ompl/datastructures/BinaryHeap.h \
-        ompl/datastructures/DynamicSSSP.h \
-        ompl/datastructures/GreedyKCenters.h \
-        ompl/datastructures/Grid.h \
-        ompl/datastructures/GridB.h \
-        ompl/datastructures/GridN.h \
-        ompl/datastructures/LPAstarOnGraph.h \
-        ompl/datastructures/NearestNeighbors.h \
-        ompl/datastructures/NearestNeighborsFLANN.h \
-        ompl/datastructures/NearestNeighborsGNAT.h \
-        ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h \
-        ompl/datastructures/NearestNeighborsLinear.h \
-        ompl/datastructures/NearestNeighborsSqrtApprox.h \
-        ompl/datastructures/PDF.h \
-        ompl/datastructures/Permutation.h \
 #        ompl/extensions/morse/MorseControlSpace.h \
 #        ompl/extensions/morse/MorseEnvironment.h \
 #        ompl/extensions/morse/MorseGoal.h \
@@ -451,66 +526,9 @@ HEADERS += \
 #        ompl/extensions/opende/OpenDEStateValidityChecker.h \
 #        ompl/extensions/triangle/PropositionalTriangularDecomposition.h \
 #        ompl/extensions/triangle/TriangularDecomposition.h \
-        ompl/geometric/GeneticSearch.h \
-        ompl/geometric/HillClimbing.h \
-        ompl/geometric/PathGeometric.h \
-        ompl/geometric/PathHybridization.h \
-        ompl/geometric/PathSimplifier.h \
-        ompl/geometric/SimpleSetup.h \
-        ompl/geometric/planners/AnytimePathShortening.h \
-        ompl/geometric/planners/PlannerIncludes.h \
-        ompl/geometric/planners/bitstar/BITstar.h \
-        ompl/geometric/planners/bitstar/datastructures/CostHelper.h \
-        ompl/geometric/planners/bitstar/datastructures/HelperFunctions.h \
-        ompl/geometric/planners/bitstar/datastructures/IdGenerator.h \
-        ompl/geometric/planners/bitstar/datastructures/ImplicitGraph.h \
-        ompl/geometric/planners/bitstar/datastructures/SearchQueue.h \
-        ompl/geometric/planners/bitstar/datastructures/Vertex.h \
-        ompl/geometric/planners/cforest/CForest.h \
-        ompl/geometric/planners/cforest/CForestStateSampler.h \
-        ompl/geometric/planners/cforest/CForestStateSpaceWrapper.h \
-        ompl/geometric/planners/est/BiEST.h \
-        ompl/geometric/planners/est/EST.h \
-        ompl/geometric/planners/est/ProjEST.h \
-#        ompl/geometric/planners/experience/LightningRetrieveRepair.h \
-#        ompl/geometric/planners/experience/ThunderRetrieveRepair.h \
-        ompl/geometric/planners/fmt/BFMT.h \
-        ompl/geometric/planners/fmt/FMT.h \
-        ompl/geometric/planners/kpiece/BKPIECE1.h \
-        ompl/geometric/planners/kpiece/Discretization.h \
-        ompl/geometric/planners/kpiece/KPIECE1.h \
-        ompl/geometric/planners/kpiece/LBKPIECE1.h \
-        ompl/geometric/planners/pdst/PDST.h \
-        ompl/geometric/planners/prm/ConnectionStrategy.h \
-        ompl/geometric/planners/prm/LazyPRM.h \
-        ompl/geometric/planners/prm/LazyPRMstar.h \
-        ompl/geometric/planners/prm/PRM.h \
-        ompl/geometric/planners/prm/PRMstar.h \
-        ompl/geometric/planners/prm/SPARS.h \
-        ompl/geometric/planners/prm/SPARStwo.h \
-        ompl/geometric/planners/prm/src/GoalVisitor.hpp \
-        ompl/geometric/planners/rrt/BiTRRT.h \
-        ompl/geometric/planners/rrt/InformedRRTstar.h \
-        ompl/geometric/planners/rrt/LBTRRT.h \
-        ompl/geometric/planners/rrt/LazyLBTRRT.h \
-        ompl/geometric/planners/rrt/LazyRRT.h \
-        ompl/geometric/planners/rrt/RRT.h \
-        ompl/geometric/planners/rrt/RRTConnect.h \
-        ompl/geometric/planners/rrt/RRTXstatic.h \
-        ompl/geometric/planners/rrt/RRTsharp.h \
-        ompl/geometric/planners/rrt/RRTstar.h \
-        ompl/geometric/planners/rrt/SORRTstar.h \
-        ompl/geometric/planners/rrt/TRRT.h \
-        ompl/geometric/planners/rrt/VFRRT.h \
-        ompl/geometric/planners/rrt/pRRT.h \
-        ompl/geometric/planners/sbl/SBL.h \
-        ompl/geometric/planners/sbl/pSBL.h \
-        ompl/geometric/planners/sst/SST.h \
-        ompl/geometric/planners/stride/STRIDE.h \
 #        ompl/tools/benchmark/Benchmark.h \
 #        ompl/tools/benchmark/MachineSpecs.h \
 #        ompl/tools/config/MagicConstants.h \
-        ompl/tools/config/SelfConfig.h \
 #        ompl/tools/debug/PlannerMonitor.h \
 #        ompl/tools/debug/Profiler.h \
 #        ompl/tools/experience/ExperienceSetup.h \
@@ -522,21 +540,9 @@ HEADERS += \
 #        ompl/tools/thunder/SPARSdb.h \
 #        ompl/tools/thunder/Thunder.h \
 #        ompl/tools/thunder/ThunderDB.h \
-        ompl/util/ClassForward.h \
-        ompl/util/Console.h \
-        ompl/util/Deprecation.h \
-        ompl/util/DisableCompilerWarning.h \
-        ompl/util/Exception.h \
-        ompl/util/GeometricEquations.h \
-        ompl/util/Hash.h \
-        ompl/util/PPM.h \
-        ompl/util/ProlateHyperspheroid.h \
-        ompl/util/RandomNumbers.h \
-        ompl/util/String.h \
-        ompl/util/Time.h \
 
 
-LIBS += -L$$PWD/WinZlgCan/ -lControlCAN
+#LIBS += -L$$PWD/WinZlgCan/ -lControlCAN
 
 LIBS += "C:/Boost/lib/libboost_date_time-mgw7-mt-x64-1_73.a"
 LIBS += "C:/Boost/lib/libboost_thread-mgw7-mt-x64-1_73.a"
@@ -544,9 +550,7 @@ LIBS += "C:/Boost/lib/libboost_serialization-mgw7-mt-x64-1_73.a"
 LIBS += "C:/Boost/lib/libboost_filesystem-mgw7-mt-x64-1_73.a"
 LIBS += "C:/Boost/lib/libboost_system-mgw7-mt-x64-1_73.a"
 LIBS += "C:/Boost/lib/libboost_program_options-mgw7-mt-x64-1_73.a"
-#LIBS += "C:/Boost/lib/libboost_test_exec_monitor-mgw7-mt-x64-1_73.a"
 LIBS += "C:/Boost/lib/libboost_chrono-mgw7-mt-x64-1_73.a"
-
 
 INCLUDEPATH += C:\eigen-3.3.7
 INCLUDEPATH += C:\Boost\include\boost-1_73
