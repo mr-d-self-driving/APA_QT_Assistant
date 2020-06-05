@@ -241,3 +241,166 @@ inline State HC_CC_StateSpace::integrate_ODE(const State &state, const Control &
     }
     return state_next;
 }
+
+double HC_CC_StateSpace::distance(const ob::State *state1, const ob::State *state2) const
+{
+    const auto *s1 = static_cast<const StateType *>(state1);
+    const auto *s2 = static_cast<const StateType *>(state2);
+
+    steering::State xstate1, xstate2;
+    xstate1.x       = s1->getX();
+    xstate1.y       = s1->getY();
+    xstate1.psi     = s1->getYaw();
+    xstate1.kappa   = s1->getKappa();
+    xstate1.d       = s1->getDirection();
+
+    xstate2.x       = s2->getX();
+    xstate2.y       = s2->getY();
+    xstate2.psi     = s2->getYaw();
+    xstate2.kappa   = s2->getKappa();
+    xstate2.d       = s2->getDirection();
+
+    return getDistance(xstate1, xstate2);
+}
+
+void HC_CC_StateSpace::interpolate(const ob::State *from, const ob::State *to, double t, ob::State *state) const
+{
+    if (t >= 1.)
+    {
+        if (to != state)
+            copyState(state, to);
+        return;
+    }
+    if (t <= 0.)
+    {
+        if (from != state)
+            copyState(state, from);
+        return;
+    }
+    State state_start, state_end;
+    const auto *s1 = static_cast<const StateType *>(from);
+    const auto *s2 = static_cast<const StateType *>(to);
+
+    state_start.x       = s1->getX();
+    state_start.y       = s1->getY();
+    state_start.psi     = s1->getYaw();
+    state_start.kappa   = s1->getKappa();
+    state_start.d       = s1->getDirection();
+
+    state_end.x       = s2->getX();
+    state_end.y       = s2->getY();
+    state_end.psi     = s2->getYaw();
+    state_end.kappa   = s2->getKappa();
+    state_end.d       = s2->getDirection();
+
+    vector<Control> controls = getControls(state_start, state_end);
+    State state_temp = interpolate(state_start, controls, t);
+    state->as<StateType>()->setX(state_temp.x);
+    state->as<StateType>()->setY(state_temp.y);
+    state->as<StateType>()->setYaw(state_temp.psi);
+    state->as<StateType>()->setKappa(state_temp.kappa);
+    state->as<StateType>()->setDirection(state_temp.d);
+}
+
+
+void HC_CC_ReedsSheppMotionValidator::defaultSettings()
+{
+    stateSpace_ = dynamic_cast<HC_CC_StateSpace *>(si_->getStateSpace().get());
+//    if (stateSpace_ == nullptr)
+//        throw ob::Exception("No state space for motion validator");
+}
+
+bool HC_CC_ReedsSheppMotionValidator::checkMotion(const ob::State *s1, const ob::State *s2) const
+{
+    /* assume motion starts in a valid configuration so s1 is valid */
+    if (!si_->isValid(s2))
+        return false;
+
+    bool result = true;
+    int nd = stateSpace_->validSegmentCount(s1, s2);
+
+    /* initialize the queue of test positions */
+    std::queue<std::pair<int, int>> pos;
+    if (nd >= 2)
+    {
+        pos.push(std::make_pair(1, nd - 1));
+
+        /* temporary storage for the checked state */
+        ob::State *test = si_->allocState();
+
+        /* repeatedly subdivide the path segment in the middle (and check the middle) */
+        while (!pos.empty())
+        {
+            std::pair<int, int> x = pos.front();
+
+            int mid = (x.first + x.second) / 2;
+            stateSpace_->interpolate(s1, s2, (double)mid / (double)nd, test);
+
+            if (!si_->isValid(test))
+            {
+                result = false;
+                break;
+            }
+
+            pos.pop();
+
+            if (x.first < mid)
+                pos.push(std::make_pair(x.first, mid - 1));
+            if (x.second > mid)
+                pos.push(std::make_pair(mid + 1, x.second));
+        }
+        si_->freeState(test);
+    }
+
+    if (result)
+        valid_++;
+    else
+        invalid_++;
+
+    return result;
+}
+
+bool HC_CC_ReedsSheppMotionValidator::checkMotion(const ob::State *s1, const ob::State *s2, std::pair<ob::State *, double> &lastValid) const
+{
+    /* assume motion starts in a valid configuration so s1 is valid */
+
+    bool result = true, firstTime = true;
+    int nd = stateSpace_->validSegmentCount(s1, s2);
+
+    if (nd > 1)
+    {
+        /* temporary storage for the checked state */
+        ob::State *test = si_->allocState();
+
+        for (int j = 1; j < nd; ++j)
+        {
+            stateSpace_->interpolate(s1, s2, (double)j / (double)nd, test);
+            if (!si_->isValid(test))
+            {
+                lastValid.second = (double)(j - 1) / (double)nd;
+                if (lastValid.first != nullptr)
+                    stateSpace_->interpolate(s1, s2, lastValid.second, lastValid.first);
+                result = false;
+                break;
+            }
+        }
+        si_->freeState(test);
+    }
+
+    if (result)
+        if (!si_->isValid(s2))
+        {
+            lastValid.second = (double)(nd - 1) / (double)nd;
+            if (lastValid.first != nullptr)
+                stateSpace_->interpolate(s1, s2, lastValid.second, lastValid.first);
+            result = false;
+        }
+
+    if (result)
+        valid_++;
+    else
+        invalid_++;
+
+    return result;
+}
+

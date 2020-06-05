@@ -16,6 +16,8 @@
 #include <fstream>
 
 #include "Planning/OMPL_Path/ompl_obstacle.h"
+#include "Planning/HC_CC_StateSpace/hc_reeds_shepp_state_space.h"
+
 
 namespace ob = ompl::base;
 

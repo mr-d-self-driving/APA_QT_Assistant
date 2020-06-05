@@ -7,14 +7,20 @@
 #include "Planning/Common/steering_common.h"
 #include "Planning/Path/hc_cc_circle.h"
 #include "Planning/Path/path_line.h"
+#include "Planning/Interface/sh2_state_space.h"
 #include "Common/Math/fresnel.h"
 #include "Common/Math/math_utils.h"
 
+#include "ompl/base/SpaceInformation.h"
+#include "ompl/base/StateValidityChecker.h"
+#include "ompl/base/spaces/SE2StateSpace.h"
+#include "ompl/base/MotionValidator.h"
+
 using namespace std;
 using namespace steering;
+namespace ob = ompl::base;
 
-
-class HC_CC_StateSpace
+class HC_CC_StateSpace : public SH2StateSpace
 {
 public:
     /**
@@ -33,7 +39,15 @@ public:
      * @param state2 :the end state
      * @return the controls
      */
-    virtual vector<Control> getControls(const State &state1, const State &state2) const= 0;
+    virtual vector<Control> getControls(const State &state1, const State &state2) const = 0;
+
+    /**
+     * @brief Returns shortest path length from state1 to state2
+     * @param state1
+     * @param state2
+     * @return the shortest path length
+     */
+    virtual double getDistance(const State &state1, const State &state2) const = 0;
 
     /**
      * @brief get the path from state1 to state2
@@ -69,6 +83,11 @@ public:
      */
     inline State integrate_ODE(const State &state, const Control &control, double integration_step) const;
 
+
+    double distance(const ob::State *state1, const ob::State *state2) const override;
+
+    void interpolate(const ob::State *from, const ob::State *to, double t, ob::State *state) const override;
+
 protected:
 
     /**
@@ -92,4 +111,30 @@ protected:
     HC_CC_Circle_Param _hc_cc_circle_param;
 };
 
+
+/** \brief A Reeds-Shepp motion validator that only uses the state validity checker.
+    Motions are checked for validity at a specified resolution.
+
+    This motion validator is almost identical to the DiscreteMotionValidator
+    except that it remembers the optimal ReedsSheppPath between different calls to
+    interpolate. */
+class HC_CC_ReedsSheppMotionValidator : public ob::MotionValidator
+{
+public:
+    HC_CC_ReedsSheppMotionValidator(ob::SpaceInformation *si) : MotionValidator(si)
+    {
+        defaultSettings();
+    }
+    HC_CC_ReedsSheppMotionValidator(const ob::SpaceInformationPtr &si) : MotionValidator(si)
+    {
+        defaultSettings();
+    }
+    ~HC_CC_ReedsSheppMotionValidator() override = default;
+    bool checkMotion(const ob::State *s1, const ob::State *s2) const override;
+    bool checkMotion(const ob::State *s1, const ob::State *s2, std::pair<ob::State *, double> &lastValid) const override;
+
+private:
+    HC_CC_StateSpace *stateSpace_;
+    void defaultSettings();
+};
 #endif // HC_CC_STATESPACE_H

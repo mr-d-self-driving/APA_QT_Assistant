@@ -72,6 +72,7 @@ SOURCES += \
         Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.cpp \
         Planning/Interface/hc_cc_state_space.cpp \
         Planning/Interface/planning.cpp \
+    Planning/Interface/sh2_state_space.cpp \
     Planning/OMPL_Path/ompl_obstacle.cpp \
     Planning/OMPL_Path/ompl_planner.cpp \
     Planning/OMPL_Path/ompl_space.cpp \
@@ -306,6 +307,7 @@ HEADERS += \
         Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.h \
         Planning/Interface/hc_cc_state_space.h \
         Planning/Interface/planning.h \
+    Planning/Interface/sh2_state_space.h \
     Planning/OMPL_Path/ompl_obstacle.h \
     Planning/OMPL_Path/ompl_planner.h \
     Planning/OMPL_Path/ompl_space.h \

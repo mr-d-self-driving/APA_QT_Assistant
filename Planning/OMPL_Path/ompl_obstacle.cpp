@@ -8,7 +8,8 @@
  */
 bool OMPL_Obstacle::isValid(const ob::State* state) const
 {
-    return getObstacleIndex(state) == 0;
+//    return getObstacleIndex(state) == 0;
+    return ObstacleChecker(state);
 }
 
 /**
@@ -76,6 +77,42 @@ uint8_t OMPL_Obstacle::getObstacleIndex(const ob::State* state)const
     // Distance formula between two points, offset by the circle's
     // radius
     return ObstacleArray[x_index * BOUNDARY_Y_SIZE + y_index];
+}
+
+/**
+ * @brief getObstacleIndex
+ * @param state :the input state
+ * @return return the obstacle result
+ */
+bool OMPL_Obstacle::ObstacleChecker(const ob::State* state)const
+{
+    // We know we're working with a RealVectorStateSpace in this
+    // example, so we downcast state into the specific type.
+    const auto* stateE2 = state->as<ob::SE2StateSpace::StateType>();
+
+    // Extract the robot's (x,y) position from its state
+    double x = stateE2->getX();
+    double y = stateE2->getY();
+
+    int16_t x_index, y_index;
+    uint16_t step_len = 1;
+    this->getDiscreteStateIndex(x, y, x_index, y_index);
+
+    for (int i = x_index - step_len > 0 ? x_index - step_len : 0;
+         i < ( (x_index + step_len) < BOUNDARY_X_SIZE ? x_index + step_len : BOUNDARY_X_SIZE - 1);
+         i++)
+    {
+        for (int j = y_index - step_len > 0 ? y_index - step_len : 0;
+             j < ( (y_index + step_len) < BOUNDARY_Y_SIZE ? y_index + step_len : BOUNDARY_Y_SIZE - 1);
+             j++)
+        {
+            if(ObstacleArray[i * BOUNDARY_Y_SIZE + j] == 255)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 /**
  * @brief base on the current point return the grid colour value

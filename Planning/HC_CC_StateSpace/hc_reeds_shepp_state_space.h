@@ -15,8 +15,11 @@
 #include "Planning/HC_CC_StateSpace/hcpm0_reeds_shepp_state_space.h"
 #include "Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.h"
 
+#include "ompl/base/State.h"
+
 using namespace std;
 using namespace steering;
+namespace ob = ompl::base;
 
 class HC_ReedsSheppStateSpace : public HC_CC_StateSpace
 {
@@ -27,7 +30,7 @@ public:
      * @param sigma :the max sharpness of the path
      * @param discretization :the discretization step
      */
-    HC_ReedsSheppStateSpace(double kappa, double sigma, double discretization = 0.1);
+    HC_ReedsSheppStateSpace(double kappa = 0.2, double sigma = 0.2, double discretization = 0.02);
 
     /**
      * @brief Destructor
@@ -47,7 +50,10 @@ public:
      * @param state2
      * @return the shortest path length
      */
-    double getDistance(const State &state1, const State &state2) const;
+    double getDistance(const State &state1, const State &state2) const override;
+
+//    double distance(const ob::State *state1, const ob::State *state2) const;
+
 
     HC_CC_RS_Path* getCirclePath(const State &state1, const State &state2) const;
 

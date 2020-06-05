@@ -5,6 +5,8 @@
 #include "ompl/base/spaces/ReedsSheppStateSpace.h"
 
 #include "ompl/base/objectives/PathLengthOptimizationObjective.h"
+#include "ompl/base/objectives/StateCostIntegralObjective.h"
+#include "ompl/base/objectives/MaximizeMinClearanceObjective.h"
 
 #include "ompl/base/SpaceInformation.h"
 #include "ompl/base/ScopedState.h"
@@ -12,6 +14,9 @@
 #include "ompl/geometric/SimpleSetup.h"
 #include "ompl/geometric/PathGeometric.h"
 #include "ompl/geometric/planners/rrt/RRTstar.h"
+#include "ompl/geometric/planners/rrt/RRTsharp.h"
+#include "ompl/geometric/planners/rrt/RRTXstatic.h"
+#include "ompl/geometric/planners/rrt/LBTRRT.h"
 
 #include <boost/program_options.hpp>
 

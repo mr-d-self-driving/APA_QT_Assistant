@@ -76,6 +76,13 @@ public:
     uint8_t getObstacleIndex(const ob::State* state)const;
 
     /**
+     * @brief getObstacleIndex
+     * @param state :the input state
+     * @return return the obstacle result
+     */
+    bool ObstacleChecker(const ob::State* state)const;
+
+    /**
      * @brief base on the current point return the grid colour value
      * @param x :the x axis grid position
      * @param y :the y axis grid position

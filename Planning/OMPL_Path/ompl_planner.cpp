@@ -13,6 +13,33 @@ ob::OptimizationObjectivePtr OMPL_Planner::getPathLengthObjective(const ob::Spac
     return std::make_shared<ob::PathLengthOptimizationObjective>(si);
 }
 
+class ClearanceObjective : public ob::StateCostIntegralObjective
+{
+public:
+    ClearanceObjective(const ob::SpaceInformationPtr& si) :
+        ob::StateCostIntegralObjective(si, true)
+    {
+    }
+
+    // Our requirement is to maximize path clearance from obstacles,
+    // but we want to represent the objective as a path cost
+    // minimization. Therefore, we set each state's cost to be the
+    // reciprocal of its clearance, so that as state clearance
+    // increases, the state cost decreases.
+    ob::Cost stateCost(const ob::State* s) const override
+    {
+        return ob::Cost(1 / (si_->getStateValidityChecker()->clearance(s) +
+            std::numeric_limits<double>::min()));
+    }
+};
+
+/** Return an optimization objective which attempts to steer the robot
+    away from obstacles. */
+ob::OptimizationObjectivePtr getClearanceObjective(const ob::SpaceInformationPtr& si)
+{
+    return std::make_shared<ClearanceObjective>(si);
+}
+
 void OMPL_Planner::ompl_motion_planner(State set_start, State set_end)
 {
     ob::ScopedState<> start(_ompl_space->getSpace()), goal(_ompl_space->getSpace());
@@ -29,7 +56,9 @@ void OMPL_Planner::ompl_motion_planner(State set_start, State set_end)
 
     _ss->setStartAndGoalStates(start, goal);
 
-//    _ss->setPlanner( std::make_shared<og::RRTstar>(_ompl_space->getSpaceInformation()) );
+    _ss->setOptimizationObjective(getClearanceObjective(_ompl_space->getSpaceInformation()));
+
+    _ss->setPlanner( std::make_shared<og::RRTsharp>(_ompl_space->getSpaceInformation()) );
 
     _ss->setup();
 
