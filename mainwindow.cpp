@@ -3,7 +3,7 @@
 
 using Eigen::MatrixXd;
 using namespace math;
-using namespace ompl;
+//using namespace ompl;
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -866,21 +866,21 @@ void MainWindow::G2_PlanUI(void)
     mPathPlot->xAxis->setLabel("x");
     mPathPlot->yAxis->setLabel("y");
 
-    mPathPlot->xAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
-                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[0]);
-    mPathPlot->yAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
-                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]);
+//    mPathPlot->xAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
+//                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[0]);
+//    mPathPlot->yAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
+//                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]);
 
-    SpaceInformationMap = new QCPColorMap(mPathPlot->xAxis,mPathPlot->yAxis);
-    SpaceInformationMap->setName("地图");
-    SpaceInformationMap->setInterpolate(false);
-    SpaceInformationMap->setTightBoundary(true);
-    SpaceInformationMap->data()->setSize(m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(),
-                                         m_OMPL_Planner->getOmplSpace()->getBoundarySizeY());
-    SpaceInformationMap->data()->setRange(QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
-                                                   m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[0]),
-                                          QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
-                                                   m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]));
+//    SpaceInformationMap = new QCPColorMap(mPathPlot->xAxis,mPathPlot->yAxis);
+//    SpaceInformationMap->setName("地图");
+//    SpaceInformationMap->setInterpolate(false);
+//    SpaceInformationMap->setTightBoundary(true);
+//    SpaceInformationMap->data()->setSize(m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(),
+//                                         m_OMPL_Planner->getOmplSpace()->getBoundarySizeY());
+//    SpaceInformationMap->data()->setRange(QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
+//                                                   m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[0]),
+//                                          QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
+//                                                   m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]));
     SpaceInformationMap->setGradient(QCPColorGradient::gpGrayscale);
     SpaceInformationMap->rescaleDataRange(true);
     SpaceInformationMap->rescaleAxes();
@@ -1198,7 +1198,7 @@ void MainWindow::Init()
 
     mHC_ReedsSheppStateSpace = new HC_ReedsSheppStateSpace(0.2, 0.215, 0.02);
 
-    m_OMPL_Planner = new OMPL_Planner();
+//    m_OMPL_Planner = new OMPL_Planner();
 
     m_base_state_index = -1;
     m_head_state_index = -1;
@@ -1445,15 +1445,15 @@ void MainWindow::SteeringAngleShow(float angle)
  */
 void MainWindow::MapDataUpdate()
 {
-    for(int i = 0; i< m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(); i++)
-    {
-        for (int j = 0; j < m_OMPL_Planner->getOmplSpace()->getBoundarySizeY(); j++)
-        {
-            SpaceInformationMap->data()->setAlpha(i, j,
-                                                  *(m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->getObstacleArray() +
-                                                    i * m_OMPL_Planner->getOmplSpace()->getBoundarySizeY() + j));
-        }
-    }
+//    for(int i = 0; i< m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(); i++)
+//    {
+//        for (int j = 0; j < m_OMPL_Planner->getOmplSpace()->getBoundarySizeY(); j++)
+//        {
+//            SpaceInformationMap->data()->setAlpha(i, j,
+//                                                  *(m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->getObstacleArray() +
+//                                                    i * m_OMPL_Planner->getOmplSpace()->getBoundarySizeY() + j));
+//        }
+//    }
 }
 
 
@@ -1534,20 +1534,20 @@ void MainWindow::MapDataUpdate()
 //    }
 //}
 
-void MainWindow::ompl_path_show(std::vector<ompl::base::State *> xstate,
-                                const ob::SpaceInformationPtr& si)
-{
-    const ompl::base::StateSpace *space(si->getStateSpace().get());
-    std::vector<double> reals;
-    QVector<double> path_x, path_y;
-    for (auto state : xstate)
-    {
-        space->copyToReals(reals, state);
-        path_x.push_back(reals.at(0));
-        path_y.push_back(reals.at(1));
-    }
-    mPathPlanningClothoid->setData(path_x, path_y);
-}
+//void MainWindow::ompl_path_show(std::vector<ompl::base::State *> xstate,
+//                                const ob::SpaceInformationPtr& si)
+//{
+//    const ompl::base::StateSpace *space(si->getStateSpace().get());
+//    std::vector<double> reals;
+//    QVector<double> path_x, path_y;
+//    for (auto state : xstate)
+//    {
+//        space->copyToReals(reals, state);
+//        path_x.push_back(reals.at(0));
+//        path_y.push_back(reals.at(1));
+//    }
+//    mPathPlanningClothoid->setData(path_x, path_y);
+//}
 /**
  * @brief MainWindow::FileDataInit 注入文件数据的缓存区初始化
  * @param  None
@@ -2242,7 +2242,7 @@ void MainWindow::sMousePressEvent(QMouseEvent *event)
 
     if(radio_obstacle_configure->isChecked())
     {
-        selected_grid_colour = m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->getCurrentGridColour(x_val, y_val);
+//        selected_grid_colour = m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->getCurrentGridColour(x_val, y_val);
     }
     else if(radio_start_gaol_configure->isChecked())
     {
@@ -2287,8 +2287,8 @@ void MainWindow::sMouseReleaseEvent(QMouseEvent *event)
 
     if(radio_obstacle_configure->isChecked())
     {
-        m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->setGridValue(x_val, y_val, ~selected_grid_colour);
-        MapDataUpdate();
+//        m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->setGridValue(x_val, y_val, ~selected_grid_colour);
+//        MapDataUpdate();
         selected_grid_colour = 0xA5;
     }
     else if(radio_start_gaol_configure->isChecked())
@@ -2311,9 +2311,9 @@ void MainWindow::sMouseReleaseEvent(QMouseEvent *event)
         VectorArrowShow(mBaseState[0], &mHeadState[0], mStartArrow);
         VectorArrowShow(mBaseState[1], &mHeadState[1], mEndArrow);
 
-        m_OMPL_Planner->ompl_motion_planner(mBaseState[0], mBaseState[1]);
-        ompl_path_show(m_OMPL_Planner->getPath()->getStates(),
-                       m_OMPL_Planner->getOmplSpace()->getSpaceInformation());
+//        m_OMPL_Planner->ompl_motion_planner(mBaseState[0], mBaseState[1]);
+//        ompl_path_show(m_OMPL_Planner->getPath()->getStates(),
+//                       m_OMPL_Planner->getOmplSpace()->getSpaceInformation());
         m_base_state_index = -1;
         m_head_state_index = -1;
     }
@@ -2343,7 +2343,7 @@ void MainWindow::sMouseMoveEvent(QMouseEvent *event)
         {
             return;
         }
-        m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->setGridValue(x_val, y_val, ~selected_grid_colour);
+//        m_OMPL_Planner->getOmplSpace()->getOmplObstacle()->setGridValue(x_val, y_val, ~selected_grid_colour);
         MapDataUpdate();
     }
     else if(radio_start_gaol_configure->isChecked())

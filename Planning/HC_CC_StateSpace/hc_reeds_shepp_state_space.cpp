@@ -150,27 +150,6 @@ double HC_ReedsSheppStateSpace::getDistance(const State &state1, const State &st
     return *min_element(distances.begin(), distances.end());
 }
 
-//double HC_ReedsSheppStateSpace::distance(const State *state1, const State *state2) const
-//{
-//    const auto *s1 = static_cast<const HC_StateType *>(state1);
-//    const auto *s2 = static_cast<const HC_StateType *>(state2);
-
-//    steering::State xstate1, xstate2;
-//    xstate1.x       = s1->getX();
-//    xstate1.y       = s1->getY();
-//    xstate1.psi     = s1->getYaw();
-//    xstate1.kappa   = s1->getKappa();
-//    xstate1.d       = s1->getDirection();
-
-//    xstate2.x       = s2->getX();
-//    xstate2.y       = s2->getY();
-//    xstate2.psi     = s2->getYaw();
-//    xstate2.kappa   = s2->getKappa();
-//    xstate2.d       = s2->getDirection();
-
-//    return getDistance(xstate1, xstate2);
-//}
-
 HC_CC_RS_Path* HC_ReedsSheppStateSpace::getCirclePath(const State &state1, const State &state2) const
 {
 

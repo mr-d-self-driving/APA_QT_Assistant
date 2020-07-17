@@ -6,7 +6,7 @@
 #include "Common/Configure/Configs/system_config.h"
 
 namespace math{
-    const double _epsilon = 1.0e-6;
+    const double _epsilon = 1.0e-15;
     /**
      * @brief Normallize Angle to [-PI,PI)
      * @param angle:the original value of the angle

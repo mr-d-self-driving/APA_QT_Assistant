@@ -15,11 +15,11 @@
 #include "Planning/HC_CC_StateSpace/hcpm0_reeds_shepp_state_space.h"
 #include "Planning/HC_CC_StateSpace/hcpmpm_reeds_shepp_state_space.h"
 
-#include "ompl/base/State.h"
+//#include "ompl/base/State.h"
 
 using namespace std;
 using namespace steering;
-namespace ob = ompl::base;
+//namespace ob = ompl::base;
 
 class HC_ReedsSheppStateSpace : public HC_CC_StateSpace
 {

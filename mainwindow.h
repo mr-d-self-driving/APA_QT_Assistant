@@ -15,11 +15,11 @@
 #include <Eigen/Dense>
 
 
-#include "ompl/base/spaces/DubinsStateSpace.h"
-#include "ompl/base/spaces/ReedsSheppStateSpace.h"
-#include "ompl/base/ScopedState.h"
-#include "ompl/geometric/SimpleSetup.h"
-#include <boost/program_options.hpp>
+//#include "ompl/base/spaces/DubinsStateSpace.h"
+//#include "ompl/base/spaces/ReedsSheppStateSpace.h"
+//#include "ompl/base/ScopedState.h"
+//#include "ompl/geometric/SimpleSetup.h"
+//#include <boost/program_options.hpp>
 
 /**
  * @brief ZLG CAN 驱动
@@ -40,7 +40,7 @@
 #include "Planning/ParallelParking/parallel_planning.h"
 #include "Planning/VerticalParking/vertical_planning.h"
 #include "Planning/HC_CC_StateSpace/hc_reeds_shepp_state_space.h"
-#include "Planning/OMPL_Path/ompl_planner.h"
+//#include "Planning/OMPL_Path/ompl_planner.h"
 /**
  * @brief 控制
  */
@@ -144,8 +144,8 @@ private:
 
     // ompl planner test
 //    void ompl_motion_planner(State start, State end);
-    void ompl_path_show(std::vector<ompl::base::State *> state,
-                        const ob::SpaceInformationPtr& si);
+//    void ompl_path_show(std::vector<ompl::base::State *> state,
+//                        const ob::SpaceInformationPtr& si);
 
     void DetectTask(void);
     void PlanTask(void);
@@ -330,7 +330,7 @@ private:
     VerticalPlanning *mVerticalPlanning;
     Curvature        *mCurvature;
     HC_ReedsSheppStateSpace *mHC_ReedsSheppStateSpace;
-    OMPL_Planner *m_OMPL_Planner;
+//    OMPL_Planner *m_OMPL_Planner;
     /**
      * @brief 箭头显示相关参数
      */

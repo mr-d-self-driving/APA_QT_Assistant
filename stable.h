@@ -112,13 +112,22 @@
 //#include <Eigen/Core>
 //#include <Eigen/Dense>
 
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/concept_check.hpp>
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/utility.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/graph_traits.hpp>
+//#include <boost/archive/binary_oarchive.hpp>
+//#include <boost/archive/binary_iarchive.hpp>
+//#include <boost/concept_check.hpp>
+//#include <boost/serialization/access.hpp>
+//#include <boost/serialization/vector.hpp>
+//#include <boost/serialization/utility.hpp>
+//#include <boost/graph/adjacency_list.hpp>
+//#include <boost/graph/graph_traits.hpp>
+
+#ifdef far
+#undef far
+#endif
+
+#ifdef near
+#undef near
+#endif
+
 #endif
 //! [0]
