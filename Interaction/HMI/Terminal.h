@@ -19,7 +19,7 @@
 
 #include <QMainWindow>
 
-#include "WinZlgCan/win_zlg_can.h"
+//#include "WinZlgCan/win_zlg_can.h"
 
 #include "./Common/Utils/Inc/property.h"
 #include "./Common/VehicleState/Interface/vehicle_state.h"
@@ -64,7 +64,7 @@ public:
 
 //    void Parse(VCI_CAN_OBJ *obj,Ultrasonic *u);
 
-    void Parse(VCI_CAN_OBJ obj,Percaption *pct);
+//    void Parse(VCI_CAN_OBJ obj,Percaption *pct);
 
 //    void Parse(VCI_CAN_OBJ *obj);
 	// Terminal Control

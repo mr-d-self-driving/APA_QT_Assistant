@@ -240,32 +240,32 @@ void    Terminal::setPushActive(uint8_t value){_push_active = value;}
 //	}
 //}
 
-void Terminal::Parse(VCI_CAN_OBJ obj,Percaption *pct)
-{
-    Byte2Int temp_int;
-    ObstacleDistancePacket obstacle_temp;
-    switch(obj.ID)
-	{
-        case 0x44D:
-            temp_int.b[0] = obj.Data[0];
-            temp_int.b[1] = obj.Data[1];
-            obstacle_temp.distance = temp_int.u16 * 0.0001f;
-            obstacle_temp.region   = static_cast<ObstacleRegion>(obj.Data[2]);
-            obstacle_temp.status   = static_cast<UltrasonicStatus>(obj.Data[3]);
-            pct->setFrontObstacleDistance(obstacle_temp);
+//void Terminal::Parse(VCI_CAN_OBJ obj,Percaption *pct)
+//{
+//    Byte2Int temp_int;
+//    ObstacleDistancePacket obstacle_temp;
+//    switch(obj.ID)
+//	{
+//        case 0x44D:
+//            temp_int.b[0] = obj.Data[0];
+//            temp_int.b[1] = obj.Data[1];
+//            obstacle_temp.distance = temp_int.u16 * 0.0001f;
+//            obstacle_temp.region   = static_cast<ObstacleRegion>(obj.Data[2]);
+//            obstacle_temp.status   = static_cast<UltrasonicStatus>(obj.Data[3]);
+//            pct->setFrontObstacleDistance(obstacle_temp);
 
-            temp_int.b[0] = obj.Data[4];
-            temp_int.b[1] = obj.Data[5];
-            obstacle_temp.distance = temp_int.u16 * 0.0001f;
-            obstacle_temp.region   = static_cast<ObstacleRegion>(obj.Data[6]);
-            obstacle_temp.status   = static_cast<UltrasonicStatus>(obj.Data[7]);
-            pct->setRearObstacleDistance(obstacle_temp);
-        	break;
+//            temp_int.b[0] = obj.Data[4];
+//            temp_int.b[1] = obj.Data[5];
+//            obstacle_temp.distance = temp_int.u16 * 0.0001f;
+//            obstacle_temp.region   = static_cast<ObstacleRegion>(obj.Data[6]);
+//            obstacle_temp.status   = static_cast<UltrasonicStatus>(obj.Data[7]);
+//            pct->setRearObstacleDistance(obstacle_temp);
+//        	break;
 
-		default:
-			break;
-	}
-}
+//		default:
+//			break;
+//	}
+//}
 
 //void Terminal::Parse(VCI_CAN_OBJ *obj)
 //{

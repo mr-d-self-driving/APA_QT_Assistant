@@ -24,8 +24,8 @@
 /**
  * @brief ZLG CAN 驱动
  */
-#include "WinZlgCan/win_zlg_can.h"
-#include "WinZlgCan/can_rev_work_thread.h"
+//#include "WinZlgCan/win_zlg_can.h"
+//#include "WinZlgCan/can_rev_work_thread.h"
 
 /**
  * @brief 交互

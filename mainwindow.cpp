@@ -871,10 +871,10 @@ void MainWindow::G2_PlanUI(void)
 //    mPathPlot->yAxis->setRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[1],
 //                               m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().high[1]);
 
-//    SpaceInformationMap = new QCPColorMap(mPathPlot->xAxis,mPathPlot->yAxis);
-//    SpaceInformationMap->setName("地图");
-//    SpaceInformationMap->setInterpolate(false);
-//    SpaceInformationMap->setTightBoundary(true);
+    SpaceInformationMap = new QCPColorMap(mPathPlot->xAxis,mPathPlot->yAxis);
+    SpaceInformationMap->setName("地图");
+    SpaceInformationMap->setInterpolate(false);
+    SpaceInformationMap->setTightBoundary(true);
 //    SpaceInformationMap->data()->setSize(m_OMPL_Planner->getOmplSpace()->getBoundarySizeX(),
 //                                         m_OMPL_Planner->getOmplSpace()->getBoundarySizeY());
 //    SpaceInformationMap->data()->setRange(QCPRange(m_OMPL_Planner->getOmplSpace()->getObstacleBoundary().low[0],
